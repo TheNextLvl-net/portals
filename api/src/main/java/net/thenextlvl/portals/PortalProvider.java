@@ -1,6 +1,8 @@
 package net.thenextlvl.portals;
 
+import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 
@@ -9,9 +11,14 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
+ * Get an instance of this class via {@link org.bukkit.plugin.ServicesManager#load(Class)}.
+ * <p>
+ * {@code PortalProvider provider = getServer().getServicesManager().load(PortalProvider.class); }
+ *
  * @since 0.1.0
  */
 @NullMarked
+@ApiStatus.NonExtendable
 public interface PortalProvider {
     @Contract(pure = true)
     Path getDataFolder();
@@ -25,8 +32,9 @@ public interface PortalProvider {
     @Contract(pure = true)
     Stream<Portal> getPortals(World world);
 
-    @Contract(value = "_ -> new", mutates = "this")
-    Portal createPortal(String name);
+    // throws if a portal with the same name already exists
+    @Contract(value = "_, _ -> new", mutates = "this")
+    Portal createPortal(String name, BoundingBox boundingBox) throws IllegalArgumentException;
 
     @Contract(pure = true)
     boolean hasPortal(Portal portal);
