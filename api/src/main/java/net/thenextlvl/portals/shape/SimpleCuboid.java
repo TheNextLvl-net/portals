@@ -5,14 +5,7 @@ import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-record CuboidBoundingBox(World world, Position min, Position max) implements BoundingBox {
-    @Override
-    public boolean contains(Position position) {
-        return position.x() >= min.x() && position.x() <= max.x() &&
-                position.y() >= min.y() && position.y() <= max.y() &&
-                position.z() >= min.z() && position.z() <= max.z();
-    }
-
+record SimpleCuboid(World world, Position min, Position max) implements Cuboid {
     @Override
     public World getWorld() {
         return world;
