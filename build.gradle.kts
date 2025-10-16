@@ -22,15 +22,19 @@ version = "0.1.0"
 
 repositories {
     mavenCentral()
-    maven("https://repo.thenextlvl.net/releases")
+    maven("https://maven.enginehub.org/repo/")
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.thenextlvl.net/releases")
 }
 
 dependencies {
     implementation(project(":api"))
 
-    compileOnly("io.papermc.paper:paper-api:1.21.9-R0.1-SNAPSHOT")
-    
+    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.16") {
+        exclude("com.google.code.gson", "gson")
+    }
+
     implementation("net.thenextlvl.core:i18n:3.2.2")
     implementation("net.thenextlvl.core:paper:2.3.1")
 
