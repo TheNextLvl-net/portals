@@ -2,9 +2,7 @@ package net.thenextlvl.portals.shape;
 
 import io.papermc.paper.math.Position;
 import org.bukkit.World;
-import org.jspecify.annotations.NullMarked;
 
-@NullMarked
 record SimpleCylinder(World world, Position center, double radius, double height) implements Cylinder {
     @Override
     public World getWorld() {

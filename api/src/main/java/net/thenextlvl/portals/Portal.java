@@ -4,7 +4,6 @@ import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
@@ -13,7 +12,6 @@ import java.util.Optional;
 /**
  * @since 0.1.0
  */
-@NullMarked
 @ApiStatus.NonExtendable
 public interface Portal {
     @Contract(pure = true)

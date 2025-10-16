@@ -2,12 +2,10 @@ package net.thenextlvl.portals.action;
 
 import org.bukkit.Location;
 import org.jetbrains.annotations.Contract;
-import org.jspecify.annotations.NullMarked;
 
 /**
  * @since 0.1.0
  */
-@NullMarked
 public sealed interface EntryActions permits SimpleEntryActions {
     @Contract(pure = true)
     static EntryActions actions() {

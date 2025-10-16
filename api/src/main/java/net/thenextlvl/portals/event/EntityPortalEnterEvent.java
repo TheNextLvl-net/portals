@@ -6,7 +6,6 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
-import org.jspecify.annotations.NullMarked;
 
 /**
  * This event is fired when an entity enters a portal.
@@ -15,7 +14,6 @@ import org.jspecify.annotations.NullMarked;
  *
  * @since 0.1.0
  */
-@NullMarked
 public final class EntityPortalEnterEvent extends PortalEvent implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
 

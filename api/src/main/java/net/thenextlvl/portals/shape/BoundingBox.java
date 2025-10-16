@@ -5,14 +5,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Contract;
-import org.jspecify.annotations.NullMarked;
 
 /**
  * Represents an AABB (Axis-Aligned Bounding Box) in a {@link World}.
  *
  * @since 0.1.0
  */
-@NullMarked
 public interface BoundingBox {
     @Contract(pure = true)
     World getWorld();

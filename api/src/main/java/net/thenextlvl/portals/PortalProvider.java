@@ -4,7 +4,6 @@ import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
-import org.jspecify.annotations.NullMarked;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -17,7 +16,6 @@ import java.util.stream.Stream;
  *
  * @since 0.1.0
  */
-@NullMarked
 @ApiStatus.NonExtendable
 public interface PortalProvider {
     @Contract(pure = true)

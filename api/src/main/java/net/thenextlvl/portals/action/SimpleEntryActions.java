@@ -1,9 +1,7 @@
 package net.thenextlvl.portals.action;
 
 import org.bukkit.Location;
-import org.jspecify.annotations.NullMarked;
 
-@NullMarked
 final class SimpleEntryActions implements EntryActions {
     public static final SimpleEntryActions INSTANCE = new SimpleEntryActions();
 

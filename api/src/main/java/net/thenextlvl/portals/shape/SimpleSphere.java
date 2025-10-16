@@ -2,9 +2,7 @@ package net.thenextlvl.portals.shape;
 
 import io.papermc.paper.math.Position;
 import org.bukkit.World;
-import org.jspecify.annotations.NullMarked;
 
-@NullMarked
 record SimpleSphere(World world, Position center, double radius) implements Sphere {
     @Override
     public World getWorld() {
@@ -56,7 +54,7 @@ record SimpleSphere(World world, Position center, double radius) implements Sphe
         var distance = (position.x() - center.x()) * (position.x() - center.x()) +
                 (position.y() - center.y()) * (position.y() - center.y()) +
                 (position.z() - center.z()) * (position.z() - center.z());
-        return distance * 2 < radius * radius;
+        return distance * distance < radius * radius;
     }
 
     @Override
