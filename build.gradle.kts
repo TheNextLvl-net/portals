@@ -1,5 +1,6 @@
 import io.papermc.hangarpublishplugin.model.Platforms
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import net.minecrell.pluginyml.paper.PaperPluginDescription
 
 plugins {
     id("java")
@@ -55,6 +56,12 @@ paper {
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
     foliaSupported = true
+    serverDependencies {
+        register("WorldEdit") {
+            load = PaperPluginDescription.RelativeLoadOrder.AFTER
+            required = false
+        }
+    }
 }
 
 val versionString: String = project.version as String
@@ -74,6 +81,11 @@ hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
         platforms.register(Platforms.PAPER) {
             jar.set(tasks.shadowJar.flatMap { it.archiveFile })
             platformVersions.set(versions)
+            dependencies {
+                hangar("WorldEdit") {
+                    required.set(false)
+                }
+            }
         }
     }
 }
@@ -87,4 +99,7 @@ modrinth {
     gameVersions.set(versions)
     syncBodyFrom.set(rootProject.file("README.md").readText())
     loaders.addAll((property("loaders") as String).split(",").map { it.trim() })
+    dependencies {
+        optional.project("worldedit")
+    }
 }
