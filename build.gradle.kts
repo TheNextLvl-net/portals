@@ -31,7 +31,7 @@ dependencies {
     implementation(project(":api"))
 
     compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.16") {
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.0-SNAPSHOT") {
         exclude("com.google.code.gson", "gson")
     }
 
