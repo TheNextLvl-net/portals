@@ -29,12 +29,11 @@ import java.util.Optional;
 
 @NullMarked
 public final class WorldEditSelectionProvider implements SelectionProvider {
+    private final WorldEdit worldEdit = WorldEdit.getInstance();
     private final PortalsPlugin plugin;
-    private final WorldEdit worldEdit;
 
-    public WorldEditSelectionProvider(PortalsPlugin plugin, WorldEdit worldEdit) {
+    public WorldEditSelectionProvider(PortalsPlugin plugin) {
         this.plugin = plugin;
-        this.worldEdit = worldEdit;
     }
 
     @Override
