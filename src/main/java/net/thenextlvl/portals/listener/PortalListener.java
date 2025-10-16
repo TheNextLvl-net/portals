@@ -12,6 +12,8 @@ import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -51,7 +53,7 @@ public final class PortalListener implements Listener {
     public void onEntityMove(EntityMoveEvent event) {
         if (!event.hasChangedPosition()) return;
         if (processMovement(event.getEntity(), event.getTo())) return;
-        pushBack(event.getEntity());
+        pushAway(event.getEntity(), event.getTo());
         event.setCancelled(true);
     }
 
@@ -59,7 +61,7 @@ public final class PortalListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
         if (processMovement(event.getPlayer(), event.getTo())) return;
-        pushBack(event.getPlayer());
+        pushAway(event.getPlayer(), event.getTo());
         event.setCancelled(true);
     }
 
@@ -67,7 +69,6 @@ public final class PortalListener implements Listener {
     public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
         if (event.isSneaking()) return;
         if (processMovement(event.getPlayer(), event.getPlayer().getLocation())) return;
-        pushBack(event.getPlayer());
         event.setCancelled(true);
     }
 
@@ -119,11 +120,16 @@ public final class PortalListener implements Listener {
                 .filter(portal -> portal.getBoundingBox().overlaps(boundingBox))
                 .findAny().map(portal -> {
                     if (portal.equals(lastPortal.get(entity.getUniqueId()))) return true;
+
                     if (!new PreEntityPortalEnterEvent(portal, entity).callEvent()) return false;
-                    if (!portal.getEntryPermission().map(entity::hasPermission).orElse(true)) return false;
+
+                    if (entity.getType().equals(EntityType.PLAYER) && !portal.getEntryPermission()
+                            .map(entity::hasPermission).orElse(true)) return false;
                     if (portal.getCooldown().isPositive() && hasCooldown(portal, entity)) return false;
                     if (portal.getEntryCost() > 0 && !withdrawEntryCost(portal, entity)) return false;
+
                     if (!new EntityPortalEnterEvent(portal, entity).callEvent()) return false;
+
                     portal.getEntryAction().ifPresent(action -> action.onEntry(portal, entity));
                     if (portal.getCooldown().isPositive()) setLastEntry(portal, entity);
                     lastPortal.put(entity.getUniqueId(), portal);
@@ -145,11 +151,17 @@ public final class PortalListener implements Listener {
         );
     }
 
-    private void pushBack(Entity entity) {
-        entity.setVelocity(entity.getVelocity().multiply(-.1));
+    private void pushAway(Entity entity, Location to) {
+        if (!plugin.config().pushBackOnEntryDenied()) return;
+        entity.getScheduler().run(plugin, task -> {
+            var direction = entity.getLocation().toVector().subtract(to.toVector()).normalize();
+            entity.setVelocity(direction.multiply(plugin.config().pushBackSpeed()));
+        }, null);
     }
 
     private boolean withdrawEntryCost(Portal portal, Entity entity) {
+        if (!plugin.config().entryCosts()) return true;
+        if (!(entity instanceof Player player)) return true;
         // return entity.withdrawMoney(portal.getEntryCost()); // vault integration
         return true;
     }
