@@ -122,6 +122,20 @@ public interface BoundingBox {
     }
 
     /**
+     * Creates a new {@link Ellipsoid} bounding box.
+     *
+     * @param world  the world
+     * @param center the center position of the ellipsoid
+     * @param radius the radius of the ellipsoid
+     * @param height the height of the ellipsoid
+     * @return a new {@link Ellipsoid} bounding box
+     */
+    @Contract(value = "_, _, _, _ -> new", pure = true)
+    static Ellipsoid ellipsoid(World world, Position center, double radius, double height) {
+        return new SimpleEllipsoid(world, center, radius, height);
+    }
+
+    /**
      * Creates a new {@link Sphere} bounding box.
      *
      * @param world  the world
