@@ -2,6 +2,8 @@ package net.thenextlvl.portals;
 
 import net.thenextlvl.portals.listener.PortalListener;
 import net.thenextlvl.portals.portal.PaperPortalProvider;
+import net.thenextlvl.portals.selection.NativeSelectionProvider;
+import net.thenextlvl.portals.selection.SelectionProvider;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,8 +16,9 @@ public final class PortalsPlugin extends JavaPlugin {
 
     public PortalsPlugin() {
         getServer().getServicesManager().register(PortalProvider.class, portalProvider, this, ServicePriority.Highest);
+        getServer().getServicesManager().register(SelectionProvider.class, new NativeSelectionProvider(), this, ServicePriority.Normal);
     }
-    
+
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
