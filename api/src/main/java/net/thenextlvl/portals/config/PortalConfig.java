@@ -12,4 +12,7 @@ public interface PortalConfig {
 
     // whether to push back entities that are denied entry
     boolean pushBackOnEntryDenied();
+    
+    // speed at which entities are pushed back
+    double pushBackSpeed();
 }
