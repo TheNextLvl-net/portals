@@ -7,5 +7,5 @@ import org.bukkit.entity.Entity;
  * @since 0.1.0
  */
 public interface EntryAction {
-    boolean onEntry(Portal portal, Entity entity);
+    void onEntry(Portal portal, Entity entity);
 }
