@@ -1,5 +1,7 @@
 package net.thenextlvl.portals;
 
+import core.i18n.file.ComponentBundle;
+import net.kyori.adventure.key.Key;
 import net.thenextlvl.portals.listener.PortalListener;
 import net.thenextlvl.portals.portal.PaperPortalProvider;
 import net.thenextlvl.portals.selection.NativeSelectionProvider;
@@ -10,10 +12,20 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Locale;
+
 @NullMarked
 public final class PortalsPlugin extends JavaPlugin {
     private final PaperPortalProvider portalProvider = new PaperPortalProvider(this);
     private final Metrics metrics = new Metrics(this, 27514);
+
+    private final ComponentBundle bundle = ComponentBundle.builder(
+                    Key.key("portals", "translations"),
+                    getDataPath().resolve("translations")
+            ).resource("messages.properties", Locale.US)
+            .resource("messages_german.properties", Locale.GERMANY)
+            .placeholder("prefix", "prefix")
+            .build();
 
     public PortalsPlugin() {
         getServer().getServicesManager().register(PortalProvider.class, portalProvider, this, ServicePriority.Highest);
@@ -35,5 +47,9 @@ public final class PortalsPlugin extends JavaPlugin {
 
     public PaperPortalProvider portalProvider() {
         return portalProvider;
+    }
+
+    public ComponentBundle bundle() {
+        return bundle;
     }
 }
