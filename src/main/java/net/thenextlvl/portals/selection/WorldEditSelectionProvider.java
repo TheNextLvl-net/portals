@@ -67,6 +67,20 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
         };
     }
 
+    @Override
+    public boolean clearSelection(Player player) {
+        var manager = worldEdit.getSessionManager();
+        var owner = new BukkitPlayer(player);
+        if (!manager.contains(owner)) return false;
+        manager.remove(owner);
+        return true;
+    }
+
+    @Override
+    public boolean hasSelection(Player player) {
+        return worldEdit.getSessionManager().contains(new BukkitPlayer(player));
+    }
+
     private Position toPosition(BlockVector3 vector) {
         return Position.block(vector.x(), vector.y(), vector.z());
     }
@@ -123,19 +137,5 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
             );
             default -> throw new IllegalArgumentException("Unsupported shape type: " + shape.getClass().getName());
         };
-    }
-
-    @Override
-    public boolean clearSelection(Player player) {
-        var manager = worldEdit.getSessionManager();
-        var owner = new BukkitPlayer(player);
-        if (!manager.contains(owner)) return false;
-        manager.remove(owner);
-        return true;
-    }
-
-    @Override
-    public boolean hasSelection(Player player) {
-        return worldEdit.getSessionManager().contains(new BukkitPlayer(player));
     }
 }
