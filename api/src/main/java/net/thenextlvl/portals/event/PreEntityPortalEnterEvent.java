@@ -8,22 +8,22 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 /**
- * This event is fired when an entity enters a portal and all checks succeeded.
+ * This event is fired before an entity enters a portal and any checks are performed.
  * Checks include permission, cooldown, and entry cost.
  * <p>
  * Canceling this event will prevent the entity from entering and using the portal.
  *
- * @see PreEntityPortalEnterEvent
+ * @see EntityPortalEnterEvent
  * @since 0.1.0
  */
-public final class EntityPortalEnterEvent extends PortalEvent implements Cancellable {
+public final class PreEntityPortalEnterEvent extends PortalEvent implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
 
     private final Entity entity;
     private boolean cancelled = false;
 
     @ApiStatus.Internal
-    public EntityPortalEnterEvent(Portal portal, Entity entity) {
+    public PreEntityPortalEnterEvent(Portal portal, Entity entity) {
         super(portal);
         this.entity = entity;
     }
