@@ -8,6 +8,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Optional;
 
 @NullMarked
@@ -82,5 +83,28 @@ public final class PaperPortal implements Portal {
     @Override
     public void setEntryAction(@Nullable EntryAction action) {
         this.entryAction = action;
+    }
+
+    @Override
+    public String toString() {
+        return "PaperPortal{" +
+                "name='" + name + '\'' +
+                ", boundingBox=" + boundingBox +
+                ", cooldown=" + cooldown +
+                ", entryPermission='" + entryPermission + '\'' +
+                ", entryCost=" + entryCost +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        PaperPortal that = (PaperPortal) o;
+        return Double.compare(entryCost, that.entryCost) == 0 && Objects.equals(name, that.name) && Objects.equals(boundingBox, that.boundingBox) && Objects.equals(cooldown, that.cooldown) && Objects.equals(entryPermission, that.entryPermission) && Objects.equals(entryAction, that.entryAction);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, boundingBox, cooldown, entryPermission, entryAction, entryCost);
     }
 }
