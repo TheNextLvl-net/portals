@@ -2,6 +2,8 @@ package net.thenextlvl.portals;
 
 import core.i18n.file.ComponentBundle;
 import net.kyori.adventure.key.Key;
+import net.thenextlvl.portals.config.PortalConfig;
+import net.thenextlvl.portals.config.SimplePortalConfig;
 import net.thenextlvl.portals.listener.PortalListener;
 import net.thenextlvl.portals.portal.PaperPortalProvider;
 import net.thenextlvl.portals.selection.NativeSelectionProvider;
@@ -17,6 +19,8 @@ import java.util.Locale;
 @NullMarked
 public final class PortalsPlugin extends JavaPlugin {
     private final PaperPortalProvider portalProvider = new PaperPortalProvider(this);
+    private final PortalConfig portalConfig = SimplePortalConfig.INSTANCE;
+
     private final Metrics metrics = new Metrics(this, 27514);
 
     private final ComponentBundle bundle = ComponentBundle.builder(
@@ -51,5 +55,9 @@ public final class PortalsPlugin extends JavaPlugin {
 
     public ComponentBundle bundle() {
         return bundle;
+    }
+
+    public PortalConfig config() {
+        return portalConfig;
     }
 }
