@@ -7,7 +7,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
+import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
+import io.papermc.paper.math.Position;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.command.brigadier.SimpleCommand;
@@ -29,8 +30,8 @@ public final class PortalCreateCommand extends SimpleCommand {
 
         var world = Commands.argument("world", ArgumentTypes.world());
 
-        var from = Commands.argument("from", ArgumentTypes.finePosition());
-        var to = Commands.argument("to", ArgumentTypes.finePosition());
+        var from = Commands.argument("from", ArgumentTypes.blockPosition());
+        var to = Commands.argument("to", ArgumentTypes.blockPosition());
         var cuboid = from.then(to.executes(command).then(world.executes(command)));
 
         return command.create().then(name
@@ -50,15 +51,17 @@ public final class PortalCreateCommand extends SimpleCommand {
 
         BoundingBox boundingBox = null;
 
-        var fromResolver = tryGetArgument(context, "from", FinePositionResolver.class).orElse(null);
-        var toResolver = tryGetArgument(context, "to", FinePositionResolver.class).orElse(null);
+        var fromResolver = tryGetArgument(context, "from", BlockPositionResolver.class).orElse(null);
+        var toResolver = tryGetArgument(context, "to", BlockPositionResolver.class).orElse(null);
 
         var from = fromResolver != null ? fromResolver.resolve(context.getSource()) : null;
         var to = toResolver != null ? toResolver.resolve(context.getSource()) : null;
 
         var world = tryGetArgument(context, "world", World.class).orElse(context.getSource().getLocation().getWorld());
 
-        if (from != null && to != null) boundingBox = BoundingBox.cuboid(world, from, to);
+        if (from != null && to != null) {
+            boundingBox = BoundingBox.cuboid(world, min(from, to), max(from, to).offset(1, 1, 1));
+        }
 
         if (boundingBox == null && context.getSource().getExecutor() instanceof Player player) {
             var provider = plugin.getServer().getServicesManager().load(SelectionProvider.class);
@@ -75,5 +78,13 @@ public final class PortalCreateCommand extends SimpleCommand {
                 Placeholder.parsed("portal", portal.getName()));
 
         return SINGLE_SUCCESS;
+    }
+
+    private Position min(Position pos1, Position pos2) {
+        return Position.fine(Math.min(pos1.x(), pos2.x()), Math.min(pos1.y(), pos2.y()), Math.min(pos1.z(), pos2.z()));
+    }
+
+    private Position max(Position pos1, Position pos2) {
+        return Position.fine(Math.max(pos1.x(), pos2.x()), Math.max(pos1.y(), pos2.y()), Math.max(pos1.z(), pos2.z()));
     }
 }
