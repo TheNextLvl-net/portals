@@ -58,7 +58,12 @@ paper {
     foliaSupported = true
     serverDependencies {
         register("WorldEdit") {
-            load = PaperPluginDescription.RelativeLoadOrder.AFTER
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+            required = false
+        }
+        // fixme: temporary solution, FAWE provides WorldEdit so this should not be required
+        register("FastAsyncWorldEdit") {
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
             required = false
         }
     }
