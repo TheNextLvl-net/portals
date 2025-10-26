@@ -23,7 +23,6 @@ import net.thenextlvl.portals.shape.Ellipsoid;
 import net.thenextlvl.portals.shape.Shape;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -43,7 +42,7 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
         var session = manager.getIfPresent(owner);
         if (session == null) return Optional.empty();
         try {
-            return Optional.ofNullable(fromRegion(session.getSelection()));
+            return Optional.of(fromRegion(player, session.getSelection()));
         } catch (IllegalArgumentException e) {
             plugin.getComponentLogger().error("Failed to convert WorldEdit region to shape", e);
             return Optional.empty();
@@ -52,9 +51,8 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
         }
     }
 
-    private @Nullable Shape fromRegion(Region region) {
-        if (!(region.getWorld() instanceof BukkitWorld bukkit)) return null;
-        var world = bukkit.getWorld();
+    private Shape fromRegion(Player player, Region region) {
+        var world = region.getWorld() instanceof BukkitWorld bukkit ? bukkit.getWorld() : player.getWorld();
         return switch (region) {
             case EllipsoidRegion ellipsoid ->
                     BoundingBox.ellipsoid(world, toPosition(ellipsoid.getCenter()), ellipsoid.getWidth(), ellipsoid.getHeight());
