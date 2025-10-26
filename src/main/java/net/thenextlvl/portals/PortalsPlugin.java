@@ -1,7 +1,9 @@
 package net.thenextlvl.portals;
 
 import core.i18n.file.ComponentBundle;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
+import net.thenextlvl.portals.command.PortalCommand;
 import net.thenextlvl.portals.config.PortalConfig;
 import net.thenextlvl.portals.config.SimplePortalConfig;
 import net.thenextlvl.portals.listener.PortalListener;
@@ -34,6 +36,7 @@ public final class PortalsPlugin extends JavaPlugin {
     public PortalsPlugin() {
         getServer().getServicesManager().register(PortalProvider.class, portalProvider, this, ServicePriority.Highest);
         getServer().getServicesManager().register(SelectionProvider.class, new NativeSelectionProvider(), this, ServicePriority.Lowest);
+        registerCommands();
     }
 
     @Override
@@ -42,6 +45,12 @@ public final class PortalsPlugin extends JavaPlugin {
         if (getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
             getServer().getServicesManager().register(SelectionProvider.class, new WorldEditSelectionProvider(this), this, ServicePriority.Normal);
         }
+    }
+
+    private void registerCommands() {
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event -> {
+            event.registrar().register(PortalCommand.create(this), "The main command to interact with portals");
+        }));
     }
 
     @Override
