@@ -3,6 +3,7 @@ package net.thenextlvl.portals.command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.command.brigadier.SimpleCommand;
@@ -18,7 +19,7 @@ public final class PortalDeleteCommand extends SimpleCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
         var command = new PortalDeleteCommand(plugin);
-        return command.create().then(portalArgument(plugin)).executes(command);
+        return command.create().then(portalArgument(plugin).executes(command));
     }
 
     @Override
@@ -26,6 +27,8 @@ public final class PortalDeleteCommand extends SimpleCommand {
         var portal = context.getArgument("portal", Portal.class);
         var success = plugin.portalProvider().removePortal(portal);
         var message = success ? "portal.delete.success" : "portal.delete.failed";
+        plugin.bundle().sendMessage(context.getSource().getSender(), message,
+                Placeholder.parsed("portal", portal.getName()));
         return success ? SINGLE_SUCCESS : 0;
     }
 }
