@@ -72,6 +72,7 @@ paper {
         register("portals.command.cooldown") { children = listOf("portals.command.portal") }
         register("portals.command.create") { children = listOf("portals.command.portal") }
         register("portals.command.delete") { children = listOf("portals.command.portal") }
+        register("portals.command.permission") { children = listOf("portals.command.portal") }
     }
 }
 

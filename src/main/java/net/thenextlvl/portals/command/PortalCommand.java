@@ -22,6 +22,7 @@ public final class PortalCommand extends BrigadierCommand {
                 .then(PortalCooldownCommand.create(plugin))
                 .then(PortalCreateCommand.create(plugin))
                 .then(PortalDeleteCommand.create(plugin))
+                .then(PortalPermissionCommand.create(plugin))
                 .build();
     }
 
