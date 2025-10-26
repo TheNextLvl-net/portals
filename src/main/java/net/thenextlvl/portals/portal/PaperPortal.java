@@ -100,11 +100,11 @@ public final class PaperPortal implements Portal {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         PaperPortal that = (PaperPortal) o;
-        return Double.compare(entryCost, that.entryCost) == 0 && Objects.equals(name, that.name) && Objects.equals(boundingBox, that.boundingBox) && Objects.equals(cooldown, that.cooldown) && Objects.equals(entryPermission, that.entryPermission) && Objects.equals(entryAction, that.entryAction);
+        return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, boundingBox, cooldown, entryPermission, entryAction, entryCost);
+        return Objects.hashCode(name);
     }
 }
