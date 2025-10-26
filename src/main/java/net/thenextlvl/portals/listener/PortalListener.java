@@ -1,16 +1,12 @@
 package net.thenextlvl.portals.listener;
 
 import io.papermc.paper.event.entity.EntityMoveEvent;
-import io.papermc.paper.math.Position;
-import net.kyori.adventure.text.Component;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.event.EntityPortalEnterEvent;
 import net.thenextlvl.portals.event.EntityPortalExitEvent;
 import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
-import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.Location;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -19,7 +15,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.event.world.PortalCreateEvent;
 import org.jspecify.annotations.NullMarked;
 
 import java.time.Instant;
@@ -77,41 +72,6 @@ public final class PortalListener implements Listener {
         plugin.portalProvider().getPortals(event.getLocation().getWorld())
                 .filter(portal -> portal.getBoundingBox().contains(event.getLocation()))
                 .findAny().ifPresent(portal -> event.setCancelled(true));
-    }
-
-    // todo: remove, just for testing
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onExit(EntityPortalExitEvent event) {
-        System.out.println("Entity " + event.getEntity().getName() + " exited portal " + event.getPortal().getName());
-    }
-
-    // todo: remove, just for testing
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onEnter(EntityPortalEnterEvent event) {
-        System.out.println("Entity " + event.getEntity().getName() + " entered portal " + event.getPortal().getName());
-    }
-
-    // todo: remove, just for testing
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPerEnter(PreEntityPortalEnterEvent event) {
-        System.out.println("Entity " + event.getEntity().getName() + " is trying to enter portal " + event.getPortal().getName());
-    }
-
-    // todo: remove, just for testing
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPortalCreate(PortalCreateEvent event) {
-        var maxX = event.getBlocks().stream().map(BlockState::getX).max(Integer::compare).orElse(0) + 1;
-        var maxY = event.getBlocks().stream().map(BlockState::getY).max(Integer::compare).orElse(0) + 1;
-        var maxZ = event.getBlocks().stream().map(BlockState::getZ).max(Integer::compare).orElse(0) + 1;
-        var minX = event.getBlocks().stream().map(BlockState::getX).min(Integer::compare).orElse(0);
-        var minY = event.getBlocks().stream().map(BlockState::getY).min(Integer::compare).orElse(0);
-        var minZ = event.getBlocks().stream().map(BlockState::getZ).min(Integer::compare).orElse(0);
-        var portal = plugin.portalProvider().createPortal(UUID.randomUUID().toString(), BoundingBox.cuboid(event.getWorld(), Position.fine(minX, minY, minZ), Position.fine(maxX, maxY, maxZ)));
-        portal.setEntryAction((portal1, entity) -> {
-            entity.sendMessage(Component.text("You entered the portal: " + portal1.getName()));
-        });
-        portal.setEntryPermission("nope.nope");
-        plugin.getServer().broadcast(Component.text("created new portal: " + portal));
     }
 
     private boolean processMovement(Entity entity, Location to) {
