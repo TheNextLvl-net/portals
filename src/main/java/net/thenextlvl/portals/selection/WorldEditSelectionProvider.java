@@ -14,6 +14,7 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.CylinderRegionSelector;
 import com.sk89q.worldedit.regions.selector.EllipsoidRegionSelector;
+import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.math.Position;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.shape.BoundingBox;
@@ -59,7 +60,7 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
             case CylinderRegion cylinder ->
                     BoundingBox.cylinder(world, toPosition(cylinder.getCenter()), cylinder.getWidth(), cylinder.getHeight());
             case CuboidRegion cuboid ->
-                    BoundingBox.cuboid(world, toPosition(cuboid.getPos1()), toPosition(cuboid.getPos2()));
+                    BoundingBox.cuboid(world, toPosition(cuboid.getMinimumPoint()), toPosition(cuboid.getMaximumPoint()).offset(1, 1, 1));
             default -> throw new IllegalArgumentException("Unsupported region type: " + region.getClass().getName());
         };
     }
@@ -78,7 +79,7 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
         return worldEdit.getSessionManager().contains(new BukkitPlayer(player));
     }
 
-    private Position toPosition(BlockVector3 vector) {
+    private BlockPosition toPosition(BlockVector3 vector) {
         return Position.block(vector.x(), vector.y(), vector.z());
     }
 
