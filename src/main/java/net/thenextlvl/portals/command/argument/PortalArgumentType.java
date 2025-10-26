@@ -1,6 +1,5 @@
 package net.thenextlvl.portals.command.argument;
 
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -28,7 +27,7 @@ public final class PortalArgumentType implements CustomArgumentType.Converted<Po
     public Portal convert(String nativeType) throws CommandSyntaxException {
         return plugin.portalProvider().getPortal(nativeType).orElseThrow(() -> new ComponentCommandExceptionType(
                 Component.text("Unknown portal: " + nativeType)
-        ).createWithContext(new StringReader(nativeType)));
+        ).create());
     }
 
     @Override
