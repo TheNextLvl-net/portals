@@ -62,6 +62,10 @@ paper {
             required = false
         }
     }
+    permissions {
+        register("portals.command.portal")
+        register("portals.command.create") { children = listOf("portals.command.portal") }
+    }
 }
 
 val versionString: String = project.version as String
