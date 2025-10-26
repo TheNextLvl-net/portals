@@ -23,7 +23,7 @@ public final class PortalCommand extends BrigadierCommand {
                 .then(PortalDeleteCommand.create(plugin))
                 .build();
     }
-    
+
     static RequiredArgumentBuilder<CommandSourceStack, Portal> portalArgument(PortalsPlugin plugin) {
         return Commands.argument("portal", new PortalArgumentType(plugin));
     }
