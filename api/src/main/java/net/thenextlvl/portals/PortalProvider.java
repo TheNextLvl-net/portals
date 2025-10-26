@@ -41,8 +41,8 @@ public interface PortalProvider {
     boolean hasPortal(String name);
 
     @Contract(mutates = "this")
-    boolean removePortal(Portal portal);
+    boolean deletePortal(Portal portal);
 
     @Contract(mutates = "this")
-    boolean removePortal(String name);
+    boolean deletePortal(String name);
 }

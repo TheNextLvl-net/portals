@@ -62,12 +62,12 @@ public final class PaperPortalProvider implements PortalProvider {
     }
 
     @Override
-    public boolean removePortal(Portal portal) {
+    public boolean deletePortal(Portal portal) {
         return portals.remove(portal);
     }
 
     @Override
-    public boolean removePortal(String name) {
+    public boolean deletePortal(String name) {
         return portals.removeIf(portal -> portal.getName().equals(name));
     }
 }

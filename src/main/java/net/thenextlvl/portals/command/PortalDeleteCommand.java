@@ -25,7 +25,7 @@ public final class PortalDeleteCommand extends SimpleCommand {
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
         var portal = context.getArgument("portal", Portal.class);
-        var success = plugin.portalProvider().removePortal(portal);
+        var success = plugin.portalProvider().deletePortal(portal);
         var message = success ? "portal.delete.success" : "portal.delete.failed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("portal", portal.getName()));
