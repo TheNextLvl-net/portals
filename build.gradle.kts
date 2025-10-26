@@ -65,6 +65,7 @@ paper {
     permissions {
         register("portals.command.portal")
         register("portals.command.create") { children = listOf("portals.command.portal") }
+        register("portals.command.delete") { children = listOf("portals.command.portal") }
     }
 }
 
