@@ -8,7 +8,6 @@ import net.thenextlvl.portals.event.EntityPortalExitEvent;
 import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -83,8 +82,7 @@ public final class PortalListener implements Listener {
 
                     if (!new PreEntityPortalEnterEvent(portal, entity).callEvent()) return false;
 
-                    if (entity.getType().equals(EntityType.PLAYER) && !portal.getEntryPermission()
-                            .map(entity::hasPermission).orElse(true)) return false;
+                    if (!portal.getEntryPermission().map(entity::hasPermission).orElse(true)) return false;
                     if (portal.getCooldown().isPositive() && hasCooldown(portal, entity)) return false;
                     if (portal.getEntryCost() > 0 && !withdrawEntryCost(portal, entity)) return false;
 
