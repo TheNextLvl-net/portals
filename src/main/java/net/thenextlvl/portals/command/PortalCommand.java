@@ -19,6 +19,7 @@ public final class PortalCommand extends BrigadierCommand {
     public static LiteralCommandNode<CommandSourceStack> create(PortalsPlugin plugin) {
         var command = new PortalCommand(plugin);
         return command.create()
+                .then(PortalCooldownCommand.create(plugin))
                 .then(PortalCreateCommand.create(plugin))
                 .then(PortalDeleteCommand.create(plugin))
                 .build();
