@@ -120,7 +120,6 @@ public final class PortalListener implements Listener {
     private boolean withdrawEntryCost(Portal portal, Entity entity) {
         if (!plugin.config().entryCosts()) return true;
         if (!(entity instanceof Player player)) return true;
-        // return entity.withdrawMoney(portal.getEntryCost()); // vault integration
-        return true;
+        return plugin.economyProvider().withdraw(player, portal.getEntryCost());
     }
 }

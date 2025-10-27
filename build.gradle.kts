@@ -36,6 +36,9 @@ dependencies {
         exclude("com.google.code.gson", "gson")
     }
 
+    compileOnly("net.thenextlvl:vault-api:1.7.1")
+    compileOnly("net.thenextlvl:service-io:2.3.3")
+
     implementation("net.thenextlvl.core:i18n:3.2.2")
     implementation("net.thenextlvl.core:paper:2.3.1")
 
@@ -63,6 +66,14 @@ paper {
         }
         // fixme: temporary solution, FAWE provides WorldEdit so this should not be required
         register("FastAsyncWorldEdit") {
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+            required = false
+        }
+        register("ServiceIO") {
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+            required = false
+        }
+        register("Vault") {
             load = PaperPluginDescription.RelativeLoadOrder.BEFORE
             required = false
         }
@@ -98,6 +109,12 @@ hangarPublish { // docs - https://docs.papermc.io/misc/hangar-publishing
                 hangar("WorldEdit") {
                     required.set(false)
                 }
+                hangar("ServiceIO") {
+                    required.set(false)
+                }
+                url("Vault", "https://www.spigotmc.org/resources/vault.34315/") {
+                    required.set(false)
+                }
             }
         }
     }
@@ -114,5 +131,6 @@ modrinth {
     loaders.addAll((property("loaders") as String).split(",").map { it.trim() })
     dependencies {
         optional.project("worldedit")
+        optional.project("service-io")
     }
 }
