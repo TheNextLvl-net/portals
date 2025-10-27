@@ -20,6 +20,7 @@ public final class PortalCommand extends BrigadierCommand {
         var command = new PortalCommand(plugin);
         return command.create()
                 .then(PortalCooldownCommand.create(plugin))
+                .then(PortalCostCommand.create(plugin))
                 .then(PortalCreateCommand.create(plugin))
                 .then(PortalDeleteCommand.create(plugin))
                 .then(PortalPermissionCommand.create(plugin))
