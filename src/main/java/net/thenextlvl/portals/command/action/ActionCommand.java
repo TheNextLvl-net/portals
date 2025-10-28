@@ -29,6 +29,7 @@ abstract class ActionCommand<T> extends SimpleCommand {
         }).orElse(false);
         if (success) portal.setEntryAction(EntryAction.create(actionType, input));
 
+        // todo: move message to command for proper information
         var message = success ? "portal.action.set" : "nothing.changed";
         plugin.bundle().sendMessage(sender, message,
                 Placeholder.unparsed("portal", portal.getName()),
