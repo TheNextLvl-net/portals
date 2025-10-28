@@ -6,6 +6,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
+import net.thenextlvl.portals.command.action.PortalActionCommand;
 import net.thenextlvl.portals.command.argument.PortalArgumentType;
 import net.thenextlvl.portals.command.brigadier.BrigadierCommand;
 import org.jspecify.annotations.NullMarked;
@@ -19,6 +20,7 @@ public final class PortalCommand extends BrigadierCommand {
     public static LiteralCommandNode<CommandSourceStack> create(PortalsPlugin plugin) {
         var command = new PortalCommand(plugin);
         return command.create()
+                .then(PortalActionCommand.create(plugin))
                 .then(PortalCooldownCommand.create(plugin))
                 .then(PortalCostCommand.create(plugin))
                 .then(PortalCreateCommand.create(plugin))
@@ -29,7 +31,7 @@ public final class PortalCommand extends BrigadierCommand {
                 .build();
     }
 
-    static RequiredArgumentBuilder<CommandSourceStack, Portal> portalArgument(PortalsPlugin plugin) {
+    public static RequiredArgumentBuilder<CommandSourceStack, Portal> portalArgument(PortalsPlugin plugin) {
         return Commands.argument("portal", new PortalArgumentType(plugin));
     }
 }
