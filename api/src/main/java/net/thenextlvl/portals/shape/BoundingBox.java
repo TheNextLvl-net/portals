@@ -21,9 +21,9 @@ public interface BoundingBox {
     @Contract(pure = true)
     Position getMaxPosition();
 
-    @Contract(pure = true)
-    default Position getCenter() {
-        return Position.fine((getMinX() + getMaxX()) / 2, (getMinY() + getMaxY()) / 2, (getMinZ() + getMaxZ()) / 2);
+    @Contract(value = " -> new", pure = true)
+    default Location getCenter() {
+        return new Location(getWorld(), (getMinX() + getMaxX()) / 2, (getMinY() + getMaxY()) / 2, (getMinZ() + getMaxZ()) / 2);
     }
 
     @Contract(value = " -> new", pure = true)

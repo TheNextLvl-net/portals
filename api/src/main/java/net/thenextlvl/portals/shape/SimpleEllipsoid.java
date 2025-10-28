@@ -1,6 +1,7 @@
 package net.thenextlvl.portals.shape;
 
 import io.papermc.paper.math.Position;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 record SimpleEllipsoid(World world, Position center, double radius, double height) implements Ellipsoid {
@@ -20,8 +21,8 @@ record SimpleEllipsoid(World world, Position center, double radius, double heigh
     }
 
     @Override
-    public Position getCenter() {
-        return center;
+    public Location getCenter() {
+        return center.toLocation(world);
     }
 
     @Override
