@@ -1,6 +1,8 @@
 package net.thenextlvl.portals.action;
 
+import net.thenextlvl.portals.action.teleport.Bounds;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -17,6 +19,9 @@ public sealed interface EntryActions permits SimpleEntryActions {
 
     @Contract(pure = true)
     EntryAction runConsoleCommand(String command);
+
+    @Contract(pure = true)
+    EntryAction randomTeleport(World world, Bounds bounds);
 
     @Contract(pure = true)
     EntryAction teleport(Location location);

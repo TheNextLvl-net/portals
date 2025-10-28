@@ -2,6 +2,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 module net.thenextlvl.portals {
+    exports net.thenextlvl.portals.action.teleport;
     exports net.thenextlvl.portals.action;
     exports net.thenextlvl.portals.config;
     exports net.thenextlvl.portals.event;

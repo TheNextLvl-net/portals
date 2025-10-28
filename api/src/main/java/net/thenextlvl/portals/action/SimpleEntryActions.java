@@ -1,6 +1,8 @@
 package net.thenextlvl.portals.action;
 
+import net.thenextlvl.portals.action.teleport.Bounds;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 final class SimpleEntryActions implements EntryActions {
     public static final SimpleEntryActions INSTANCE = new SimpleEntryActions();
@@ -12,6 +14,11 @@ final class SimpleEntryActions implements EntryActions {
 
     @Override
     public EntryAction runConsoleCommand(String command) {
+        return null; // todo: implement
+    }
+
+    @Override
+    public EntryAction randomTeleport(World world, Bounds bounds) {
         return null; // todo: implement
     }
 
