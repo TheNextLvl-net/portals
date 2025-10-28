@@ -3,7 +3,7 @@ package net.thenextlvl.portals.shape;
 import org.jetbrains.annotations.Contract;
 
 /**
- * Represents a ellipsoid in a {@link org.bukkit.World}.
+ * Represents an ellipsoid in a {@link org.bukkit.World}.
  *
  * @since 0.1.0
  */
