@@ -1,5 +1,6 @@
 package net.thenextlvl.portals.action;
 
+import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.action.teleport.Bounds;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -24,6 +25,11 @@ final class SimpleEntryActions implements EntryActions {
 
     @Override
     public EntryAction teleport(Location location) {
+        return null; // todo: implement
+    }
+
+    @Override
+    public EntryAction teleport(Portal portal) {
         return null; // todo: implement
     }
 
