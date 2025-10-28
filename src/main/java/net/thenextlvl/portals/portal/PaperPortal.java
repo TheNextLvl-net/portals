@@ -19,9 +19,10 @@ public final class PaperPortal implements Portal {
     private Duration cooldown = Duration.ZERO;
 
     private @Nullable String entryPermission = null;
-    private @Nullable EntryAction entryAction = null;
+    private @Nullable EntryAction<?> entryAction = null;
 
     private double entryCost = 0.0;
+    private boolean persistent = true;
 
     public PaperPortal(String name, BoundingBox boundingBox) {
         this.name = name;
@@ -76,13 +77,28 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public Optional<EntryAction> getEntryAction() {
+    public Optional<EntryAction<?>> getEntryAction() {
         return Optional.ofNullable(entryAction);
     }
 
     @Override
-    public void setEntryAction(@Nullable EntryAction action) {
+    public void setEntryAction(@Nullable EntryAction<?> action) {
         this.entryAction = action;
+    }
+
+    @Override
+    public boolean isPersistent() {
+        return persistent;
+    }
+
+    @Override
+    public void setPersistent(boolean persistent) {
+        this.persistent = persistent;
+    }
+
+    @Override
+    public boolean persist() {
+        return true; // todo: implement persistence
     }
 
     @Override

@@ -44,8 +44,17 @@ public interface Portal {
     void setEntryCost(double cost) throws IllegalArgumentException;
 
     @Contract(pure = true)
-    Optional<EntryAction> getEntryAction();
+    Optional<EntryAction<?>> getEntryAction();
 
     @Contract(mutates = "this")
-    void setEntryAction(@Nullable EntryAction action);
+    void setEntryAction(@Nullable EntryAction<?> action);
+
+    @Contract(pure = true)
+    boolean isPersistent();
+
+    @Contract(mutates = "this")
+    void setPersistent(boolean persistent);
+
+    @Contract(mutates = "io")
+    boolean persist();
 }
