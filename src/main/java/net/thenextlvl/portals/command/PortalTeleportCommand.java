@@ -31,7 +31,7 @@ public final class PortalTeleportCommand extends SimpleCommand {
         var portal = context.getArgument("portal", Portal.class);
         var player = (Player) context.getSource().getSender();
 
-        player.teleportAsync(portal.getBoundingBox().getCenter().toLocation(player.getWorld())).thenAccept(success -> {
+        player.teleportAsync(portal.getBoundingBox().getCenter()).thenAccept(success -> {
             var message = success ? "portal.teleport.success" : "portal.teleport.failed";
             plugin.bundle().sendMessage(player, message, Placeholder.parsed("portal", portal.getName()));
         }).exceptionally(throwable -> {
