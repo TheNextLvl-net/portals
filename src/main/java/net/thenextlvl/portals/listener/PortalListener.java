@@ -45,6 +45,7 @@ public final class PortalListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityMove(EntityMoveEvent event) {
+        if (!event.hasChangedPosition()) return;
         if (plugin.config().ignoreEntityMovement()) return;
         if (processMovement(event.getEntity(), event.getTo())) return;
         pushAway(event.getEntity(), event.getTo());
@@ -53,6 +54,7 @@ public final class PortalListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
+        if (!event.hasChangedPosition()) return;
         if (processMovement(event.getPlayer(), event.getTo())) return;
         pushAway(event.getPlayer(), event.getTo());
         event.setCancelled(true);
