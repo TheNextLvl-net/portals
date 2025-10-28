@@ -2,7 +2,6 @@ package net.thenextlvl.portals.command.action;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.portals.Portal;
@@ -23,7 +22,7 @@ public final class TeleportPortalCommand extends ActionCommand<Portal> {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) {
         var target = context.getArgument("target", Portal.class);
         return addAction(context, target);
     }

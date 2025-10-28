@@ -4,7 +4,6 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.portals.PortalsPlugin;
@@ -27,7 +26,7 @@ public final class TransferCommand extends ActionCommand<InetSocketAddress> {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) {
         var hostname = context.getArgument("hostname", String.class);
         var port = tryGetArgument(context, "port", int.class).orElse(25565);
         return addAction(context, new InetSocketAddress(hostname, port));
