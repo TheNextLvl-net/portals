@@ -11,7 +11,6 @@ module net.thenextlvl.portals {
     exports net.thenextlvl.portals;
 
     requires org.bukkit;
-    requires com.google.common;
     requires net.kyori.adventure.key;
     
     requires static org.jetbrains.annotations;
