@@ -7,6 +7,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -52,6 +53,12 @@ public interface Portal {
 
     @Contract(mutates = "this")
     void setEntryAction(@Nullable EntryAction<?> action);
+
+    @Contract(pure = true)
+    Path getDataFile();
+
+    @Contract(pure = true)
+    Path getBackupFile();
 
     @Contract(pure = true)
     boolean isPersistent();
