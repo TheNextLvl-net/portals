@@ -12,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
 import static net.thenextlvl.portals.command.PortalCommand.portalArgument;
 
 @NullMarked
-public final class PortalDeleteCommand extends SimpleCommand {
+final class PortalDeleteCommand extends SimpleCommand {
     public PortalDeleteCommand(PortalsPlugin plugin) {
         super(plugin, "delete", "portals.command.delete");
     }

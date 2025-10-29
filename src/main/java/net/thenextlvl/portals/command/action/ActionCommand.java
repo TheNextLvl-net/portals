@@ -25,7 +25,7 @@ abstract class ActionCommand<T> extends SimpleCommand {
         var portal = context.getArgument("portal", Portal.class);
 
         var success = !portal.getEntryAction().map(action -> {
-            return action.getActionType().equals(actionType) && action.getInput().equals(input);
+            return action.getType().equals(actionType) && action.getInput().equals(input);
         }).orElse(false);
         if (success) portal.setEntryAction(EntryAction.create(actionType, input));
 

@@ -17,7 +17,7 @@ import java.util.Objects;
 import static net.thenextlvl.portals.command.PortalCommand.portalArgument;
 
 @NullMarked
-public final class PortalPermissionCommand extends SimpleCommand {
+final class PortalPermissionCommand extends SimpleCommand {
     public PortalPermissionCommand(PortalsPlugin plugin) {
         super(plugin, "permission", "portals.command.permission");
     }

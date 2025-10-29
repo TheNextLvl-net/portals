@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 import static net.thenextlvl.portals.command.PortalCommand.portalArgument;
 
 @NullMarked
-public final class PortalCostCommand extends SimpleCommand {
+final class PortalCostCommand extends SimpleCommand {
     public PortalCostCommand(PortalsPlugin plugin) {
         super(plugin, "cost", "portals.command.cost");
     }

@@ -7,7 +7,7 @@ import net.thenextlvl.portals.action.ActionTypes;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class RunPlayerCommand extends StringActionCommand {
+final class RunPlayerCommand extends StringActionCommand {
     private RunPlayerCommand(PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().runCommand(), "run-command", "command");
     }

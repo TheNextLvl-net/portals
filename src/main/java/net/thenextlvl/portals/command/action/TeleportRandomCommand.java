@@ -16,7 +16,7 @@ import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class TeleportRandomCommand extends ActionCommand<Bounds> {
+final class TeleportRandomCommand extends ActionCommand<Bounds> {
     private TeleportRandomCommand(PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().teleportRandom(), "teleport-random");
     }

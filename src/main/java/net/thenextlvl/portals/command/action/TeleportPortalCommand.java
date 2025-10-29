@@ -11,7 +11,7 @@ import net.thenextlvl.portals.command.argument.PortalArgumentType;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class TeleportPortalCommand extends ActionCommand<Portal> {
+final class TeleportPortalCommand extends ActionCommand<Portal> {
     private TeleportPortalCommand(PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().teleportPortal(), "teleport-portal");
     }

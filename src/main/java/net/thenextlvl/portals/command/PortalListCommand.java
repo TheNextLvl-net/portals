@@ -13,7 +13,7 @@ import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class PortalListCommand extends SimpleCommand {
+final class PortalListCommand extends SimpleCommand {
     public PortalListCommand(PortalsPlugin plugin) {
         super(plugin, "list", "portals.command.list");
     }
@@ -30,7 +30,7 @@ public final class PortalListCommand extends SimpleCommand {
         var sender = context.getSource().getSender();
         var world = tryGetArgument(context, "world", World.class);
         var portals = world.map(plugin.portalProvider()::getPortals)
-                .orElseGet(() -> plugin.portalProvider().getPortals())
+                .orElseGet(plugin.portalProvider()::getPortals)
                 .map(portal -> plugin.bundle().component("portal.list.entry", sender,
                         Placeholder.parsed("portal", portal.getName())))
                 .toList();

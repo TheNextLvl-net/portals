@@ -7,7 +7,7 @@ import net.thenextlvl.portals.action.ActionTypes;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class ConnectCommand extends StringActionCommand {
+final class ConnectCommand extends StringActionCommand {
     private ConnectCommand(PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().connect(), "connect", "server");
     }

@@ -17,7 +17,7 @@ import java.time.Duration;
 import static net.thenextlvl.portals.command.PortalCommand.portalArgument;
 
 @NullMarked
-public final class PortalCooldownCommand extends SimpleCommand {
+final class PortalCooldownCommand extends SimpleCommand {
     public PortalCooldownCommand(PortalsPlugin plugin) {
         super(plugin, "cooldown", "portals.command.cooldown");
     }

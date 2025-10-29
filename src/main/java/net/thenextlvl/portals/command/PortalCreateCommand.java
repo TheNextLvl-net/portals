@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class PortalCreateCommand extends SimpleCommand {
+final class PortalCreateCommand extends SimpleCommand {
     public PortalCreateCommand(PortalsPlugin plugin) {
         super(plugin, "create", "portals.command.create");
     }

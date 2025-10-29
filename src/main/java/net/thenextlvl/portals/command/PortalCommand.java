@@ -28,6 +28,7 @@ public final class PortalCommand extends BrigadierCommand {
                 .then(PortalListCommand.create(plugin))
                 .then(PortalPermissionCommand.create(plugin))
                 .then(PortalTeleportCommand.create(plugin))
+                // todo: redefine shape command
                 .build();
     }
 

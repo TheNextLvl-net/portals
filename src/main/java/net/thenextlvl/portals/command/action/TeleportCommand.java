@@ -15,7 +15,7 @@ import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class TeleportCommand extends ActionCommand<Location> {
+final class TeleportCommand extends ActionCommand<Location> {
     private TeleportCommand(PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().teleport(), "teleport");
     }
