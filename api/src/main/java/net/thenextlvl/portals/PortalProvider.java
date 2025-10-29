@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Contract;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -45,4 +46,6 @@ public interface PortalProvider {
 
     @Contract(mutates = "this")
     boolean deletePortal(String name);
+
+    void forEachPortal(Consumer<Portal> action);
 }

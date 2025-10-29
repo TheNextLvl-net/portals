@@ -68,6 +68,11 @@ public final class PaperPortalProvider implements PortalProvider {
 
     @Override
     public boolean deletePortal(String name) {
-        return portals.removeIf(portal -> portal.getName().equals(name));
+        return getPortal(name).map(this::deletePortal).orElse(false);
+    }
+
+    @Override
+    public void forEachPortal(Consumer<Portal> action) {
+        portals.forEach(action);
     }
 }
