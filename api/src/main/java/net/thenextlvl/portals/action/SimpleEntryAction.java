@@ -6,17 +6,17 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public final class SimpleEntryAction<T> implements EntryAction<T> {
-    private final ActionType<T> actionType;
+    private final ActionType<T> type;
     private T input;
 
-    public SimpleEntryAction(ActionType<T> actionType, T input) {
-        this.actionType = actionType;
+    public SimpleEntryAction(ActionType<T> type, T input) {
+        this.type = type;
         this.input = input;
     }
 
     @Override
-    public ActionType<T> getActionType() {
-        return actionType;
+    public ActionType<T> getType() {
+        return type;
     }
 
     @Override
@@ -32,6 +32,6 @@ public final class SimpleEntryAction<T> implements EntryAction<T> {
 
     @Override
     public boolean onEntry(Entity entity, Portal portal) {
-        return actionType.action().invoke(entity, portal, input);
+        return type.action().invoke(entity, portal, input);
     }
 }

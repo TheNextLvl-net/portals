@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public sealed interface EntryAction<T> permits SimpleEntryAction {
     @Contract(pure = true)
-    ActionType<T> getActionType();
+    ActionType<T> getType();
 
     @Contract(pure = true)
     T getInput();
@@ -22,7 +22,7 @@ public sealed interface EntryAction<T> permits SimpleEntryAction {
     boolean onEntry(Entity entity, Portal portal);
 
     @Contract(value = "_, _ -> new", pure = true)
-    static <T> EntryAction<T> create(ActionType<T> actionType, T input) {
-        return new SimpleEntryAction<>(actionType, input);
+    static <T> EntryAction<T> create(ActionType<T> type, T input) {
+        return new SimpleEntryAction<>(type, input);
     }
 }
