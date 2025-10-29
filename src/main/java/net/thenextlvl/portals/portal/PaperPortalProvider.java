@@ -8,24 +8,27 @@ import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @NullMarked
 public final class PaperPortalProvider implements PortalProvider {
-    private final Set<Portal> portals = new HashSet<>();
-    private final Path dataPath;
+    public final Set<Portal> portals = new HashSet<>();
+    private final PortalsPlugin plugin;
 
     public PaperPortalProvider(PortalsPlugin plugin) {
-        this.dataPath = plugin.getDataPath().resolve("saves");
+        this.plugin = plugin;
     }
 
     @Override
     public Path getDataFolder() {
-        return dataPath;
+        return plugin.savesFolder();
     }
 
     @Override
@@ -46,7 +49,7 @@ public final class PaperPortalProvider implements PortalProvider {
     @Override
     public Portal createPortal(String name, BoundingBox boundingBox) throws IllegalArgumentException {
         Preconditions.checkArgument(!hasPortal(name), "Portal with name '%s' already exists", name);
-        var portal = new PaperPortal(name, boundingBox);
+        var portal = new PaperPortal(plugin, name, boundingBox);
         portals.add(portal);
         return portal;
     }
@@ -63,7 +66,15 @@ public final class PaperPortalProvider implements PortalProvider {
 
     @Override
     public boolean deletePortal(Portal portal) {
-        return portals.remove(portal);
+        try {
+            if (!portals.remove(portal)) return false;
+            Files.deleteIfExists(portal.getDataFile());
+            Files.deleteIfExists(portal.getBackupFile());
+            return true;
+        } catch (IOException e) {
+            plugin.getComponentLogger().error("Failed to delete portal {}", portal.getName(), e);
+            return false;
+        }
     }
 
     @Override
