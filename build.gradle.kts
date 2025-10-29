@@ -40,6 +40,7 @@ dependencies {
     compileOnly("net.thenextlvl:service-io:2.3.3")
 
     implementation("net.thenextlvl.core:i18n:3.2.2")
+    implementation("net.thenextlvl:nbt:3.0.1")
 
     implementation("org.bstats:bstats-bukkit:3.1.0")
 }
@@ -54,7 +55,7 @@ paper {
     main = "net.thenextlvl.portals.PortalsPlugin"
     apiVersion = "1.21.4"
     description = "Create, delete and manage custom portals"
-    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
+    load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
     foliaSupported = true
