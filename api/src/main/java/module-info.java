@@ -12,7 +12,7 @@ module net.thenextlvl.portals {
 
     requires org.bukkit;
     requires net.kyori.adventure.key;
-    
+
     requires static org.jetbrains.annotations;
     requires static org.jspecify;
     requires core.paper;
