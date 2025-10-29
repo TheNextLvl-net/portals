@@ -2,7 +2,7 @@ package net.thenextlvl.portals.selection;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitPlayer;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -39,7 +39,7 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
     @Override
     public Optional<Shape> getSelection(Player player) {
         var manager = worldEdit.getSessionManager();
-        var owner = new BukkitPlayer(player);
+        var owner = BukkitAdapter.adapt(player);
         var session = manager.getIfPresent(owner);
         if (session == null) return Optional.empty();
         try {
@@ -68,7 +68,7 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
     @Override
     public boolean clearSelection(Player player) {
         var manager = worldEdit.getSessionManager();
-        var owner = new BukkitPlayer(player);
+        var owner = BukkitAdapter.adapt(player);
         if (!manager.contains(owner)) return false;
         manager.remove(owner);
         return true;
@@ -76,7 +76,7 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
 
     @Override
     public boolean hasSelection(Player player) {
-        return worldEdit.getSessionManager().contains(new BukkitPlayer(player));
+        return worldEdit.getSessionManager().contains(BukkitAdapter.adapt(player));
     }
 
     private BlockPosition toPosition(BlockVector3 vector) {
@@ -98,19 +98,19 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
     @Override
     public void setSelection(Player player, Shape shape) {
         var manager = worldEdit.getSessionManager();
-        var session = manager.get(new BukkitPlayer(player));
-        session.setRegionSelector(new BukkitWorld(shape.getWorld()), toRegionSelector(shape));
+        var session = manager.get(BukkitAdapter.adapt(player));
+        session.setRegionSelector(BukkitAdapter.adapt(shape.getWorld()), toRegionSelector(shape));
     }
 
     private RegionSelector toRegionSelector(Shape shape) {
         return switch (shape) {
             case Ellipsoid ellipsoid -> new EllipsoidRegionSelector(
-                    new BukkitWorld(ellipsoid.getWorld()),
+                    BukkitAdapter.adapt(ellipsoid.getWorld()),
                     toBlockVector(ellipsoid.getCenter()),
                     new Vector3(ellipsoid.getRadius(), ellipsoid.getHeight(), ellipsoid.getRadius())
             );
             case Cylinder cylinder -> {
-                var world = new BukkitWorld(cylinder.getWorld());
+                var world = BukkitAdapter.adapt(cylinder.getWorld());
                 var region = new CylinderRegion(world);
 
                 var pos1 = toBlockVector(shape.getMinPosition());
@@ -129,7 +129,7 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
                 yield new CylinderRegionSelector(world, center2, radius, region.getMinimumY(), region.getMaximumY());
             }
             case Cuboid cuboid -> new CuboidRegionSelector(
-                    new BukkitWorld(cuboid.getWorld()),
+                    BukkitAdapter.adapt(cuboid.getWorld()),
                     toBlockVector(cuboid.getMinPosition()),
                     toBlockVector(cuboid.getMaxPosition())
             );
