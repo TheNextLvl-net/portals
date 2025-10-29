@@ -1,5 +1,6 @@
 package net.thenextlvl.portals.action.teleport;
 
+import io.papermc.paper.math.FinePosition;
 import io.papermc.paper.math.Position;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -54,6 +55,28 @@ public record Bounds(
      */
     public Bounds(World world, Position min, Position max) {
         this(world, min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+    }
+
+    /**
+     * Gets the minimum position of the bounds.
+     *
+     * @return the minimum position of the bounds
+     * @since 0.1.0
+     */
+    @Contract(value = " -> new", pure = true)
+    public FinePosition minPosition() {
+        return Position.fine(minX, minY, minZ);
+    }
+
+    /**
+     * Gets the maximum position of the bounds.
+     *
+     * @return the maximum position of the bounds
+     * @since 0.1.0
+     */
+    @Contract(value = " -> new", pure = true)
+    public FinePosition maxPosition() {
+        return Position.fine(maxX, maxY, maxZ);
     }
 
     /**
