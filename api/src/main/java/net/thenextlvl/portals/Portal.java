@@ -2,6 +2,7 @@ package net.thenextlvl.portals;
 
 import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.shape.BoundingBox;
+import org.bukkit.World;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.Nullable;
@@ -17,6 +18,9 @@ public interface Portal {
     @Contract(pure = true)
     String getName();
 
+    @Contract(pure = true)
+    World getWorld();
+    
     @Contract(pure = true)
     BoundingBox getBoundingBox();
 

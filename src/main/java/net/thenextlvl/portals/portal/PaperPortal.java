@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.shape.BoundingBox;
+import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -32,6 +33,11 @@ public final class PaperPortal implements Portal {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public World getWorld() {
+        return boundingBox.getWorld();
     }
 
     @Override
