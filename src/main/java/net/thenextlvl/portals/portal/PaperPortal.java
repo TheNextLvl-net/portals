@@ -37,10 +37,17 @@ public final class PaperPortal implements Portal {
     private double entryCost = 0.0;
     private boolean persistent = true;
 
+    private final Path dataFile;
+    private final Path backupFile;
+
     public PaperPortal(PortalsPlugin plugin, String name, BoundingBox boundingBox) {
         this.plugin = plugin;
         this.name = name;
         this.boundingBox = boundingBox;
+
+        var dataFolder = plugin.portalProvider().getDataFolder(getWorld());
+        this.dataFile = dataFolder.resolve(name + ".dat");
+        this.backupFile = dataFolder.resolve(name + ".dat_old");
     }
 
     @Override
@@ -107,12 +114,12 @@ public final class PaperPortal implements Portal {
 
     @Override
     public Path getDataFile() {
-        return plugin.savesFolder().resolve(name + ".dat");
+        return dataFile;
     }
 
     @Override
     public Path getBackupFile() {
-        return plugin.savesFolder().resolve(name + ".dat_old");
+        return backupFile;
     }
 
     @Override
@@ -132,7 +139,7 @@ public final class PaperPortal implements Portal {
         var backup = getBackupFile();
         try {
             if (Files.isRegularFile(file)) Files.move(file, backup, StandardCopyOption.REPLACE_EXISTING);
-            else Files.createDirectories(plugin.savesFolder());
+            else Files.createDirectories(file.getParent());
             try (var outputStream = new NBTOutputStream(
                     Files.newOutputStream(file, WRITE, CREATE, TRUNCATE_EXISTING),
                     StandardCharsets.UTF_8
