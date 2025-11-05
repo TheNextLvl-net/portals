@@ -10,7 +10,7 @@ import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.portal.PaperPortal;
-import net.thenextlvl.portals.shape.Shape;
+import net.thenextlvl.portals.shape.BoundingBox;
 import org.jspecify.annotations.NullMarked;
 
 import java.time.Duration;
@@ -28,7 +28,7 @@ public final class PortalAdapter implements TagAdapter<Portal> {
         var root = tag.getAsCompound();
 
         var name = root.get("name").getAsString();
-        var boundingBox = context.deserialize(root.get("boundingBox"), Shape.class);
+        var boundingBox = context.deserialize(root.get("boundingBox"), BoundingBox.class);
 
         var portal = new PaperPortal(plugin, name, boundingBox);
 
@@ -45,7 +45,7 @@ public final class PortalAdapter implements TagAdapter<Portal> {
         var tag = CompoundTag.empty();
 
         tag.add("name", portal.getName());
-        tag.add("boundingBox", context.serialize(portal.getBoundingBox(), Shape.class));
+        tag.add("boundingBox", context.serialize(portal.getBoundingBox(), BoundingBox.class));
 
         portal.getEntryAction().ifPresent(action -> tag.add("entryAction", context.serialize(action)));
         portal.getEntryPermission().ifPresent(permission -> tag.add("entryPermission", permission));

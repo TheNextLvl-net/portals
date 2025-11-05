@@ -10,6 +10,7 @@ import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolve
 import io.papermc.paper.command.brigadier.argument.resolvers.RotationResolver;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
+import net.thenextlvl.portals.lazy.LazyLocation;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
@@ -38,6 +39,6 @@ final class TeleportCommand extends ActionCommand<Location> {
         resolveArgument(context, "rotation", RotationResolver.class)
                 .ifPresent(location::setRotation);
         
-        return addAction(context, location);
+        return addAction(context, new LazyLocation(location));
     }
 }

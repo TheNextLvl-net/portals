@@ -144,7 +144,7 @@ public final class PaperPortal implements Portal {
                     Files.newOutputStream(file, WRITE, CREATE, TRUNCATE_EXISTING),
                     StandardCharsets.UTF_8
             )) {
-                outputStream.writeTag(getName(), plugin.nbt().serialize(this));
+                outputStream.writeTag(getName(), plugin.nbt(getWorld()).serialize(this));
                 return true;
             }
         } catch (Throwable t) {

@@ -4,6 +4,7 @@ import net.thenextlvl.nbt.NBTInputStream;
 import net.thenextlvl.nbt.serialization.ParserException;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -37,7 +38,7 @@ public final class WorldListener implements Listener {
         try (var files = Files.find(dataFolder, 1, (path, attributes) -> {
             return attributes.isRegularFile() && path.getFileName().toString().endsWith(".dat");
         })) {
-            files.forEach(this::loadSafe);
+            files.forEach(path -> loadSafe(path, event.getWorld()));
         } catch (IOException e) {
             plugin.getComponentLogger().error("Failed to load all portals in world {}", event.getWorld().getName(), e);
         }
@@ -58,17 +59,17 @@ public final class WorldListener implements Listener {
         });
     }
 
-    private @Nullable Portal loadSafe(Path file) {
+    private @Nullable Portal loadSafe(Path file, World world) {
         try {
             try (var inputStream = stream(file)) {
-                return load(inputStream);
+                return load(inputStream, world);
             } catch (Exception e) {
                 var backup = file.resolveSibling(file.getFileName() + "_old");
                 if (!Files.isRegularFile(backup)) throw e;
                 plugin.getComponentLogger().warn("Failed to load portal from {}", file, e);
                 plugin.getComponentLogger().warn("Falling back to {}", backup);
                 try (var inputStream = stream(backup)) {
-                    return load(inputStream);
+                    return load(inputStream, world);
                 }
             }
         } catch (ParserException e) {
@@ -88,8 +89,8 @@ public final class WorldListener implements Listener {
         return new NBTInputStream(Files.newInputStream(file, READ), StandardCharsets.UTF_8);
     }
 
-    private @Nullable Portal load(NBTInputStream inputStream) throws IOException {
-        var portal = plugin.nbt().deserialize(inputStream.readTag(), Portal.class);
+    private @Nullable Portal load(NBTInputStream inputStream, World world) throws IOException {
+        var portal = plugin.nbt(world).deserialize(inputStream.readTag(), Portal.class);
         if (plugin.portalProvider().portals.add(portal)) return portal;
         plugin.getComponentLogger().warn("A portal with the name '{}' is already loaded", portal.getName());
         return null;

@@ -60,7 +60,7 @@ final class PortalCreateCommand extends SimpleCommand {
         var world = tryGetArgument(context, "world", World.class).orElse(context.getSource().getLocation().getWorld());
 
         if (from != null && to != null) {
-            boundingBox = BoundingBox.cuboid(world, min(from, to), max(from, to).offset(1, 1, 1));
+            boundingBox = BoundingBox.of(world, min(from, to), max(from, to).offset(1, 1, 1));
         }
 
         if (boundingBox == null && context.getSource().getExecutor() instanceof Player player) {

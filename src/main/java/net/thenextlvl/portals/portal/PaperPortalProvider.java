@@ -43,7 +43,7 @@ public final class PaperPortalProvider implements PortalProvider {
 
     @Override
     public Stream<Portal> getPortals(World world) {
-        return getPortals().filter(portal -> portal.getBoundingBox().getWorld().equals(world));
+        return getPortals().filter(portal -> portal.getWorld().equals(world));
     }
 
     @Override

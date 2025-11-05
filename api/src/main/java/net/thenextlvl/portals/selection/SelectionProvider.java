@@ -1,6 +1,6 @@
 package net.thenextlvl.portals.selection;
 
-import net.thenextlvl.portals.shape.Shape;
+import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 
@@ -15,9 +15,9 @@ import java.util.Optional;
  */
 public interface SelectionProvider {
     @Contract(pure = true)
-    Optional<Shape> getSelection(Player player);
+    Optional<BoundingBox> getSelection(Player player);
 
-    void setSelection(Player player, Shape shape);
+    void setSelection(Player player, BoundingBox boundingBox);
 
     boolean clearSelection(Player player);
 

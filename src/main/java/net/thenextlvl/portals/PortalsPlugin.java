@@ -1,22 +1,16 @@
 package net.thenextlvl.portals;
 
 import core.i18n.file.ComponentBundle;
-import io.papermc.paper.math.BlockPosition;
-import io.papermc.paper.math.FinePosition;
+import io.papermc.paper.math.Position;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.nbt.serialization.NBT;
 import net.thenextlvl.portals.action.EntryAction;
-import net.thenextlvl.portals.action.teleport.Bounds;
-import net.thenextlvl.portals.adapter.BlockPositionAdapter;
-import net.thenextlvl.portals.adapter.BoundsAdapter;
+import net.thenextlvl.portals.adapter.BoundingBoxAdapter;
 import net.thenextlvl.portals.adapter.EntryActionAdapter;
-import net.thenextlvl.portals.adapter.FinePositionAdapter;
+import net.thenextlvl.portals.adapter.PositionAdapter;
 import net.thenextlvl.portals.adapter.KeyAdapter;
-import net.thenextlvl.portals.adapter.LocationAdapter;
 import net.thenextlvl.portals.adapter.PortalAdapter;
-import net.thenextlvl.portals.adapter.WorldAdapter;
-import net.thenextlvl.portals.adapter.shape.ShapeAdapter;
 import net.thenextlvl.portals.command.PortalCommand;
 import net.thenextlvl.portals.config.PortalConfig;
 import net.thenextlvl.portals.config.SimplePortalConfig;
@@ -30,9 +24,8 @@ import net.thenextlvl.portals.portal.PaperPortalProvider;
 import net.thenextlvl.portals.selection.NativeSelectionProvider;
 import net.thenextlvl.portals.selection.SelectionProvider;
 import net.thenextlvl.portals.selection.WorldEditSelectionProvider;
-import net.thenextlvl.portals.shape.Shape;
+import net.thenextlvl.portals.shape.BoundingBox;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -59,18 +52,6 @@ public final class PortalsPlugin extends JavaPlugin {
             .placeholder("prefix", "prefix")
             .build();
 
-    private final NBT nbt = NBT.builder()
-            .registerTypeHierarchyAdapter(BlockPosition.class, new BlockPositionAdapter())
-            .registerTypeHierarchyAdapter(Bounds.class, new BoundsAdapter())
-            .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter())
-            .registerTypeHierarchyAdapter(FinePosition.class, new FinePositionAdapter())
-            .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
-            .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
-            .registerTypeHierarchyAdapter(Portal.class, new PortalAdapter(this))
-            .registerTypeHierarchyAdapter(Shape.class, new ShapeAdapter())
-            .registerTypeHierarchyAdapter(World.class, new WorldAdapter(getServer()))
-            .build();
-
     public PortalsPlugin() {
         getServer().getServicesManager().register(PortalProvider.class, portalProvider, this, ServicePriority.Highest);
         getServer().getServicesManager().register(SelectionProvider.class, new NativeSelectionProvider(), this, ServicePriority.Lowest);
@@ -83,7 +64,7 @@ public final class PortalsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
 
         if (getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
-            getServer().getServicesManager().register(SelectionProvider.class, new WorldEditSelectionProvider(this), this, ServicePriority.Normal);
+            getServer().getServicesManager().register(SelectionProvider.class, new WorldEditSelectionProvider(), this, ServicePriority.Normal);
         }
         if (getServer().getPluginManager().isPluginEnabled("ServiceIO")) {
             this.economyProvider = new ServiceEconomyProvider(this);
@@ -124,8 +105,14 @@ public final class PortalsPlugin extends JavaPlugin {
         return portalConfig;
     }
 
-    @Contract(pure = true)
-    public NBT nbt() {
-        return nbt;
+    @Contract(value = "_ -> new", pure = true)
+    public NBT nbt(World world) {
+        return NBT.builder()
+                .registerTypeHierarchyAdapter(BoundingBox.class, new BoundingBoxAdapter(world))
+                .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter(this))
+                .registerTypeHierarchyAdapter(Position.class, new PositionAdapter())
+                .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
+                .registerTypeHierarchyAdapter(Portal.class, new PortalAdapter(this))
+                .build();
     }
 }

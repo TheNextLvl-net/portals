@@ -21,7 +21,7 @@ public interface Portal {
 
     @Contract(pure = true)
     World getWorld();
-    
+
     @Contract(pure = true)
     BoundingBox getBoundingBox();
 

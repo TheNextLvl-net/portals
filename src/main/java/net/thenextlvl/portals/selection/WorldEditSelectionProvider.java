@@ -7,21 +7,11 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.CylinderRegion;
-import com.sk89q.worldedit.regions.EllipsoidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
-import com.sk89q.worldedit.regions.selector.CylinderRegionSelector;
-import com.sk89q.worldedit.regions.selector.EllipsoidRegionSelector;
 import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.math.Position;
-import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.shape.BoundingBox;
-import net.thenextlvl.portals.shape.Cuboid;
-import net.thenextlvl.portals.shape.Cylinder;
-import net.thenextlvl.portals.shape.Ellipsoid;
-import net.thenextlvl.portals.shape.Shape;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 
@@ -30,39 +20,31 @@ import java.util.Optional;
 @NullMarked
 public final class WorldEditSelectionProvider implements SelectionProvider {
     private final WorldEdit worldEdit = WorldEdit.getInstance();
-    private final PortalsPlugin plugin;
-
-    public WorldEditSelectionProvider(PortalsPlugin plugin) {
-        this.plugin = plugin;
-    }
 
     @Override
-    public Optional<Shape> getSelection(Player player) {
+    public Optional<BoundingBox> getSelection(Player player) {
         var manager = worldEdit.getSessionManager();
         var owner = BukkitAdapter.adapt(player);
         var session = manager.getIfPresent(owner);
         if (session == null) return Optional.empty();
         try {
-            return Optional.of(fromRegion(player, session.getSelection()));
-        } catch (IllegalArgumentException e) {
-            plugin.getComponentLogger().error("Failed to convert WorldEdit region to shape", e);
-            return Optional.empty();
+            if (!(session.getSelection() instanceof CuboidRegion cuboid)) return Optional.empty();
+            var world = cuboid.getWorld() instanceof BukkitWorld bukkit ? bukkit.getWorld() : player.getWorld();
+            var min = toPosition(cuboid.getMinimumPoint());
+            var max = toPosition(cuboid.getMaximumPoint()).offset(1, 1, 1);
+            return Optional.of(BoundingBox.of(world, min, max));
         } catch (IncompleteRegionException e) {
             return Optional.empty();
         }
     }
 
-    private Shape fromRegion(Player player, Region region) {
+    private BoundingBox fromRegion(Player player, Region region) {
         var world = region.getWorld() instanceof BukkitWorld bukkit ? bukkit.getWorld() : player.getWorld();
-        return switch (region) {
-            case EllipsoidRegion ellipsoid ->
-                    BoundingBox.ellipsoid(world, toPosition(ellipsoid.getCenter()), ellipsoid.getWidth(), ellipsoid.getHeight());
-            case CylinderRegion cylinder ->
-                    BoundingBox.cylinder(world, toPosition(cylinder.getCenter()), cylinder.getWidth(), cylinder.getHeight());
-            case CuboidRegion cuboid ->
-                    BoundingBox.cuboid(world, toPosition(cuboid.getMinimumPoint()), toPosition(cuboid.getMaximumPoint()).offset(1, 1, 1));
-            default -> throw new IllegalArgumentException("Unsupported region type: " + region.getClass().getName());
-        };
+        if (!(region instanceof CuboidRegion cuboid))
+            throw new IllegalArgumentException("");
+        var min = toPosition(cuboid.getMinimumPoint());
+        var max = toPosition(cuboid.getMaximumPoint()).offset(1, 1, 1);
+        return BoundingBox.of(world, min, max);
     }
 
     @Override
@@ -96,44 +78,14 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
     }
 
     @Override
-    public void setSelection(Player player, Shape shape) {
+    public void setSelection(Player player, BoundingBox boundingBox) {
         var manager = worldEdit.getSessionManager();
         var session = manager.get(BukkitAdapter.adapt(player));
-        session.setRegionSelector(BukkitAdapter.adapt(shape.getWorld()), toRegionSelector(shape));
-    }
-
-    private RegionSelector toRegionSelector(Shape shape) {
-        return switch (shape) {
-            case Ellipsoid ellipsoid -> new EllipsoidRegionSelector(
-                    BukkitAdapter.adapt(ellipsoid.getWorld()),
-                    toBlockVector(ellipsoid.getCenter()),
-                    new Vector3(ellipsoid.getRadius(), ellipsoid.getHeight(), ellipsoid.getRadius())
-            );
-            case Cylinder cylinder -> {
-                var world = BukkitAdapter.adapt(cylinder.getWorld());
-                var region = new CylinderRegion(world);
-
-                var pos1 = toBlockVector(shape.getMinPosition());
-                var pos2 = toBlockVector(shape.getMaxPosition());
-
-                var center = pos1.add(pos2).divide(2).floor();
-                var center2 = center.toBlockVector2();
-                var radius = pos2.toBlockVector2().subtract(center2).toVector2();
-
-                region.setCenter(center2);
-                region.setRadius(radius);
-
-                region.setMaximumY(Math.max(pos1.y(), pos2.y()));
-                region.setMinimumY(Math.min(pos1.y(), pos2.y()));
-
-                yield new CylinderRegionSelector(world, center2, radius, region.getMinimumY(), region.getMaximumY());
-            }
-            case Cuboid cuboid -> new CuboidRegionSelector(
-                    BukkitAdapter.adapt(cuboid.getWorld()),
-                    toBlockVector(cuboid.getMinPosition()),
-                    toBlockVector(cuboid.getMaxPosition())
-            );
-            default -> throw new IllegalArgumentException("Unsupported shape type: " + shape.getClass().getName());
-        };
+        var selector = new CuboidRegionSelector(
+                BukkitAdapter.adapt(boundingBox.getWorld()),
+                toBlockVector(boundingBox.getMinPosition()),
+                toBlockVector(boundingBox.getMaxPosition())
+        );
+        session.setRegionSelector(BukkitAdapter.adapt(boundingBox.getWorld()), selector);
     }
 }

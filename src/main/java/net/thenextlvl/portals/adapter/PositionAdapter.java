@@ -1,6 +1,5 @@
 package net.thenextlvl.portals.adapter;
 
-import io.papermc.paper.math.FinePosition;
 import io.papermc.paper.math.Position;
 import net.thenextlvl.nbt.serialization.ParserException;
 import net.thenextlvl.nbt.serialization.TagAdapter;
@@ -11,9 +10,9 @@ import net.thenextlvl.nbt.tag.Tag;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class FinePositionAdapter implements TagAdapter<FinePosition> {
+public final class PositionAdapter implements TagAdapter<Position> {
     @Override
-    public FinePosition deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
+    public Position deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
         var root = tag.getAsCompound();
         var x = root.get("x").getAsDouble();
         var y = root.get("y").getAsDouble();
@@ -22,7 +21,7 @@ public final class FinePositionAdapter implements TagAdapter<FinePosition> {
     }
 
     @Override
-    public Tag serialize(FinePosition position, TagSerializationContext context) throws ParserException {
+    public Tag serialize(Position position, TagSerializationContext context) throws ParserException {
         var tag = CompoundTag.empty();
         tag.add("x", position.x());
         tag.add("y", position.y());
