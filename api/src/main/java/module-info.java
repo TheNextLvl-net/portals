@@ -10,10 +10,10 @@ module net.thenextlvl.portals {
     exports net.thenextlvl.portals.shape;
     exports net.thenextlvl.portals;
 
-    requires org.bukkit;
+    requires core.paper;
     requires net.kyori.adventure.key;
+    requires org.bukkit;
 
     requires static org.jetbrains.annotations;
     requires static org.jspecify;
-    requires core.paper;
 }
