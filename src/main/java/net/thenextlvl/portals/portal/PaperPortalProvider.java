@@ -27,8 +27,8 @@ public final class PaperPortalProvider implements PortalProvider {
     }
 
     @Override
-    public Path getDataFolder() {
-        return plugin.savesFolder();
+    public Path getDataFolder(World world) {
+        return world.getWorldPath().resolve("portals");
     }
 
     @Override

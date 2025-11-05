@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @ApiStatus.NonExtendable
 public interface PortalProvider {
     @Contract(pure = true)
-    Path getDataFolder();
+    Path getDataFolder(World world);
 
     @Contract(pure = true)
     Optional<Portal> getPortal(String name);
