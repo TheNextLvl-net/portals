@@ -55,7 +55,7 @@ paper {
     main = "net.thenextlvl.portals.PortalsPlugin"
     apiVersion = "1.21.4"
     description = "Create, delete and manage custom portals"
-    load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"
     authors = listOf("NonSwag")
     foliaSupported = true
