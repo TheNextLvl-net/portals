@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public sealed interface EntryAction<T> permits SimpleEntryAction {
     @Contract(pure = true)
-    ActionType<T> getType();
+    ActionType<T> getActionType();
 
     @Contract(pure = true)
     T getInput();

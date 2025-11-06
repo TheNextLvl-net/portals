@@ -25,7 +25,7 @@ abstract class ActionCommand<T> extends SimpleCommand {
         var portal = context.getArgument("portal", Portal.class);
 
         var success = !portal.getEntryAction().map(action -> {
-            return action.getType().equals(actionType) && action.getInput().equals(input);
+            return action.getActionType().equals(actionType) && action.getInput().equals(input);
         }).orElse(false);
         if (success) portal.setEntryAction(EntryAction.create(actionType, input));
 
@@ -33,7 +33,7 @@ abstract class ActionCommand<T> extends SimpleCommand {
         var message = success ? "portal.action.set" : "nothing.changed";
         plugin.bundle().sendMessage(sender, message,
                 Placeholder.unparsed("portal", portal.getName()),
-                Placeholder.unparsed("action", actionType.name()));
+                Placeholder.unparsed("action", actionType.getName()));
         return success ? Command.SINGLE_SUCCESS : 0;
     }
 }

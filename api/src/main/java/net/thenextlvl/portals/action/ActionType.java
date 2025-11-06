@@ -12,14 +12,14 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public sealed interface ActionType<T> permits SimpleActionType {
     @Contract(pure = true)
-    Class<T> type();
+    Class<T> getType();
 
     @KeyPattern.Value
     @Contract(pure = true)
-    String name();
+    String getName();
 
     @Contract(pure = true)
-    Action<T> action();
+    Action<T> getAction();
 
     @FunctionalInterface
     interface Action<T> {

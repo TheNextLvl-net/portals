@@ -15,7 +15,7 @@ public final class SimpleEntryAction<T> implements EntryAction<T> {
     }
 
     @Override
-    public ActionType<T> getType() {
+    public ActionType<T> getActionType() {
         return type;
     }
 
@@ -32,6 +32,6 @@ public final class SimpleEntryAction<T> implements EntryAction<T> {
 
     @Override
     public boolean onEntry(Entity entity, Portal portal) {
-        return type.action().invoke(entity, portal, input);
+        return type.getAction().invoke(entity, portal, input);
     }
 }

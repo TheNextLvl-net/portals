@@ -35,15 +35,15 @@ public final class EntryActionAdapter implements TagAdapter<EntryAction<?>> {
         var typeName = root.get("type").getAsString();
         var actionType = ActionTypeRegistry.registry().getByName(typeName)
                 .orElseThrow(() -> new ParserException("Unknown action type: " + typeName));
-        var input = nbt.deserialize(root.get("input"), actionType.type());
+        var input = nbt.deserialize(root.get("input"), actionType.getType());
         return EntryAction.create(actionType, input);
     }
 
     @Override
     public Tag serialize(EntryAction<?> action, TagSerializationContext context) throws ParserException {
         var tag = CompoundTag.empty();
-        tag.add("type", action.getType().name());
-        tag.add("input", nbt.serialize(action.getInput(), action.getType().type()));
+        tag.add("type", action.getActionType().getName());
+        tag.add("input", nbt.serialize(action.getInput(), action.getActionType().getType()));
         return tag;
     }
 }
