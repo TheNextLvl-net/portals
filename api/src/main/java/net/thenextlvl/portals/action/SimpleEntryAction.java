@@ -4,8 +4,10 @@ import net.thenextlvl.portals.Portal;
 import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
 @NullMarked
-public final class SimpleEntryAction<T> implements EntryAction<T> {
+final class SimpleEntryAction<T> implements EntryAction<T> {
     private final ActionType<T> type;
     private T input;
 
@@ -26,6 +28,7 @@ public final class SimpleEntryAction<T> implements EntryAction<T> {
 
     @Override
     public boolean setInput(T input) {
+        if (Objects.equals(this.input, input)) return false;
         this.input = input;
         return true;
     }
