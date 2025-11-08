@@ -15,10 +15,7 @@ import java.util.Optional;
  * @since 0.1.0
  */
 @ApiStatus.NonExtendable
-public interface Portal {
-    @Contract(pure = true)
-    String getName();
-
+public interface Portal extends PortalLike {
     @Contract(pure = true)
     World getWorld();
 

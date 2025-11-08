@@ -1,7 +1,7 @@
 package net.thenextlvl.portals.action;
 
-import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.action.teleport.Bounds;
+import net.thenextlvl.portals.PortalLike;
+import net.thenextlvl.portals.model.Bounds;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Contract;
 
@@ -29,7 +29,7 @@ public sealed interface ActionTypes permits SimpleActionTypes {
     ActionType<Location> teleport();
 
     @Contract(pure = true)
-    ActionType<Portal> teleportPortal();
+    ActionType<PortalLike> teleportPortal();
 
     @Contract(pure = true)
     ActionType<Bounds> teleportRandom();

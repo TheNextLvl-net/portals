@@ -8,11 +8,11 @@ import net.thenextlvl.nbt.serialization.TagDeserializationContext;
 import net.thenextlvl.nbt.serialization.TagSerializationContext;
 import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.nbt.tag.Tag;
-import net.thenextlvl.portals.Portal;
+import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypeRegistry;
 import net.thenextlvl.portals.action.EntryAction;
-import net.thenextlvl.portals.action.teleport.Bounds;
+import net.thenextlvl.portals.model.Bounds;
 import org.bukkit.Location;
 import org.jspecify.annotations.NullMarked;
 
@@ -25,7 +25,7 @@ public final class EntryActionAdapter implements TagAdapter<EntryAction<?>> {
                 .registerTypeHierarchyAdapter(Bounds.class, new BoundsAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Location.class, new LazyLocationAdapter())
-                .registerTypeHierarchyAdapter(Portal.class, new LazyPortalAdapter(plugin))
+                .registerTypeHierarchyAdapter(PortalLike.class, new PortalLikeAdapter(plugin))
                 .build();
     }
 
