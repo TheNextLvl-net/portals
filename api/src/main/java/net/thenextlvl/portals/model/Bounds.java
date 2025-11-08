@@ -1,11 +1,10 @@
-package net.thenextlvl.portals.action.teleport;
+package net.thenextlvl.portals.model;
 
 import io.papermc.paper.math.FinePosition;
 import io.papermc.paper.math.Position;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.Contract;
-import org.jspecify.annotations.NullMarked;
 
 import java.util.Random;
 
@@ -20,7 +19,6 @@ import java.util.Random;
  * @param maxY  The maximum Y coordinate.
  * @param maxZ  The maximum Z coordinate.
  */
-@NullMarked
 public record Bounds(
         World world,
         double minX, double minY, double minZ,
