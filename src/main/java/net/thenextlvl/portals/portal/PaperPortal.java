@@ -56,6 +56,11 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
+    public Optional<Portal> getPortal() {
+        return Optional.of(this);
+    }
+
+    @Override
     public World getWorld() {
         return boundingBox.getWorld();
     }
