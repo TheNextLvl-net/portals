@@ -4,16 +4,17 @@ import core.i18n.file.ComponentBundle;
 import io.papermc.paper.math.Position;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
+import net.thenextlvl.binder.StaticBinder;
 import net.thenextlvl.nbt.serialization.NBT;
 import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.adapter.BoundingBoxAdapter;
 import net.thenextlvl.portals.adapter.EntryActionAdapter;
-import net.thenextlvl.portals.adapter.PositionAdapter;
 import net.thenextlvl.portals.adapter.KeyAdapter;
 import net.thenextlvl.portals.adapter.PortalAdapter;
+import net.thenextlvl.portals.adapter.PositionAdapter;
 import net.thenextlvl.portals.command.PortalCommand;
-import net.thenextlvl.portals.config.PortalConfig;
-import net.thenextlvl.portals.config.SimplePortalConfig;
+import net.thenextlvl.portals.model.PortalConfig;
+import net.thenextlvl.portals.model.SimplePortalConfig;
 import net.thenextlvl.portals.economy.EconomyProvider;
 import net.thenextlvl.portals.economy.EmptyEconomyProvider;
 import net.thenextlvl.portals.economy.ServiceEconomyProvider;
@@ -53,7 +54,7 @@ public final class PortalsPlugin extends JavaPlugin {
             .build();
 
     public PortalsPlugin() {
-        getServer().getServicesManager().register(PortalProvider.class, portalProvider, this, ServicePriority.Highest);
+        StaticBinder.getInstance(PortalProvider.class.getClassLoader()).bind(PortalProvider.class, portalProvider);
         getServer().getServicesManager().register(SelectionProvider.class, new NativeSelectionProvider(), this, ServicePriority.Lowest);
         registerCommands();
     }
