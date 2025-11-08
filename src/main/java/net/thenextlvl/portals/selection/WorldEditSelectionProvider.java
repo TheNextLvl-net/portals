@@ -5,9 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.math.Position;
@@ -38,15 +36,6 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
         }
     }
 
-    private BoundingBox fromRegion(Player player, Region region) {
-        var world = region.getWorld() instanceof BukkitWorld bukkit ? bukkit.getWorld() : player.getWorld();
-        if (!(region instanceof CuboidRegion cuboid))
-            throw new IllegalArgumentException("");
-        var min = toPosition(cuboid.getMinimumPoint());
-        var max = toPosition(cuboid.getMaximumPoint()).offset(1, 1, 1);
-        return BoundingBox.of(world, min, max);
-    }
-
     @Override
     public boolean clearSelection(Player player) {
         var manager = worldEdit.getSessionManager();
@@ -58,23 +47,7 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
 
     @Override
     public boolean hasSelection(Player player) {
-        return worldEdit.getSessionManager().contains(BukkitAdapter.adapt(player));
-    }
-
-    private BlockPosition toPosition(BlockVector3 vector) {
-        return Position.block(vector.x(), vector.y(), vector.z());
-    }
-
-    private Position toPosition(Vector3 vector) {
-        return Position.fine(vector.x(), vector.y(), vector.z());
-    }
-
-    private BlockVector3 toBlockVector(Position position) {
-        return BlockVector3.at(position.blockX(), position.blockY(), position.blockZ());
-    }
-
-    private Vector3 toVector(Position position) {
-        return Vector3.at(position.x(), position.y(), position.z());
+        return getSelection(player).isPresent();
     }
 
     @Override
@@ -87,5 +60,13 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
                 toBlockVector(boundingBox.getMaxPosition())
         );
         session.setRegionSelector(BukkitAdapter.adapt(boundingBox.getWorld()), selector);
+    }
+
+    private BlockPosition toPosition(BlockVector3 vector) {
+        return Position.block(vector.x(), vector.y(), vector.z());
+    }
+
+    private BlockVector3 toBlockVector(Position position) {
+        return BlockVector3.at(position.blockX(), position.blockY(), position.blockZ());
     }
 }
