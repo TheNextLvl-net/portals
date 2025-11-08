@@ -12,7 +12,7 @@ import net.thenextlvl.portals.model.LazyPortal;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class PortalLikeAdapter implements TagAdapter<PortalLike> {
+public final class PortalLikeAdapter implements TagAdapter<PortalLike> {
     private final PortalsPlugin plugin;
 
     public PortalLikeAdapter(PortalsPlugin plugin) {

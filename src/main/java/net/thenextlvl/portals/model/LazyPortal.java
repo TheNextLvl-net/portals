@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference;
 import java.util.Optional;
 
 @NullMarked
-public class LazyPortal implements PortalLike {
+public final class LazyPortal implements PortalLike {
     private @Nullable WeakReference<Portal> portal = null;
     private final String name;
 

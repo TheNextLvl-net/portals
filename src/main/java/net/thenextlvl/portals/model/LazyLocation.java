@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public class LazyLocation extends Location implements Keyed {
+public final class LazyLocation extends Location implements Keyed {
     private final Key key;
 
     public LazyLocation(Location location) {
