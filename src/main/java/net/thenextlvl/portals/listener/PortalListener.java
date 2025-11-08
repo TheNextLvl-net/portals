@@ -72,7 +72,7 @@ public final class PortalListener implements Listener {
         var to = event.getTo() != null ? event.getTo() : event.getEntity().getLocation();
         processTeleport(event.getEntity(), to);
     }
-    
+
     private void processTeleport(Entity entity, Location to) {
         var boundingBox = translate(entity.getBoundingBox(), to);
         plugin.portalProvider().getPortals(to.getWorld())
@@ -134,7 +134,7 @@ public final class PortalListener implements Listener {
         if (!plugin.config().pushBackOnEntryDenied()) return;
         entity.getScheduler().run(plugin, task -> {
             var direction = entity.getLocation().toVector().subtract(to.toVector()).normalize();
-            entity.setVelocity(direction.multiply(plugin.config().pushBackSpeed()));
+            entity.setVelocity(direction.multiply(plugin.config().pushbackSpeed()));
         }, null);
     }
 
