@@ -12,7 +12,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.jspecify.annotations.NullMarked;
 
@@ -58,6 +60,24 @@ public final class PortalListener implements Listener {
         if (processMovement(event.getPlayer(), event.getTo())) return;
         pushAway(event.getPlayer(), event.getTo());
         event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        processTeleport(event.getPlayer(), event.getTo());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityTeleport(EntityTeleportEvent event) {
+        var to = event.getTo() != null ? event.getTo() : event.getEntity().getLocation();
+        processTeleport(event.getEntity(), to);
+    }
+    
+    private void processTeleport(Entity entity, Location to) {
+        var boundingBox = translate(entity.getBoundingBox(), to);
+        plugin.portalProvider().getPortals(to.getWorld())
+                .filter(portal -> portal.getBoundingBox().overlaps(boundingBox))
+                .findAny().ifPresent(portal -> lastPortal.put(entity.getUniqueId(), portal));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
