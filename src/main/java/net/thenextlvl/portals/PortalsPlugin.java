@@ -13,14 +13,14 @@ import net.thenextlvl.portals.adapter.KeyAdapter;
 import net.thenextlvl.portals.adapter.PortalAdapter;
 import net.thenextlvl.portals.adapter.PositionAdapter;
 import net.thenextlvl.portals.command.PortalCommand;
-import net.thenextlvl.portals.model.PortalConfig;
-import net.thenextlvl.portals.model.SimplePortalConfig;
 import net.thenextlvl.portals.economy.EconomyProvider;
 import net.thenextlvl.portals.economy.EmptyEconomyProvider;
 import net.thenextlvl.portals.economy.ServiceEconomyProvider;
 import net.thenextlvl.portals.economy.VaultEconomyProvider;
 import net.thenextlvl.portals.listener.PortalListener;
 import net.thenextlvl.portals.listener.WorldListener;
+import net.thenextlvl.portals.model.PortalConfig;
+import net.thenextlvl.portals.model.SimplePortalConfig;
 import net.thenextlvl.portals.portal.PaperPortalProvider;
 import net.thenextlvl.portals.selection.NativeSelectionProvider;
 import net.thenextlvl.portals.selection.SelectionProvider;
@@ -54,8 +54,11 @@ public final class PortalsPlugin extends JavaPlugin {
             .build();
 
     public PortalsPlugin() {
+        StaticBinder.getInstance(PortalConfig.class.getClassLoader()).bind(PortalConfig.class, portalConfig);
         StaticBinder.getInstance(PortalProvider.class.getClassLoader()).bind(PortalProvider.class, portalProvider);
+
         getServer().getServicesManager().register(SelectionProvider.class, new NativeSelectionProvider(), this, ServicePriority.Lowest);
+
         registerCommands();
     }
 
