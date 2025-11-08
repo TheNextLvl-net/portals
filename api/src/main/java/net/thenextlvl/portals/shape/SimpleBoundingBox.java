@@ -6,6 +6,19 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 record SimpleBoundingBox(World world, Position minPosition, Position maxPosition) implements BoundingBox {
+
+    SimpleBoundingBox(World world, Position minPosition, Position maxPosition) {
+        this.world = world;
+        var minX = Math.min(minPosition.x(), maxPosition.x());
+        var minY = Math.min(minPosition.y(), maxPosition.y());
+        var minZ = Math.min(minPosition.z(), maxPosition.z());
+        this.minPosition = Position.fine(minX, minY, minZ);
+        var maxX = Math.max(minPosition.x(), maxPosition.x());
+        var maxY = Math.max(minPosition.y(), maxPosition.y());
+        var maxZ = Math.max(minPosition.z(), maxPosition.z());
+        this.maxPosition = Position.fine(maxX, maxY, maxZ);
+    }
+
     @Override
     public World getWorld() {
         return world;
