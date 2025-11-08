@@ -5,13 +5,14 @@ import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.thenextlvl.portals.Portal;
+import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
 import net.thenextlvl.portals.command.argument.PortalArgumentType;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-final class TeleportPortalCommand extends ActionCommand<Portal> {
+final class TeleportPortalCommand extends ActionCommand<PortalLike> {
     private TeleportPortalCommand(PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().teleportPortal(), "teleport-portal");
     }
