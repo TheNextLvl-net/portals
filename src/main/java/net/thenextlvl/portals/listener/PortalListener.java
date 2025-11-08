@@ -109,10 +109,10 @@ public final class PortalListener implements Listener {
 
                     if (!new EntityPortalEnterEvent(portal, entity).callEvent()) return false;
 
-                    portal.getEntryAction().ifPresent(action -> action.onEntry(entity, portal));
                     if (portal.getCooldown().isPositive()) setLastEntry(portal, entity);
                     lastPortal.put(entity.getUniqueId(), portal);
-                    return true;
+
+                    return portal.getEntryAction().map(action -> action.onEntry(entity, portal)).orElse(true);
                 }).orElseGet(() -> {
                     var removed = lastPortal.remove(entity.getUniqueId());
                     if (removed != null) new EntityPortalExitEvent(removed, entity).callEvent();
