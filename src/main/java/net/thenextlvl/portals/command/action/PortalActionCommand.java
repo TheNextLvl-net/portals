@@ -18,6 +18,7 @@ public final class PortalActionCommand extends BrigadierCommand {
         var command = new PortalActionCommand(plugin);
         return command.create().then(portalArgument(plugin)
                 .then(ConnectCommand.create(plugin))
+                .then(RemoveCommand.create(plugin))
                 .then(RunConsoleCommand.create(plugin))
                 .then(RunPlayerCommand.create(plugin))
                 .then(TeleportCommand.create(plugin))
