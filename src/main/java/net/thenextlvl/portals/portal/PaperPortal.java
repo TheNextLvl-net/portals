@@ -14,11 +14,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
@@ -37,8 +37,8 @@ public final class PaperPortal implements Portal {
     private double entryCost = 0.0;
     private boolean persistent = true;
 
-    private final Path dataFile;
-    private final Path backupFile;
+    private Path dataFile;
+    private Path backupFile;
 
     public PaperPortal(PortalsPlugin plugin, String name, BoundingBox boundingBox) {
         this.plugin = plugin;
@@ -71,8 +71,31 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public void setBoundingBox(BoundingBox boundingBox) {
+    public boolean setBoundingBox(BoundingBox boundingBox) {
+        if (this.boundingBox.equals(boundingBox)) return false;
+
+        if (boundingBox.getWorld().equals(getWorld())) {
+            this.boundingBox = boundingBox;
+            return true;
+        }
+
+        var target = plugin.portalProvider().getDataFolder(boundingBox.getWorld());
+        var dataFile = target.resolve(getDataFile().getFileName());
+        var backupFile = target.resolve(getBackupFile().getFileName());
+
+        try {
+            Files.createDirectories(target);
+            if (Files.exists(getDataFile())) Files.move(getDataFile(), dataFile, REPLACE_EXISTING);
+            if (Files.exists(getBackupFile())) Files.move(getBackupFile(), backupFile, REPLACE_EXISTING);
+        } catch (IOException e) {
+            plugin.getComponentLogger().error("Failed to move portal data files for {}", getName(), e);
+            return false;
+        }
+
+        this.dataFile = dataFile;
+        this.backupFile = backupFile;
         this.boundingBox = boundingBox;
+        return true;
     }
 
     @Override
@@ -81,8 +104,10 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public void setEntryPermission(@Nullable String permission) {
+    public boolean setEntryPermission(@Nullable String permission) {
+        if (Objects.equals(this.entryPermission, permission)) return false;
         this.entryPermission = permission;
+        return true;
     }
 
     @Override
@@ -91,9 +116,11 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public void setCooldown(Duration cooldown) throws IllegalArgumentException {
+    public boolean setCooldown(Duration cooldown) throws IllegalArgumentException {
         Preconditions.checkArgument(!cooldown.isNegative(), "Cooldown cannot be negative");
+        if (this.cooldown.equals(cooldown)) return false;
         this.cooldown = cooldown;
+        return true;
     }
 
     @Override
@@ -102,9 +129,11 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public void setEntryCost(double cost) throws IllegalArgumentException {
+    public boolean setEntryCost(double cost) throws IllegalArgumentException {
         Preconditions.checkArgument(cost >= 0, "Entry cost cannot be negative");
+        if (this.entryCost == cost) return false;
         this.entryCost = cost;
+        return true;
     }
 
     @Override
@@ -113,8 +142,10 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public void setEntryAction(@Nullable EntryAction<?> action) {
+    public boolean setEntryAction(@Nullable EntryAction<?> action) {
+        if (Objects.equals(this.entryAction, action)) return false;
         this.entryAction = action;
+        return true;
     }
 
     @Override
@@ -133,8 +164,10 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public void setPersistent(boolean persistent) {
+    public boolean setPersistent(boolean persistent) {
+        if (this.persistent == persistent) return false;
         this.persistent = persistent;
+        return true;
     }
 
     @Override
@@ -143,7 +176,7 @@ public final class PaperPortal implements Portal {
         var file = getDataFile();
         var backup = getBackupFile();
         try {
-            if (Files.isRegularFile(file)) Files.move(file, backup, StandardCopyOption.REPLACE_EXISTING);
+            if (Files.isRegularFile(file)) Files.move(file, backup, REPLACE_EXISTING);
             else Files.createDirectories(file.getParent());
             try (var outputStream = new NBTOutputStream(
                     Files.newOutputStream(file, WRITE, CREATE, TRUNCATE_EXISTING),
@@ -154,7 +187,7 @@ public final class PaperPortal implements Portal {
             }
         } catch (Throwable t) {
             if (Files.isRegularFile(backup)) try {
-                Files.copy(backup, file, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(backup, file, REPLACE_EXISTING);
                 plugin.getComponentLogger().warn("Recovered portal {} from potential data loss", getName());
             } catch (IOException e) {
                 plugin.getComponentLogger().error("Failed to restore portal {}", getName(), e);
