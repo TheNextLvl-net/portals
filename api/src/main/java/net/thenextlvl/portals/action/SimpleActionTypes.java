@@ -1,6 +1,7 @@
 package net.thenextlvl.portals.action;
 
 import core.paper.messenger.PluginMessenger;
+import io.papermc.paper.entity.TeleportFlag;
 import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.model.Bounds;
 import org.bukkit.Location;
@@ -42,9 +43,69 @@ final class SimpleActionTypes implements ActionTypes {
 
     private final ActionType<PortalLike> teleportPortal = ActionType.create("teleport_portal", PortalLike.class, (entity, portal, target) -> {
         return target.getPortal().map(targetPortal -> {
-            var location = targetPortal.getBoundingBox().getCenter().setRotation(entity.getLocation().getRotation());
-            entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            var sourceBB = portal.getBoundingBox();
+            var targetBB = targetPortal.getBoundingBox();
+            var from = entity.getLocation();
+
+            // Source extents
+            var sMin = new double[]{sourceBB.getMinX(), sourceBB.getMinY(), sourceBB.getMinZ()};
+            var sMax = new double[]{sourceBB.getMaxX(), sourceBB.getMaxY(), sourceBB.getMaxZ()};
+            var sSize = new double[]{sMax[0] - sMin[0], sMax[1] - sMin[1], sMax[2] - sMin[2]};
+
+            // Identify source axis roles by size:
+            // W = thickness (smallest), U = largest (width), V = middle (height)
+            var sW = 0;
+            if (sSize[1] < sSize[sW]) sW = 1;
+            if (sSize[2] < sSize[sW]) sW = 2;
+            var sU = (sW == 0) ? 1 : 0;
+            var sV = (sW == 2) ? 1 : 2;
+            if (sSize[sV] > sSize[sU]) {
+                var tmp = sU;
+                sU = sV;
+                sV = tmp;
+            }
+
+            // Fractions inside source portal along U/V/W
+            var eps = 1.0e-6;
+            var margin = 1.0e-3; // keep slightly inside to avoid edge issues
+
+            var pos = new double[]{from.getX(), from.getY(), from.getZ()};
+            var fu = (sSize[sU] < eps) ? 0 : (pos[sU] - sMin[sU]) / Math.max(sSize[sU], eps);
+            var fv = (sSize[sV] < eps) ? 0 : (pos[sV] - sMin[sV]) / Math.max(sSize[sV], eps);
+            var fw = (sSize[sW] < eps) ? 0 : (pos[sW] - sMin[sW]) / Math.max(sSize[sW], eps);
+
+            // Clamp to always be strictly inside
+            fu = Math.min(1 - margin, Math.max(margin, fu));
+            // fv = Math.min(1 - margin, Math.max(margin, fv));
+            fw = Math.min(1 - margin, Math.max(margin, fw));
+
+            // Target extents
+            var tMin = new double[]{targetBB.getMinX(), targetBB.getMinY(), targetBB.getMinZ()};
+            var tMax = new double[]{targetBB.getMaxX(), targetBB.getMaxY(), targetBB.getMaxZ()};
+            var tSize = new double[]{tMax[0] - tMin[0], tMax[1] - tMin[1], tMax[2] - tMin[2]};
+
+            // Identify target axis roles by size (match roles, not absolute axes)
+            var tW = 0;
+            if (tSize[1] < tSize[tW]) tW = 1;
+            if (tSize[2] < tSize[tW]) tW = 2;
+            var tU = (tW == 0) ? 1 : 0;
+            var tV = (tW == 2) ? 1 : 2;
+            if (tSize[tV] > tSize[tU]) {
+                var tmp = tU;
+                tU = tV;
+                tV = tmp;
+            }
+
+            // Map U/V/W fractions from source to target roles
+            var dest = new double[3];
+            dest[tU] = tMin[tU] + fu * tSize[tU];
+            dest[tV] = tMin[tV] + fv * tSize[tV];
+            dest[tW] = tMin[tW] + fw * tSize[tW];
+
+            var destination = new Location(targetPortal.getWorld(), dest[0], dest[1], dest[2]).setRotation(from.getRotation());
+            entity.teleportAsync(destination, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.Relative.values());
             return true;
+
         }).orElse(false);
     });
 
