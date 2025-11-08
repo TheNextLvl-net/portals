@@ -1,13 +1,11 @@
 package net.thenextlvl.portals.action;
 
 import org.jetbrains.annotations.Unmodifiable;
-import org.jspecify.annotations.NullMarked;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-@NullMarked
 final class SimpleActionTypeRegistry implements ActionTypeRegistry {
     public static final ActionTypeRegistry INSTANCE = new SimpleActionTypeRegistry();
 

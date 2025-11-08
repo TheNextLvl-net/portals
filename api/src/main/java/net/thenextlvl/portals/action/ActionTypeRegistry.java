@@ -2,7 +2,6 @@ package net.thenextlvl.portals.action;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
-import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 import java.util.Set;
@@ -10,7 +9,6 @@ import java.util.Set;
 /**
  * @since 0.1.0
  */
-@NullMarked
 public sealed interface ActionTypeRegistry permits SimpleActionTypeRegistry {
     @Contract(pure = true)
     static ActionTypeRegistry registry() {

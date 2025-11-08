@@ -2,11 +2,9 @@ package net.thenextlvl.portals.action;
 
 import net.thenextlvl.portals.Portal;
 import org.bukkit.entity.Entity;
-import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 
-@NullMarked
 final class SimpleEntryAction<T> implements EntryAction<T> {
     private final ActionType<T> type;
     private T input;
