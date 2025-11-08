@@ -12,9 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.jspecify.annotations.NullMarked;
 
@@ -25,24 +23,13 @@ import java.util.UUID;
 
 @NullMarked
 public final class PortalListener implements Listener {
+    private static final Map<Portal, Map<UUID, Instant>> lastEntry = new HashMap<>();
+    private static final Map<UUID, Portal> lastPortal = new HashMap<>();
+
     private final PortalsPlugin plugin;
-    private final Map<Portal, Map<UUID, Instant>> lastEntry = new HashMap<>();
-    private final Map<UUID, Portal> lastPortal = new HashMap<>();
 
     public PortalListener(PortalsPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    private boolean hasCooldown(Portal portal, Entity entity) {
-        var entries = this.lastEntry.get(portal);
-        if (entries == null) return false;
-        var lastEntry = entries.get(entity.getUniqueId());
-        return lastEntry != null && Instant.now().isBefore(lastEntry.plus(portal.getCooldown()));
-    }
-
-    private void setLastEntry(Portal portal, Entity entity) {
-        lastEntry.computeIfAbsent(portal, ignored -> new HashMap<>())
-                .put(entity.getUniqueId(), Instant.now());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -60,24 +47,6 @@ public final class PortalListener implements Listener {
         if (processMovement(event.getPlayer(), event.getTo())) return;
         pushAway(event.getPlayer(), event.getTo());
         event.setCancelled(true);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
-        processTeleport(event.getPlayer(), event.getTo());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onEntityTeleport(EntityTeleportEvent event) {
-        var to = event.getTo() != null ? event.getTo() : event.getEntity().getLocation();
-        processTeleport(event.getEntity(), to);
-    }
-
-    private void processTeleport(Entity entity, Location to) {
-        var boundingBox = translate(entity.getBoundingBox(), to);
-        plugin.portalProvider().getPortals(to.getWorld())
-                .filter(portal -> portal.getBoundingBox().overlaps(boundingBox))
-                .findAny().ifPresent(portal -> lastPortal.put(entity.getUniqueId(), portal));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -110,7 +79,7 @@ public final class PortalListener implements Listener {
                     if (!new EntityPortalEnterEvent(portal, entity).callEvent()) return false;
 
                     if (portal.getCooldown().isPositive()) setLastEntry(portal, entity);
-                    lastPortal.put(entity.getUniqueId(), portal);
+                    setLastPortal(entity, portal);
 
                     return portal.getEntryAction().map(action -> action.onEntry(entity, portal)).orElse(true);
                 }).orElseGet(() -> {
@@ -118,16 +87,6 @@ public final class PortalListener implements Listener {
                     if (removed != null) new EntityPortalExitEvent(removed, entity).callEvent();
                     return true;
                 });
-    }
-
-    private org.bukkit.util.BoundingBox translate(org.bukkit.util.BoundingBox boundingBox, Location location) {
-        var widthX = boundingBox.getWidthX() / 2;
-        var widthZ = boundingBox.getWidthZ() / 2;
-
-        return new org.bukkit.util.BoundingBox(
-                location.getX() - widthX, location.getY(), location.getZ() - widthZ,
-                location.getX() + widthX, location.getY() + boundingBox.getHeight(), location.getZ() + widthZ
-        );
     }
 
     private void pushAway(Entity entity, Location to) {
@@ -142,5 +101,31 @@ public final class PortalListener implements Listener {
         if (!plugin.config().entryCosts()) return true;
         if (!(entity instanceof Player player)) return true;
         return plugin.economyProvider().withdraw(player, portal.getEntryCost());
+    }
+
+    public static void setLastPortal(Entity entity, Portal portal) {
+        lastPortal.put(entity.getUniqueId(), portal);
+    }
+
+    private static org.bukkit.util.BoundingBox translate(org.bukkit.util.BoundingBox boundingBox, Location location) {
+        var widthX = boundingBox.getWidthX() / 2;
+        var widthZ = boundingBox.getWidthZ() / 2;
+
+        return new org.bukkit.util.BoundingBox(
+                location.getX() - widthX, location.getY(), location.getZ() - widthZ,
+                location.getX() + widthX, location.getY() + boundingBox.getHeight(), location.getZ() + widthZ
+        );
+    }
+
+    private static boolean hasCooldown(Portal portal, Entity entity) {
+        var entries = lastEntry.get(portal);
+        if (entries == null) return false;
+        var lastEntry = entries.get(entity.getUniqueId());
+        return lastEntry != null && Instant.now().isBefore(lastEntry.plus(portal.getCooldown()));
+    }
+
+    private static void setLastEntry(Portal portal, Entity entity) {
+        lastEntry.computeIfAbsent(portal, ignored -> new HashMap<>())
+                .put(entity.getUniqueId(), Instant.now());
     }
 }

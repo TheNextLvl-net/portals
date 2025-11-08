@@ -1,5 +1,7 @@
 package net.thenextlvl.portals.action;
 
+import net.thenextlvl.binder.StaticBinder;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -11,7 +13,8 @@ import java.util.Set;
  *
  * @since 0.1.0
  */
-public sealed interface ActionTypeRegistry permits SimpleActionTypeRegistry {
+@ApiStatus.NonExtendable
+public interface ActionTypeRegistry {
     /**
      * Gets the action type registry.
      *
@@ -20,7 +23,7 @@ public sealed interface ActionTypeRegistry permits SimpleActionTypeRegistry {
      */
     @Contract(pure = true)
     static ActionTypeRegistry registry() {
-        return SimpleActionTypeRegistry.INSTANCE;
+        return StaticBinder.getInstance(ActionTypeRegistry.class.getClassLoader()).find(ActionTypeRegistry.class);
     }
 
     /**

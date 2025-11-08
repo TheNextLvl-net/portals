@@ -3,16 +3,19 @@ package net.thenextlvl.portals.action;
 import core.paper.messenger.PluginMessenger;
 import io.papermc.paper.entity.TeleportFlag;
 import net.thenextlvl.portals.PortalLike;
+import net.thenextlvl.portals.listener.PortalListener;
 import net.thenextlvl.portals.model.Bounds;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jspecify.annotations.NullMarked;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadLocalRandom;
 
-final class SimpleActionTypes implements ActionTypes {
+@NullMarked
+public final class SimpleActionTypes implements ActionTypes {
     public static final SimpleActionTypes INSTANCE = new SimpleActionTypes();
 
     private final PluginMessenger messenger = new PluginMessenger(JavaPlugin.getProvidingPlugin(SimpleActionTypes.class));
@@ -103,7 +106,9 @@ final class SimpleActionTypes implements ActionTypes {
             dest[tW] = tMin[tW] + fw * tSize[tW];
 
             var destination = new Location(targetPortal.getWorld(), dest[0], dest[1], dest[2]).setRotation(from.getRotation());
-            entity.teleportAsync(destination, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.Relative.values());
+            entity.teleportAsync(destination, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.Relative.values()).thenAccept(success -> {
+                if (success) PortalListener.setLastPortal(entity, targetPortal);
+            });
             return true;
 
         }).orElse(false);

@@ -6,7 +6,11 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.binder.StaticBinder;
 import net.thenextlvl.nbt.serialization.NBT;
+import net.thenextlvl.portals.action.ActionTypeRegistry;
+import net.thenextlvl.portals.action.ActionTypes;
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.action.SimpleActionTypeRegistry;
+import net.thenextlvl.portals.action.SimpleActionTypes;
 import net.thenextlvl.portals.adapter.BoundingBoxAdapter;
 import net.thenextlvl.portals.adapter.EntryActionAdapter;
 import net.thenextlvl.portals.adapter.KeyAdapter;
@@ -53,6 +57,8 @@ public final class PortalsPlugin extends JavaPlugin {
             .build();
 
     public PortalsPlugin() {
+        StaticBinder.getInstance(ActionTypes.class.getClassLoader()).bind(ActionTypes.class, SimpleActionTypes.INSTANCE);
+        StaticBinder.getInstance(ActionTypeRegistry.class.getClassLoader()).bind(ActionTypeRegistry.class, SimpleActionTypeRegistry.INSTANCE);
         StaticBinder.getInstance(PortalConfig.class.getClassLoader()).bind(PortalConfig.class, portalConfig);
         StaticBinder.getInstance(PortalProvider.class.getClassLoader()).bind(PortalProvider.class, portalProvider);
 

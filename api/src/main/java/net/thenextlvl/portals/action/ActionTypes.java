@@ -1,8 +1,10 @@
 package net.thenextlvl.portals.action;
 
+import net.thenextlvl.binder.StaticBinder;
 import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.model.Bounds;
 import org.bukkit.Location;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 import java.net.InetSocketAddress;
@@ -12,7 +14,8 @@ import java.net.InetSocketAddress;
  *
  * @since 0.1.0
  */
-public sealed interface ActionTypes permits SimpleActionTypes {
+@ApiStatus.NonExtendable
+public interface ActionTypes {
     /**
      * Gets the action type registry.
      *
@@ -21,7 +24,7 @@ public sealed interface ActionTypes permits SimpleActionTypes {
      */
     @Contract(pure = true)
     static ActionTypes types() {
-        return SimpleActionTypes.INSTANCE;
+        return StaticBinder.getInstance(ActionTypes.class.getClassLoader()).find(ActionTypes.class);
     }
 
     /**
