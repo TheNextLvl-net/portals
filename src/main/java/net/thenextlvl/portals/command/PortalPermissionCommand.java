@@ -12,8 +12,6 @@ import net.thenextlvl.portals.command.brigadier.SimpleCommand;
 import net.thenextlvl.portals.command.suggestion.PermissionSuggestionProvider;
 import org.jspecify.annotations.NullMarked;
 
-import java.util.Objects;
-
 import static net.thenextlvl.portals.command.PortalCommand.portalArgument;
 
 @NullMarked
@@ -35,10 +33,11 @@ final class PortalPermissionCommand extends SimpleCommand {
     private int set(CommandContext<CommandSourceStack> context) {
         var portal = context.getArgument("portal", Portal.class);
         var permission = tryGetArgument(context, "permission", String.class).orElse(null);
-        var success = !Objects.equals(portal.getEntryPermission().orElse(null), permission);
-        if (success) portal.setEntryPermission(permission);
+
+        var success = portal.setEntryPermission(permission);
         var message = !success ? "nothing.changed" : permission != null
                 ? "portal.permission.set" : "portal.permission.cleared";
+
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("portal", portal.getName()),
                 Placeholder.parsed("permission", String.valueOf(permission)));
@@ -48,8 +47,10 @@ final class PortalPermissionCommand extends SimpleCommand {
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
         var portal = context.getArgument("portal", Portal.class);
+
         var permission = portal.getEntryPermission().orElse(null);
         var message = permission != null ? "portal.permission" : "portal.permission.none";
+
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("portal", portal.getName()),
                 Placeholder.parsed("permission", String.valueOf(permission)));

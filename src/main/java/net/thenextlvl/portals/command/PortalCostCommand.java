@@ -33,15 +33,20 @@ final class PortalCostCommand extends SimpleCommand {
 
         var portal = context.getArgument("portal", Portal.class);
         var cost = tryGetArgument(context, "cost", Double.class).orElse(null);
-        var message = cost == null ? "portal.cost.current"
-                : cost.equals(portal.getEntryCost()) ? "nothing.changed" : "portal.cost.set";
-        if (cost != null) portal.setEntryCost(cost);
 
-        var formatted = plugin.economyProvider().format(sender, cost != null ? cost : portal.getEntryCost());
+        if (cost == null) {
+            plugin.bundle().sendMessage(sender, "portal.cost.current",
+                    Placeholder.parsed("cost", plugin.economyProvider().format(sender, portal.getEntryCost())),
+                    Placeholder.parsed("portal", portal.getName()));
+            return SINGLE_SUCCESS;
+        }
+
+        var success = portal.setEntryCost(cost);
+        var message = success ? "portal.cost.set" : "nothing.changed";
+
         plugin.bundle().sendMessage(sender, message,
-                Placeholder.parsed("portal", portal.getName()),
-                Placeholder.parsed("cost", formatted));
-
-        return SINGLE_SUCCESS;
+                Placeholder.parsed("cost", plugin.economyProvider().format(sender, cost)),
+                Placeholder.parsed("portal", portal.getName()));
+        return success ? SINGLE_SUCCESS : 0;
     }
 }

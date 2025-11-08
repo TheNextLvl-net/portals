@@ -36,14 +36,20 @@ final class PortalCooldownCommand extends SimpleCommand {
 
         var portal = context.getArgument("portal", Portal.class);
         var cooldown = tryGetArgument(context, "cooldown", Duration.class).orElse(null);
-        var message = cooldown == null ? "portal.cooldown.current"
-                : cooldown.equals(portal.getCooldown()) ? "nothing.changed" : "portal.cooldown.set";
-        if (cooldown != null) portal.setCooldown(cooldown);
+
+        if (cooldown == null) {
+            plugin.bundle().sendMessage(sender, "portal.cooldown.current",
+                    Placeholder.parsed("portal", portal.getName()),
+                    Formatter.number("cooldown", portal.getCooldown().toMillis() / 1000d));
+            return SINGLE_SUCCESS;
+        }
+
+        var success = portal.setCooldown(cooldown);
+        var message = success ? "portal.cooldown.set" : "nothing.changed";
 
         plugin.bundle().sendMessage(sender, message,
                 Placeholder.parsed("portal", portal.getName()),
-                Formatter.number("cooldown", (cooldown != null ? cooldown : portal.getCooldown()).toMillis() / 1000d));
-
-        return SINGLE_SUCCESS;
+                Formatter.number("cooldown", cooldown.toMillis() / 1000d));
+        return success ? SINGLE_SUCCESS : 0;
     }
 }
