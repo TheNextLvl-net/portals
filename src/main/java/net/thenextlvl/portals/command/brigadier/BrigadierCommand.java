@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @NullMarked
 public abstract class BrigadierCommand {
-    protected final PortalsPlugin plugin;
+    public final PortalsPlugin plugin;
 
     private final @Nullable String permission;
     private final String name;
@@ -33,7 +33,7 @@ public abstract class BrigadierCommand {
         return permission == null || source.getSender().hasPermission(permission);
     }
 
-    protected <T> Optional<T> tryGetArgument(CommandContext<CommandSourceStack> context, String name, Class<T> type) {
+    public <T> Optional<T> tryGetArgument(CommandContext<CommandSourceStack> context, String name, Class<T> type) {
         try {
             return Optional.of(context.getArgument(name, type));
         } catch (IllegalArgumentException e) {
@@ -43,7 +43,7 @@ public abstract class BrigadierCommand {
         }
     }
 
-    protected <T> Optional<T> resolveArgument(CommandContext<CommandSourceStack> context, String name, Class<? extends ArgumentResolver<T>> type) throws CommandSyntaxException {
+    public <T> Optional<T> resolveArgument(CommandContext<CommandSourceStack> context, String name, Class<? extends ArgumentResolver<T>> type) throws CommandSyntaxException {
         var resolver = tryGetArgument(context, name, type).orElse(null);
         return resolver != null ? Optional.of(resolver.resolve(context.getSource())) : Optional.empty();
     }
