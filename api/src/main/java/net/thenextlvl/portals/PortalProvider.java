@@ -1,8 +1,10 @@
 package net.thenextlvl.portals;
 
+import net.thenextlvl.binder.StaticBinder;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.Contract;
 
 import java.nio.file.Path;
@@ -11,14 +13,14 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
- * Get an instance of this class via {@link org.bukkit.plugin.ServicesManager#load(Class)}.
- * <p>
- * {@code PortalProvider provider = getServer().getServicesManager().load(PortalProvider.class); }
- *
  * @since 0.1.0
  */
 @ApiStatus.NonExtendable
 public interface PortalProvider {
+    static @CheckReturnValue PortalProvider provider() {
+        return StaticBinder.getInstance(PortalProvider.class.getClassLoader()).find(PortalProvider.class);
+    }
+
     @Contract(pure = true)
     Path getDataFolder(World world);
 
