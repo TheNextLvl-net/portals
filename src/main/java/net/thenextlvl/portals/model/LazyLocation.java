@@ -1,4 +1,4 @@
-package net.thenextlvl.portals.lazy;
+package net.thenextlvl.portals.model;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.Keyed;

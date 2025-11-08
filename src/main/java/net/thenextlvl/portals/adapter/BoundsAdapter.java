@@ -7,7 +7,7 @@ import net.thenextlvl.nbt.serialization.TagDeserializationContext;
 import net.thenextlvl.nbt.serialization.TagSerializationContext;
 import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.nbt.tag.Tag;
-import net.thenextlvl.portals.action.teleport.Bounds;
+import net.thenextlvl.portals.model.Bounds;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 

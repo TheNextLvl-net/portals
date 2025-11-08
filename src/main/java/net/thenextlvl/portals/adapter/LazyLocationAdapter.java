@@ -7,7 +7,7 @@ import net.thenextlvl.nbt.serialization.TagDeserializationContext;
 import net.thenextlvl.nbt.serialization.TagSerializationContext;
 import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.nbt.tag.Tag;
-import net.thenextlvl.portals.lazy.LazyLocation;
+import net.thenextlvl.portals.model.LazyLocation;
 import org.bukkit.Location;
 import org.jspecify.annotations.NullMarked;
 
