@@ -3,16 +3,19 @@ package net.thenextlvl.portals.action;
 import core.paper.messenger.PluginMessenger;
 import io.papermc.paper.entity.TeleportFlag;
 import net.thenextlvl.portals.PortalLike;
+import net.thenextlvl.portals.listener.PortalListener;
 import net.thenextlvl.portals.model.Bounds;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jspecify.annotations.NullMarked;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadLocalRandom;
 
-final class SimpleActionTypes implements ActionTypes {
+@NullMarked
+public final class SimpleActionTypes implements ActionTypes {
     public static final SimpleActionTypes INSTANCE = new SimpleActionTypes();
 
     private final PluginMessenger messenger = new PluginMessenger(JavaPlugin.getProvidingPlugin(SimpleActionTypes.class));
