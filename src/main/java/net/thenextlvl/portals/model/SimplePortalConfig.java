@@ -1,4 +1,4 @@
-package net.thenextlvl.portals.config;
+package net.thenextlvl.portals.model;
 
 public record SimplePortalConfig(
         boolean entryCosts,
