@@ -22,7 +22,6 @@ import net.thenextlvl.portals.listener.WorldListener;
 import net.thenextlvl.portals.model.PortalConfig;
 import net.thenextlvl.portals.model.SimplePortalConfig;
 import net.thenextlvl.portals.portal.PaperPortalProvider;
-import net.thenextlvl.portals.selection.NativeSelectionProvider;
 import net.thenextlvl.portals.selection.SelectionProvider;
 import net.thenextlvl.portals.selection.WorldEditSelectionProvider;
 import net.thenextlvl.portals.shape.BoundingBox;
@@ -56,8 +55,6 @@ public final class PortalsPlugin extends JavaPlugin {
     public PortalsPlugin() {
         StaticBinder.getInstance(PortalConfig.class.getClassLoader()).bind(PortalConfig.class, portalConfig);
         StaticBinder.getInstance(PortalProvider.class.getClassLoader()).bind(PortalProvider.class, portalProvider);
-
-        getServer().getServicesManager().register(SelectionProvider.class, new NativeSelectionProvider(), this, ServicePriority.Lowest);
 
         registerCommands();
     }
