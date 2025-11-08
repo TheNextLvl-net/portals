@@ -11,7 +11,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
-import net.thenextlvl.portals.action.teleport.Bounds;
+import net.thenextlvl.portals.model.Bounds;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
