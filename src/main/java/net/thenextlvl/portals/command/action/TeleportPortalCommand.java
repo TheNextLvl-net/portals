@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.PortalsPlugin;
@@ -26,5 +27,12 @@ final class TeleportPortalCommand extends ActionCommand<PortalLike> {
     public int run(CommandContext<CommandSourceStack> context) {
         var target = context.getArgument("target", Portal.class);
         return addAction(context, target);
+    }
+
+    @Override
+    protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, PortalLike input) {
+        plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.teleport-portal",
+                Placeholder.parsed("portal", portal.getName()),
+                Placeholder.parsed("target", input.getName()));
     }
 }

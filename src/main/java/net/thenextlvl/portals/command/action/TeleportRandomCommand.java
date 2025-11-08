@@ -9,6 +9,9 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
 import net.thenextlvl.portals.model.Bounds;
@@ -58,5 +61,18 @@ final class TeleportRandomCommand extends ActionCommand<Bounds> {
         }
 
         return addAction(context, bounds);
+    }
+
+    @Override
+    protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, Bounds input) {
+        plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.teleport-random",
+                Placeholder.parsed("portal", portal.getName()),
+                Placeholder.parsed("world", input.world().getName()),
+                Formatter.number("min_x", input.minX()),
+                Formatter.number("min_y", input.minY()),
+                Formatter.number("min_z", input.minZ()),
+                Formatter.number("max_x", input.maxX()),
+                Formatter.number("max_y", input.maxY()),
+                Formatter.number("max_z", input.maxZ()));
     }
 }

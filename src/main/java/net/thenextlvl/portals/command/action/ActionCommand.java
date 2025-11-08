@@ -1,9 +1,7 @@
 package net.thenextlvl.portals.command.action;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionType;
@@ -27,13 +25,16 @@ abstract class ActionCommand<T> extends SimpleCommand {
         var success = !portal.getEntryAction().map(action -> {
             return action.getActionType().equals(actionType) && action.getInput().equals(input);
         }).orElse(false);
-        if (success) portal.setEntryAction(EntryAction.create(actionType, input));
 
-        // todo: move message to command for proper information
-        var message = success ? "portal.action.set" : "nothing.changed";
-        plugin.bundle().sendMessage(sender, message,
-                Placeholder.unparsed("portal", portal.getName()),
-                Placeholder.unparsed("action", actionType.getName()));
-        return success ? Command.SINGLE_SUCCESS : 0;
+        if (!success) {
+            plugin.bundle().sendMessage(sender, "nothing.changed");
+            return 0;
+        }
+
+        portal.setEntryAction(EntryAction.create(actionType, input));
+        onSuccess(context, portal, input);
+        return SINGLE_SUCCESS;
     }
+
+    protected abstract void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, T input);
 }

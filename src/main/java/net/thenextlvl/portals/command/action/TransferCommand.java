@@ -6,6 +6,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
 import org.jspecify.annotations.NullMarked;
@@ -30,5 +32,13 @@ public final class TransferCommand extends ActionCommand<InetSocketAddress> {
         var hostname = context.getArgument("hostname", String.class);
         var port = tryGetArgument(context, "port", int.class).orElse(25565);
         return addAction(context, new InetSocketAddress(hostname, port));
+    }
+
+    @Override
+    protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, InetSocketAddress input) {
+        plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.transfer",
+                Placeholder.parsed("portal", portal.getName()),
+                Placeholder.parsed("hostname", input.getHostString()),
+                Placeholder.parsed("port", String.valueOf(input.getPort())));
     }
 }

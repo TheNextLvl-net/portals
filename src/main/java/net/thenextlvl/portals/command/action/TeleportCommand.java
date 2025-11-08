@@ -8,6 +8,9 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.RotationResolver;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
 import net.thenextlvl.portals.model.LazyLocation;
@@ -32,13 +35,23 @@ final class TeleportCommand extends ActionCommand<Location> {
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var world = context.getArgument("world", World.class);
-        
+
         var location = resolveArgument(context, "position", FinePositionResolver.class)
                 .orElseGet(world::getSpawnLocation)
                 .toLocation(world);
         resolveArgument(context, "rotation", RotationResolver.class)
                 .ifPresent(location::setRotation);
-        
+
         return addAction(context, new LazyLocation(location));
+    }
+
+    @Override
+    protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, Location input) {
+        plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.teleport",
+                Placeholder.parsed("portal", portal.getName()),
+                Placeholder.parsed("world", input.getWorld().getName()),
+                Formatter.number("x", input.getX()),
+                Formatter.number("y", input.getY()),
+                Formatter.number("z", input.getZ()));
     }
 }
