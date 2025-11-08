@@ -1,9 +1,9 @@
-## Portals – The Ultimate Portal Plugin
+# Portals – The Ultimate Portal Plugin
 
 Portals is a modern, flexible portal plugin designed for **Paper** and **Folia** servers.  
 Create custom portals with permissions, cooldowns, entry fees, and pushback mechanics.
 
-### Why Choose Portals?
+## Why Choose Portals?
 
 * **Advanced Permission System** – Fine-grained control over who can use each portal
 * **Cooldowns** – Prevent players from using a portal too often
@@ -14,7 +14,7 @@ Create custom portals with permissions, cooldowns, entry fees, and pushback mech
 * **Pushback Protection** – Players can be pushed back when denied portal access
 * **Seamless World Integration** – Works perfectly with any world management plugin
 
-### Features
+## Features
 
 * BungeeCord/Velocity support for server switching
 * Per-portal permissions, cooldowns, and fees
@@ -24,7 +24,9 @@ Create custom portals with permissions, cooldowns, entry fees, and pushback mech
 * Server transfer support
 * Smooth portal to portal teleportation
 
-### What's Next?
+For more information and documentation, visit the [Wiki](https://thenextlvl.net/docs/portals).
+
+## What's Next?
 
 * **Multiverse-Portals Migration** – Easy import tool to migrate from Multiverse-Portals
 
