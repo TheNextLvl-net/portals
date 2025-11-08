@@ -18,6 +18,7 @@ import java.util.Random;
  * @param maxX  The maximum X coordinate.
  * @param maxY  The maximum Y coordinate.
  * @param maxZ  The maximum Z coordinate.
+ * @since 0.1.0
  */
 public record Bounds(
         World world,
@@ -34,6 +35,7 @@ public record Bounds(
      * @param maxX  The maximum X coordinate.
      * @param maxY  The maximum Y coordinate.
      * @param maxZ  The maximum Z coordinate.
+     * @since 0.1.0
      */
     public Bounds(World world, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         this.world = world;
@@ -50,6 +52,7 @@ public record Bounds(
      *
      * @param min The minimum position.
      * @param max The maximum position.
+     * @since 0.1.0
      */
     public Bounds(World world, Position min, Position max) {
         this(world, min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
@@ -83,6 +86,7 @@ public record Bounds(
      * @param center The center position.
      * @param radius The radius.
      * @param height The height.
+     * @since 0.1.0
      */
     @Contract(value = "_, _, _, _ -> new", pure = true)
     public static Bounds radius(World world, Position center, double radius, double height) {
@@ -102,6 +106,7 @@ public record Bounds(
      *
      * @param random The random number generator.
      * @return A random location within the bounds.
+     * @since 0.1.0
      */
     public Location getRandomLocation(Random random) {
         return new Location(

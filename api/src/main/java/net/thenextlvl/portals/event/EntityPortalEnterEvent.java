@@ -28,6 +28,12 @@ public final class EntityPortalEnterEvent extends PortalEvent implements Cancell
         this.entity = entity;
     }
 
+    /**
+     * Gets the entity that entered the portal.
+     *
+     * @return the entity
+     * @since 0.1.0
+     */
     @Contract(pure = true)
     public Entity getEntity() {
         return entity;

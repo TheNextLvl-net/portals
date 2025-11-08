@@ -28,6 +28,12 @@ public final class PreEntityPortalEnterEvent extends PortalEvent implements Canc
         this.entity = entity;
     }
 
+    /**
+     * Gets the entity that is about to enter the portal.
+     *
+     * @return the entity
+     * @since 0.1.0
+     */
     @Contract(pure = true)
     public Entity getEntity() {
         return entity;

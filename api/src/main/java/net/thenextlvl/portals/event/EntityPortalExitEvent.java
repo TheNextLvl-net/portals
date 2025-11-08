@@ -22,6 +22,12 @@ public final class EntityPortalExitEvent extends PortalEvent {
         this.entity = entity;
     }
 
+    /**
+     * Gets the entity that exited the portal.
+     *
+     * @return the entity
+     * @since 0.1.0
+     */
     @Contract(pure = true)
     public Entity getEntity() {
         return entity;
