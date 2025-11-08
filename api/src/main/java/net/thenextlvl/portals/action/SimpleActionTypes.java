@@ -1,8 +1,8 @@
 package net.thenextlvl.portals.action;
 
 import core.paper.messenger.PluginMessenger;
-import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.action.teleport.Bounds;
+import net.thenextlvl.portals.PortalLike;
+import net.thenextlvl.portals.model.Bounds;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -40,10 +40,12 @@ final class SimpleActionTypes implements ActionTypes {
         return true;
     });
 
-    private final ActionType<Portal> teleportPortal = ActionType.create("teleport_portal", Portal.class, (entity, portal, target) -> {
-        var location = target.getBoundingBox().getCenter().setRotation(entity.getLocation().getRotation());
-        entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
-        return true;
+    private final ActionType<PortalLike> teleportPortal = ActionType.create("teleport_portal", PortalLike.class, (entity, portal, target) -> {
+        return portal.getPortal().map(targetPortal -> {
+            var location = targetPortal.getBoundingBox().getCenter().setRotation(entity.getLocation().getRotation());
+            entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            return true;
+        }).orElse(false);
     });
 
     private final ActionType<Bounds> teleportRandom = ActionType.create("teleport_random", Bounds.class, (entity, portal, bounds) -> {
@@ -80,7 +82,7 @@ final class SimpleActionTypes implements ActionTypes {
     }
 
     @Override
-    public ActionType<Portal> teleportPortal() {
+    public ActionType<PortalLike> teleportPortal() {
         return teleportPortal;
     }
 
