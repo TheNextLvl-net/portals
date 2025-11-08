@@ -41,7 +41,7 @@ final class SimpleActionTypes implements ActionTypes {
     });
 
     private final ActionType<PortalLike> teleportPortal = ActionType.create("teleport_portal", PortalLike.class, (entity, portal, target) -> {
-        return portal.getPortal().map(targetPortal -> {
+        return target.getPortal().map(targetPortal -> {
             var location = targetPortal.getBoundingBox().getCenter().setRotation(entity.getLocation().getRotation());
             entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
             return true;
