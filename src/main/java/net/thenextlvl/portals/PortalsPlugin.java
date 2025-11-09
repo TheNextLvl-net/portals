@@ -56,7 +56,7 @@ public final class PortalsPlugin extends JavaPlugin {
             IO.of(getDataPath().resolve("config.json")),
             new SimplePortalConfig(false, true, false, true, 0.3),
             SimplePortalConfig.class
-    ).validate().saveIfAbsent();
+    ).validate().save();
 
     private final ComponentBundle bundle = ComponentBundle.builder(
                     Key.key("portals", "translations"),
