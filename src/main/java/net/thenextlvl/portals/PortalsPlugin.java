@@ -16,9 +16,10 @@ import net.thenextlvl.portals.action.SimpleActionTypeRegistry;
 import net.thenextlvl.portals.action.SimpleActionTypes;
 import net.thenextlvl.portals.adapter.BoundingBoxAdapter;
 import net.thenextlvl.portals.adapter.EntryActionAdapter;
+import net.thenextlvl.portals.adapter.FinePositionAdapter;
 import net.thenextlvl.portals.adapter.KeyAdapter;
 import net.thenextlvl.portals.adapter.PortalAdapter;
-import net.thenextlvl.portals.adapter.PositionAdapter;
+import net.thenextlvl.portals.bounds.SimpleBoundsFactory;
 import net.thenextlvl.portals.command.PortalCommand;
 import net.thenextlvl.portals.economy.EconomyProvider;
 import net.thenextlvl.portals.economy.EmptyEconomyProvider;
@@ -127,7 +128,7 @@ public final class PortalsPlugin extends JavaPlugin {
         return NBT.builder()
                 .registerTypeHierarchyAdapter(BoundingBox.class, new BoundingBoxAdapter(world))
                 .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter(this))
-                .registerTypeHierarchyAdapter(Position.class, new PositionAdapter())
+                .registerTypeHierarchyAdapter(Position.class, new FinePositionAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Portal.class, new PortalAdapter(this))
                 .build();
