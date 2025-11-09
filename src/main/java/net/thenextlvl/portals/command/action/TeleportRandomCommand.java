@@ -63,7 +63,7 @@ final class TeleportRandomCommand extends ActionCommand<Bounds> {
 
         if (bounds == null) bounds = Bounds.factory().of(world,
                 -30_000_000, world.getMinHeight(), -30_000_000,
-                30_000_000, world.getMaxHeight(), 30_000_000
+                30_000_000, world.getLogicalHeight(), 30_000_000
         );
 
         return addAction(context, bounds);

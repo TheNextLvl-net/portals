@@ -2,11 +2,16 @@ package net.thenextlvl.portals.bounds;
 
 import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.math.Position;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.tag.TagKey;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.portals.PortalsPlugin;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -97,7 +102,7 @@ record SimpleBounds(
     private CompletableFuture<@Nullable Location> searchSafeLocationAtXZ(Random random, World world, int x, int z) {
         // Clamp to world height limits
         var minY = Math.max(this.minY, world.getMinHeight());
-        var maxY = Math.min(this.maxY, world.getMaxHeight());
+        var maxY = Math.min(this.maxY, world.getLogicalHeight());
 
         var startY = minY == maxY ? maxY : random.nextInt(minY, maxY + 1);
 
@@ -133,11 +138,16 @@ record SimpleBounds(
     }
 
     private boolean isValidSpawn(Block block) {
-        return block.isCollidable() && block.getType().isOccluding();
+        return block.isCollidable() && block.getType().isOccluding() && !block.getType().equals(Material.BEDROCK);
     }
 
     private boolean isInvalidSpawnInside(Block block) {
         if (block.getLightFromSky() == 0 && !plugin.config().allowCaveSpawns()) return true;
-        return !block.isPassable() || block.isLiquid();
+        return !block.isPassable() || block.isLiquid() || block.getType().equals(Material.KELP);
+    }
+    
+    private boolean isTagged(Block block, TagKey<BlockType> tag) {
+        return RegistryAccess.registryAccess().getRegistry(RegistryKey.BLOCK)
+                .getTagValues(tag).contains(block.getType().asBlockType());
     }
 }
