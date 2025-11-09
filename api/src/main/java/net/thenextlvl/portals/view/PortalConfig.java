@@ -22,17 +22,12 @@ public interface PortalConfig {
     }
 
     /**
-     * Whether to use the custom safe search algorithm.
-     * <p>
-     * If {@code false}, the vanilla safe search algorithm is used.
-     * <p>
-     * The custom safe search algorithm is less strict and allows cave and structure spawns
-     * that might potentially be unsafe.
+     * Whether to allow random teleports to caves.
      *
-     * @return {@code true} if the custom safe search algorithm is used, {@code false} otherwise
+     * @return {@code true} if cave and spawns are allowed, {@code false} otherwise
      * @since 0.2.0
      */
-    boolean customSafeSearchAlgorithm();
+    boolean allowCaveSpawns();
 
     /**
      * Whether to use economy for entry costs.
