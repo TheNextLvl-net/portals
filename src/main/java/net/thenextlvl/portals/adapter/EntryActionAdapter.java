@@ -12,7 +12,7 @@ import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypeRegistry;
 import net.thenextlvl.portals.action.EntryAction;
-import net.thenextlvl.portals.model.Bounds;
+import net.thenextlvl.portals.bounds.Bounds;
 import org.bukkit.Location;
 import org.jspecify.annotations.NullMarked;
 

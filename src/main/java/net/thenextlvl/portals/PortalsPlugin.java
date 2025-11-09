@@ -26,7 +26,8 @@ import net.thenextlvl.portals.economy.ServiceEconomyProvider;
 import net.thenextlvl.portals.economy.VaultEconomyProvider;
 import net.thenextlvl.portals.listener.PortalListener;
 import net.thenextlvl.portals.listener.WorldListener;
-import net.thenextlvl.portals.model.PortalConfig;
+import net.thenextlvl.portals.bounds.BoundsFactory;
+import net.thenextlvl.portals.view.PortalConfig;
 import net.thenextlvl.portals.model.SimplePortalConfig;
 import net.thenextlvl.portals.portal.PaperPortalProvider;
 import net.thenextlvl.portals.selection.SelectionProvider;
@@ -66,6 +67,7 @@ public final class PortalsPlugin extends JavaPlugin {
 
     public PortalsPlugin() {
         StaticBinder.getInstance(ActionTypes.class.getClassLoader()).bind(ActionTypes.class, SimpleActionTypes.INSTANCE);
+        StaticBinder.getInstance(BoundsFactory.class.getClassLoader()).bind(BoundsFactory.class, SimpleBoundsFactory.INSTANCE);
         StaticBinder.getInstance(ActionTypeRegistry.class.getClassLoader()).bind(ActionTypeRegistry.class, SimpleActionTypeRegistry.INSTANCE);
         StaticBinder.getInstance(PortalConfig.class.getClassLoader()).bind(PortalConfig.class, portalConfig.getRoot());
         StaticBinder.getInstance(PortalProvider.class.getClassLoader()).bind(PortalProvider.class, portalProvider);

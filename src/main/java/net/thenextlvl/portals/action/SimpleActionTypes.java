@@ -4,7 +4,7 @@ import core.paper.messenger.PluginMessenger;
 import io.papermc.paper.entity.TeleportFlag;
 import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.listener.PortalListener;
-import net.thenextlvl.portals.model.Bounds;
+import net.thenextlvl.portals.bounds.Bounds;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -115,9 +115,17 @@ public final class SimpleActionTypes implements ActionTypes {
     });
 
     private final ActionType<Bounds> teleportRandom = ActionType.create("teleport_random", Bounds.class, (entity, portal, bounds) -> {
-        var random = ThreadLocalRandom.current();
-        var location = bounds.getRandomLocation(random).setRotation(entity.getLocation().getRotation());
-        entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+        bounds.searchSafeLocation(ThreadLocalRandom.current()).thenAccept(location -> {
+            if (location == null) {
+                System.out.println("Failed to find a safe location within bounds: " + bounds);
+                // todo: send message to player
+                // plugin.bundle().sendMessage(entity, "portal.action.teleport-random.failed");
+                return;
+            }
+            location.setRotation(entity.getLocation().getRotation());
+            entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            System.out.println("random teleported to " + location);
+        });
         return true;
     });
 

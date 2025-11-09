@@ -14,7 +14,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
-import net.thenextlvl.portals.model.Bounds;
+import net.thenextlvl.portals.bounds.Bounds;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
@@ -51,14 +51,19 @@ final class TeleportRandomCommand extends ActionCommand<Bounds> {
         var bounds = resolveArgument(context, "center", FinePositionResolver.class).map(center -> {
             var radius = context.getArgument("radius", Double.class);
             var height = context.getArgument("height", Double.class);
-            return Bounds.radius(world, center, radius, height);
+            return Bounds.factory().radius(world, center, radius, height);
         }).orElse(null);
 
         if (bounds == null) {
-            var from = resolveArgument(context, "from", FinePositionResolver.class).orElseThrow();
-            var to = resolveArgument(context, "to", FinePositionResolver.class).orElseThrow();
-            bounds = new Bounds(world, from, to);
+            var from = resolveArgument(context, "from", BlockPositionResolver.class).orElse(null);
+            var to = resolveArgument(context, "to", BlockPositionResolver.class).orElse(null);
+            if (from != null && to != null) bounds = Bounds.factory().of(world, from, to);
         }
+
+        if (bounds == null) bounds = Bounds.factory().of(world,
+                -30_000_000, world.getMinHeight(), -30_000_000,
+                30_000_000, world.getMaxHeight(), 30_000_000
+        );
 
         return addAction(context, bounds);
     }
@@ -67,7 +72,7 @@ final class TeleportRandomCommand extends ActionCommand<Bounds> {
     protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, Bounds input) {
         plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.teleport-random",
                 Placeholder.parsed("portal", portal.getName()),
-                Placeholder.parsed("world", input.world().getName()),
+                Placeholder.parsed("world", input.world().map(World::getName).orElse(input.worldKey().asString())),
                 Formatter.number("min_x", input.minX()),
                 Formatter.number("min_y", input.minY()),
                 Formatter.number("min_z", input.minZ()),
