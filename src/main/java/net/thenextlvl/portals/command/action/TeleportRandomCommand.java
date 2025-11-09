@@ -1,6 +1,6 @@
 package net.thenextlvl.portals.command.action;
 
-import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
+import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
@@ -28,19 +28,20 @@ final class TeleportRandomCommand extends ActionCommand<Bounds> {
         var command = new TeleportRandomCommand(plugin);
         return command.create().then(Commands.argument("world", ArgumentTypes.world())
                 .then(command.boundsArgument())
-                .then(command.radiusArgument()));
+                .then(command.radiusArgument())
+                .executes(command));
     }
 
     private ArgumentBuilder<CommandSourceStack, ?> radiusArgument() {
-        var center = Commands.argument("center", ArgumentTypes.finePosition());
-        var radius = Commands.argument("radius", DoubleArgumentType.doubleArg());
-        var height = Commands.argument("height", DoubleArgumentType.doubleArg());
+        var center = Commands.argument("center", ArgumentTypes.blockPosition());
+        var radius = Commands.argument("radius", IntegerArgumentType.integer(1));
+        var height = Commands.argument("height", IntegerArgumentType.integer(1));
         return center.then(radius.then(height.executes(this)));
     }
 
     private ArgumentBuilder<CommandSourceStack, ?> boundsArgument() {
-        var from = Commands.argument("from", ArgumentTypes.finePosition());
-        var to = Commands.argument("to", ArgumentTypes.finePosition());
+        var from = Commands.argument("from", ArgumentTypes.blockPosition());
+        var to = Commands.argument("to", ArgumentTypes.blockPosition());
         return from.then(to.executes(this));
     }
 
@@ -48,9 +49,9 @@ final class TeleportRandomCommand extends ActionCommand<Bounds> {
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var world = context.getArgument("world", World.class);
 
-        var bounds = resolveArgument(context, "center", FinePositionResolver.class).map(center -> {
-            var radius = context.getArgument("radius", Double.class);
-            var height = context.getArgument("height", Double.class);
+        var bounds = resolveArgument(context, "center", BlockPositionResolver.class).map(center -> {
+            var radius = context.getArgument("radius", int.class);
+            var height = context.getArgument("height", int.class);
             return Bounds.factory().radius(world, center, radius, height);
         }).orElse(null);
 
