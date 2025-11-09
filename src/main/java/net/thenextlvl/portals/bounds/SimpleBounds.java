@@ -7,12 +7,11 @@ import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys;
 import io.papermc.paper.registry.tag.TagKey;
 import net.kyori.adventure.key.Key;
-import net.thenextlvl.portals.view.PortalConfig;
-import org.bukkit.Bukkit;
+import net.thenextlvl.portals.PortalsPlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockType;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -26,6 +25,8 @@ record SimpleBounds(
         int minX, int minY, int minZ,
         int maxX, int maxY, int maxZ
 ) implements Bounds {
+    private static final PortalsPlugin plugin = JavaPlugin.getPlugin(PortalsPlugin.class);
+
     public SimpleBounds(Key worldKey, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         this.minX = Math.min(minX, maxX);
         this.minY = Math.min(minY, maxY);
@@ -38,7 +39,7 @@ record SimpleBounds(
 
     @Override
     public Optional<World> world() {
-        return Optional.ofNullable(Bukkit.getWorld(worldKey));
+        return Optional.ofNullable(plugin.getServer().getWorld(worldKey));
     }
 
     @Override
@@ -58,7 +59,7 @@ record SimpleBounds(
 
         // Clamp bounds to world border
         var border = world.getWorldBorder();
-        var borderSize = Math.min((int) border.getSize() / 2, Bukkit.getMaxWorldSize());
+        var borderSize = Math.min((int) border.getSize() / 2, plugin.getServer().getMaxWorldSize());
         var centerX = border.getCenter().getBlockX();
         var centerZ = border.getCenter().getBlockZ();
         var borderMinX = centerX - borderSize;
@@ -103,7 +104,6 @@ record SimpleBounds(
         var maxY = Math.min(this.maxY, world.getMaxHeight());
 
         var startY = minY == maxY ? maxY : random.nextInt(minY, maxY + 1);
-        System.out.println(startY);
 
         // Load chunk asynchronously before accessing blocks
         return world.getChunkAtAsync(x >> 4, z >> 4).thenApply(chunk -> {
