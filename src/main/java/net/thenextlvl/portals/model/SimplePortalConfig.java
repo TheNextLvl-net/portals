@@ -6,7 +6,6 @@ public record SimplePortalConfig(
         boolean allowCaveSpawns,
         boolean entryCosts,
         boolean ignoreEntityMovement,
-        boolean pushBackOnEntryDenied,
         double pushbackSpeed
 ) implements PortalConfig {
 }
