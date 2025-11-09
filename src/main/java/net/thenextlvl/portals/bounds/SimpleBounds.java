@@ -2,10 +2,6 @@ package net.thenextlvl.portals.bounds;
 
 import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.math.Position;
-import io.papermc.paper.registry.RegistryAccess;
-import io.papermc.paper.registry.RegistryKey;
-import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys;
-import io.papermc.paper.registry.tag.TagKey;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.portals.PortalsPlugin;
 import org.bukkit.Location;
@@ -131,27 +127,17 @@ record SimpleBounds(
     }
 
     private boolean isSafeLocation(World world, int x, int y, int z) {
-        if (PortalConfig.config().customSafeSearchAlgorithm()) {
-            if (!isValidSpawn(world.getBlockAt(x, y - 1, z))) return false;
-            if (isInvalidSpawn(world.getBlockAt(x, y, z))) return false;
-            return !isInvalidSpawn(world.getBlockAt(x, y + 1, z));
-        } else {
-            if (!world.getBlockAt(x, y, z).isPassable()) return false;
-            if (!world.getBlockAt(x, y + 1, z).isPassable()) return false;
-            return world.getBlockAt(x, y - 1, z).isCollidable();
-        }
+        if (!isValidSpawn(world.getBlockAt(x, y - 1, z))) return false;
+        if (isInvalidSpawnInside(world.getBlockAt(x, y, z))) return false;
+        return !isInvalidSpawnInside(world.getBlockAt(x, y + 1, z));
     }
 
     private boolean isValidSpawn(Block block) {
-        return isTagged(BlockTypeTagKeys.VALID_SPAWN, block);
+        return block.isCollidable() && block.getType().isOccluding();
     }
 
-    private boolean isInvalidSpawn(Block block) {
-        return isTagged(BlockTypeTagKeys.INVALID_SPAWN_INSIDE, block);
-    }
-
-    private boolean isTagged(TagKey<BlockType> tagKey, Block block) {
-        return RegistryAccess.registryAccess().getRegistry(RegistryKey.BLOCK)
-                .getTagValues(tagKey).contains(block.getType().asBlockType());
+    private boolean isInvalidSpawnInside(Block block) {
+        if (block.getLightFromSky() == 0 && !plugin.config().allowCaveSpawns()) return true;
+        return !block.isPassable() || block.isLiquid();
     }
 }
