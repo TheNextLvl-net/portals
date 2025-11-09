@@ -2,7 +2,7 @@ package net.thenextlvl.portals.action;
 
 import net.thenextlvl.binder.StaticBinder;
 import net.thenextlvl.portals.PortalLike;
-import net.thenextlvl.portals.model.Bounds;
+import net.thenextlvl.portals.bounds.Bounds;
 import org.bukkit.Location;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;

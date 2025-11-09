@@ -10,7 +10,7 @@ import net.thenextlvl.nbt.tag.Tag;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class PositionAdapter implements TagAdapter<Position> {
+public final class FinePositionAdapter implements TagAdapter<Position> {
     @Override
     public Position deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
         var root = tag.getAsCompound();

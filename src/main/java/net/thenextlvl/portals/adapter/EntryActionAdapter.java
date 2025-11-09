@@ -1,5 +1,6 @@
 package net.thenextlvl.portals.adapter;
 
+import io.papermc.paper.math.BlockPosition;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.nbt.serialization.NBT;
 import net.thenextlvl.nbt.serialization.ParserException;
@@ -12,7 +13,7 @@ import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypeRegistry;
 import net.thenextlvl.portals.action.EntryAction;
-import net.thenextlvl.portals.model.Bounds;
+import net.thenextlvl.portals.bounds.Bounds;
 import org.bukkit.Location;
 import org.jspecify.annotations.NullMarked;
 
@@ -22,6 +23,7 @@ public final class EntryActionAdapter implements TagAdapter<EntryAction<?>> {
 
     public EntryActionAdapter(PortalsPlugin plugin) {
         this.nbt = NBT.builder()
+                .registerTypeHierarchyAdapter(BlockPosition.class, new BlockPositionAdapter())
                 .registerTypeHierarchyAdapter(Bounds.class, new BoundsAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Location.class, new LazyLocationAdapter())

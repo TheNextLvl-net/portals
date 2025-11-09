@@ -16,9 +16,10 @@ import net.thenextlvl.portals.action.SimpleActionTypeRegistry;
 import net.thenextlvl.portals.action.SimpleActionTypes;
 import net.thenextlvl.portals.adapter.BoundingBoxAdapter;
 import net.thenextlvl.portals.adapter.EntryActionAdapter;
+import net.thenextlvl.portals.adapter.FinePositionAdapter;
 import net.thenextlvl.portals.adapter.KeyAdapter;
 import net.thenextlvl.portals.adapter.PortalAdapter;
-import net.thenextlvl.portals.adapter.PositionAdapter;
+import net.thenextlvl.portals.bounds.SimpleBoundsFactory;
 import net.thenextlvl.portals.command.PortalCommand;
 import net.thenextlvl.portals.economy.EconomyProvider;
 import net.thenextlvl.portals.economy.EmptyEconomyProvider;
@@ -26,7 +27,8 @@ import net.thenextlvl.portals.economy.ServiceEconomyProvider;
 import net.thenextlvl.portals.economy.VaultEconomyProvider;
 import net.thenextlvl.portals.listener.PortalListener;
 import net.thenextlvl.portals.listener.WorldListener;
-import net.thenextlvl.portals.model.PortalConfig;
+import net.thenextlvl.portals.bounds.BoundsFactory;
+import net.thenextlvl.portals.view.PortalConfig;
 import net.thenextlvl.portals.model.SimplePortalConfig;
 import net.thenextlvl.portals.portal.PaperPortalProvider;
 import net.thenextlvl.portals.selection.SelectionProvider;
@@ -52,9 +54,9 @@ public final class PortalsPlugin extends JavaPlugin {
 
     private final FileIO<SimplePortalConfig> portalConfig = new GsonFile<>(
             IO.of(getDataPath().resolve("config.json")),
-            new SimplePortalConfig(true, false, true, 0.3),
+            new SimplePortalConfig(false, true, false, true, 0.3),
             SimplePortalConfig.class
-    ).validate().saveIfAbsent();
+    ).validate().save();
 
     private final ComponentBundle bundle = ComponentBundle.builder(
                     Key.key("portals", "translations"),
@@ -66,6 +68,7 @@ public final class PortalsPlugin extends JavaPlugin {
 
     public PortalsPlugin() {
         StaticBinder.getInstance(ActionTypes.class.getClassLoader()).bind(ActionTypes.class, SimpleActionTypes.INSTANCE);
+        StaticBinder.getInstance(BoundsFactory.class.getClassLoader()).bind(BoundsFactory.class, SimpleBoundsFactory.INSTANCE);
         StaticBinder.getInstance(ActionTypeRegistry.class.getClassLoader()).bind(ActionTypeRegistry.class, SimpleActionTypeRegistry.INSTANCE);
         StaticBinder.getInstance(PortalConfig.class.getClassLoader()).bind(PortalConfig.class, portalConfig.getRoot());
         StaticBinder.getInstance(PortalProvider.class.getClassLoader()).bind(PortalProvider.class, portalProvider);
@@ -125,7 +128,7 @@ public final class PortalsPlugin extends JavaPlugin {
         return NBT.builder()
                 .registerTypeHierarchyAdapter(BoundingBox.class, new BoundingBoxAdapter(world))
                 .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter(this))
-                .registerTypeHierarchyAdapter(Position.class, new PositionAdapter())
+                .registerTypeHierarchyAdapter(Position.class, new FinePositionAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Portal.class, new PortalAdapter(this))
                 .build();
