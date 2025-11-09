@@ -4,8 +4,8 @@ import core.paper.messenger.PluginMessenger;
 import io.papermc.paper.entity.TeleportFlag;
 import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.PortalsPlugin;
-import net.thenextlvl.portals.listener.PortalListener;
 import net.thenextlvl.portals.bounds.Bounds;
+import net.thenextlvl.portals.listener.PortalListener;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @NullMarked
 public final class SimpleActionTypes implements ActionTypes {
     public static final SimpleActionTypes INSTANCE = new SimpleActionTypes();
-    
+
     private final PortalsPlugin plugin = JavaPlugin.getPlugin(PortalsPlugin.class);
     private final PluginMessenger messenger = new PluginMessenger(plugin);
 
@@ -117,16 +117,17 @@ public final class SimpleActionTypes implements ActionTypes {
     });
 
     private final ActionType<Bounds> teleportRandom = ActionType.create("teleport_random", Bounds.class, (entity, portal, bounds) -> {
+        plugin.bundle().sendMessage(entity, "portal.random-teleport.searching");
         bounds.searchSafeLocation(ThreadLocalRandom.current()).thenAccept(location -> {
             if (location == null) {
-                System.out.println("Failed to find a safe location within bounds: " + bounds);
-                // todo: send message to player
-                // plugin.bundle().sendMessage(entity, "portal.action.teleport-random.failed");
+                plugin.bundle().sendMessage(entity, "portal.random-teleport.failed");
                 return;
             }
             location.setRotation(entity.getLocation().getRotation());
-            entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
-            System.out.println("random teleported to " + location);
+            entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN).thenAccept(success -> {
+                var message = success ? "portal.random-teleport.success" : "portal.random-teleport.cancelled";
+                plugin.bundle().sendMessage(entity, message);
+            });
         });
         return true;
     });
