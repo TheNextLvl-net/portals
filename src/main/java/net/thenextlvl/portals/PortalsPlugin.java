@@ -53,7 +53,7 @@ public final class PortalsPlugin extends JavaPlugin {
 
     private final FileIO<SimplePortalConfig> portalConfig = new GsonFile<>(
             IO.of(getDataPath().resolve("config.json")),
-            new SimplePortalConfig(true, false, true, 0.3),
+            new SimplePortalConfig(true, true, false, true, 0.3),
             SimplePortalConfig.class
     ).validate().saveIfAbsent();
 
