@@ -6,7 +6,4 @@ public record SimplePortalConfig(
         boolean pushBackOnEntryDenied,
         double pushbackSpeed
 ) implements PortalConfig {
-    public static final SimplePortalConfig INSTANCE = new SimplePortalConfig(
-            true, false, true, 0.3
-    );
 }

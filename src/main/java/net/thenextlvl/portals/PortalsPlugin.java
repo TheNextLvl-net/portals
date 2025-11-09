@@ -1,6 +1,9 @@
 package net.thenextlvl.portals;
 
+import core.file.FileIO;
+import core.file.format.GsonFile;
 import core.i18n.file.ComponentBundle;
+import core.io.IO;
 import io.papermc.paper.math.Position;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
@@ -43,10 +46,15 @@ public final class PortalsPlugin extends JavaPlugin {
     public static final String ISSUES = "https://github.com/TheNextLvl-net/portals/issues/new";
 
     private final PaperPortalProvider portalProvider = new PaperPortalProvider(this);
-    private final PortalConfig portalConfig = SimplePortalConfig.INSTANCE;
     private EconomyProvider economyProvider = new EmptyEconomyProvider();
 
     private final Metrics metrics = new Metrics(this, 27514);
+
+    private final FileIO<SimplePortalConfig> portalConfig = new GsonFile<>(
+            IO.of(getDataPath().resolve("config.json")),
+            new SimplePortalConfig(true, false, true, 0.3),
+            SimplePortalConfig.class
+    ).validate().saveIfAbsent();
 
     private final ComponentBundle bundle = ComponentBundle.builder(
                     Key.key("portals", "translations"),
@@ -59,7 +67,7 @@ public final class PortalsPlugin extends JavaPlugin {
     public PortalsPlugin() {
         StaticBinder.getInstance(ActionTypes.class.getClassLoader()).bind(ActionTypes.class, SimpleActionTypes.INSTANCE);
         StaticBinder.getInstance(ActionTypeRegistry.class.getClassLoader()).bind(ActionTypeRegistry.class, SimpleActionTypeRegistry.INSTANCE);
-        StaticBinder.getInstance(PortalConfig.class.getClassLoader()).bind(PortalConfig.class, portalConfig);
+        StaticBinder.getInstance(PortalConfig.class.getClassLoader()).bind(PortalConfig.class, portalConfig.getRoot());
         StaticBinder.getInstance(PortalProvider.class.getClassLoader()).bind(PortalProvider.class, portalProvider);
 
         registerCommands();
@@ -109,7 +117,7 @@ public final class PortalsPlugin extends JavaPlugin {
 
     @Contract(pure = true)
     public PortalConfig config() {
-        return portalConfig;
+        return portalConfig.getRoot();
     }
 
     @Contract(value = "_ -> new", pure = true)
