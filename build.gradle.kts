@@ -64,7 +64,7 @@ paper {
             load = PaperPluginDescription.RelativeLoadOrder.BEFORE
             required = false
         }
-        // fixme: temporary solution, FAWE provides WorldEdit so this should not be required
+        // todo: remove this eventually – "provides" was fixed in paper 1.21.10
         register("FastAsyncWorldEdit") {
             load = PaperPluginDescription.RelativeLoadOrder.BEFORE
             required = false
