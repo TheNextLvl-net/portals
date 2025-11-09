@@ -46,15 +46,9 @@ public interface PortalConfig {
     boolean ignoreEntityMovement();
 
     /**
-     * Whether to push back entities that are denied entry.
-     *
-     * @return {@code true} if entities are pushed back, {@code false} otherwise
-     * @since 0.2.0
-     */
-    boolean pushBackOnEntryDenied();
-
-    /**
      * Speed at which entities are pushed back.
+     * <p>
+     * A value of 0 and below means this feature is disabled.
      *
      * @return the pushback speed
      * @since 0.2.0

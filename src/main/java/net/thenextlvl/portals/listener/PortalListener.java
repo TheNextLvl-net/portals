@@ -90,10 +90,10 @@ public final class PortalListener implements Listener {
     }
 
     private void pushAway(Entity entity, Location to) {
-        if (!plugin.config().pushBackOnEntryDenied()) return;
-        entity.getScheduler().run(plugin, task -> {
+        var speed = plugin.config().pushbackSpeed();
+        if (speed > 0) entity.getScheduler().run(plugin, task -> {
             var direction = entity.getLocation().toVector().subtract(to.toVector()).normalize();
-            entity.setVelocity(direction.multiply(plugin.config().pushbackSpeed()));
+            entity.setVelocity(direction.multiply(speed));
         }, null);
     }
 
