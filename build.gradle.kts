@@ -39,7 +39,7 @@ dependencies {
     compileOnly("net.thenextlvl:vault-api:1.7.1")
     compileOnly("net.thenextlvl:service-io:2.3.3")
 
-    implementation("net.thenextlvl.core:i18n:3.2.2")
+    implementation("net.thenextlvl.core:i18n:3.2.3")
     implementation("net.thenextlvl:nbt:3.0.1")
 
     implementation("org.bstats:bstats-bukkit:3.1.0")
