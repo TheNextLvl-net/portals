@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
-    api("net.thenextlvl.core:paper:2.3.1")
+    api("net.thenextlvl.core:paper:2.3.2")
     api("net.thenextlvl:static-binder:0.1.3")
 }
 
