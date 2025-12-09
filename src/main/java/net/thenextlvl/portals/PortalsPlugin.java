@@ -1,8 +1,7 @@
 package net.thenextlvl.portals;
 
 import core.file.FileIO;
-import core.file.format.GsonFile;
-import core.io.IO;
+import core.file.formats.GsonFile;
 import io.papermc.paper.math.Position;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
@@ -53,7 +52,7 @@ public final class PortalsPlugin extends JavaPlugin {
     private final Metrics metrics = new Metrics(this, 27514);
 
     private final FileIO<SimplePortalConfig> portalConfig = new GsonFile<>(
-            IO.of(getDataPath().resolve("config.json")),
+            getDataPath().resolve("config.json"),
             new SimplePortalConfig(false, true, false, 0.3),
             SimplePortalConfig.class
     ).validate().save();
