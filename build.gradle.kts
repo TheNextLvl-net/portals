@@ -26,6 +26,7 @@ repositories {
     maven("https://maven.enginehub.org/repo/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.thenextlvl.net/releases")
+    maven("https://repo.thenextlvl.net/snapshots")
 }
 
 dependencies {
@@ -39,7 +40,7 @@ dependencies {
     compileOnly("net.thenextlvl:vault-api:1.7.1")
     compileOnly("net.thenextlvl:service-io:2.3.3")
 
-    implementation("net.thenextlvl.core:i18n:3.2.2")
+    implementation("net.thenextlvl:i18n:1.1.0")
     implementation("net.thenextlvl:nbt:3.0.1")
 
     implementation("org.bstats:bstats-bukkit:3.1.0")

@@ -2,7 +2,7 @@ package net.thenextlvl.portals.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import core.paper.command.argument.DurationArgumentType;
+import core.paper.brigadier.arguments.DurationArgumentType;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
