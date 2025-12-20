@@ -23,10 +23,10 @@ public final class BlockPositionAdapter implements TagAdapter<BlockPosition> {
 
     @Override
     public Tag serialize(BlockPosition position, TagSerializationContext context) throws ParserException {
-        var tag = CompoundTag.empty();
-        tag.add("x", position.blockX());
-        tag.add("y", position.blockY());
-        tag.add("z", position.blockZ());
-        return tag;
+        return CompoundTag.builder()
+                .put("x", position.blockX())
+                .put("y", position.blockY())
+                .put("z", position.blockZ())
+                .build();
     }
 }

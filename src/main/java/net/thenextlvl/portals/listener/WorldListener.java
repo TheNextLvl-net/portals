@@ -16,11 +16,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static java.nio.file.StandardOpenOption.READ;
 import static net.thenextlvl.portals.PortalsPlugin.ISSUES;
 
 @NullMarked
@@ -61,14 +59,14 @@ public final class WorldListener implements Listener {
 
     private @Nullable Portal loadSafe(Path file, World world) {
         try {
-            try (var inputStream = stream(file)) {
+            try (var inputStream = NBTInputStream.create(file)) {
                 return load(inputStream, world);
             } catch (Exception e) {
                 var backup = file.resolveSibling(file.getFileName() + "_old");
                 if (!Files.isRegularFile(backup)) throw e;
                 plugin.getComponentLogger().warn("Failed to load portal from {}", file, e);
                 plugin.getComponentLogger().warn("Falling back to {}", backup);
-                try (var inputStream = stream(backup)) {
+                try (var inputStream = NBTInputStream.create(backup)) {
                     return load(inputStream, world);
                 }
             }
@@ -83,10 +81,6 @@ public final class WorldListener implements Listener {
             plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             return null;
         }
-    }
-
-    private NBTInputStream stream(Path file) throws IOException {
-        return new NBTInputStream(Files.newInputStream(file, READ), StandardCharsets.UTF_8);
     }
 
     private @Nullable Portal load(NBTInputStream inputStream, World world) throws IOException {

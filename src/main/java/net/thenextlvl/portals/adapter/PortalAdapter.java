@@ -42,17 +42,17 @@ public final class PortalAdapter implements TagAdapter<Portal> {
 
     @Override
     public Tag serialize(Portal portal, TagSerializationContext context) throws ParserException {
-        var tag = CompoundTag.empty();
+        var tag = CompoundTag.builder();
 
-        tag.add("name", portal.getName());
-        tag.add("boundingBox", context.serialize(portal.getBoundingBox(), BoundingBox.class));
+        tag.put("name", portal.getName());
+        tag.put("boundingBox", context.serialize(portal.getBoundingBox(), BoundingBox.class));
 
-        portal.getEntryAction().ifPresent(action -> tag.add("entryAction", context.serialize(action)));
-        portal.getEntryPermission().ifPresent(permission -> tag.add("entryPermission", permission));
+        portal.getEntryAction().ifPresent(action -> tag.put("entryAction", context.serialize(action)));
+        portal.getEntryPermission().ifPresent(permission -> tag.put("entryPermission", permission));
 
-        tag.add("cooldown", context.serialize(portal.getCooldown()));
-        tag.add("entryCost", portal.getEntryCost());
+        tag.put("cooldown", context.serialize(portal.getCooldown()));
+        tag.put("entryCost", portal.getEntryCost());
 
-        return tag;
+        return tag.build();
     }
 }

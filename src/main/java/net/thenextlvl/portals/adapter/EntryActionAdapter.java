@@ -43,9 +43,9 @@ public final class EntryActionAdapter implements TagAdapter<EntryAction<?>> {
 
     @Override
     public Tag serialize(EntryAction<?> action, TagSerializationContext context) throws ParserException {
-        var tag = CompoundTag.empty();
-        tag.add("type", action.getActionType().getName());
-        tag.add("input", nbt.serialize(action.getInput(), action.getActionType().getType()));
-        return tag;
+        return CompoundTag.builder()
+                .put("type", action.getActionType().getName())
+                .put("input", nbt.serialize(action.getInput(), action.getActionType().getType()))
+                .build();
     }
 }
