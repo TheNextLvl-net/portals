@@ -11,7 +11,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -19,9 +18,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
-import static java.nio.file.StandardOpenOption.WRITE;
 
 @NullMarked
 public final class PaperPortal implements Portal {
@@ -178,10 +174,7 @@ public final class PaperPortal implements Portal {
         try {
             if (Files.isRegularFile(file)) Files.move(file, backup, REPLACE_EXISTING);
             else Files.createDirectories(file.getParent());
-            try (var outputStream = new NBTOutputStream(
-                    Files.newOutputStream(file, WRITE, CREATE, TRUNCATE_EXISTING),
-                    StandardCharsets.UTF_8
-            )) {
+            try (var outputStream = NBTOutputStream.create(file)) {
                 outputStream.writeTag(getName(), plugin.nbt(getWorld()).serialize(this));
                 return true;
             }

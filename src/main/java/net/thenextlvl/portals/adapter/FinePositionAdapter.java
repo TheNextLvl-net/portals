@@ -22,10 +22,10 @@ public final class FinePositionAdapter implements TagAdapter<Position> {
 
     @Override
     public Tag serialize(Position position, TagSerializationContext context) throws ParserException {
-        var tag = CompoundTag.empty();
-        tag.add("x", position.x());
-        tag.add("y", position.y());
-        tag.add("z", position.z());
-        return tag;
+        return CompoundTag.builder()
+                .put("x", position.x())
+                .put("y", position.y())
+                .put("z", position.z())
+                .build();
     }
 }

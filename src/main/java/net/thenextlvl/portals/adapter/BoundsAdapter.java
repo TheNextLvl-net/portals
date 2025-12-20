@@ -24,10 +24,10 @@ public final class BoundsAdapter implements TagAdapter<Bounds> {
 
     @Override
     public Tag serialize(Bounds bounds, TagSerializationContext context) throws ParserException {
-        var tag = CompoundTag.empty();
-        tag.add("world", context.serialize(bounds.worldKey(), Key.class));
-        tag.add("min", context.serialize(bounds.minPosition()));
-        tag.add("max", context.serialize(bounds.maxPosition()));
-        return tag;
+        return CompoundTag.builder()
+                .put("world", context.serialize(bounds.worldKey(), Key.class))
+                .put("min", context.serialize(bounds.minPosition()))
+                .put("max", context.serialize(bounds.maxPosition()))
+                .build();
     }
 }

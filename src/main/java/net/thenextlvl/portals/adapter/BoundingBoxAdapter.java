@@ -29,9 +29,9 @@ public final class BoundingBoxAdapter implements TagAdapter<BoundingBox> {
 
     @Override
     public Tag serialize(BoundingBox boundingBox, TagSerializationContext context) throws ParserException {
-        var root = CompoundTag.empty();
-        root.add("min", context.serialize(boundingBox.getMinPosition()));
-        root.add("max", context.serialize(boundingBox.getMaxPosition()));
-        return root;
+        return CompoundTag.builder()
+                .put("min", context.serialize(boundingBox.getMinPosition()))
+                .put("max", context.serialize(boundingBox.getMaxPosition()))
+                .build();
     }
 }
