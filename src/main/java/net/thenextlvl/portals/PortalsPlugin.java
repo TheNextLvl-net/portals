@@ -1,5 +1,6 @@
 package net.thenextlvl.portals;
 
+import com.google.common.io.ByteStreams;
 import core.file.FileIO;
 import core.file.formats.GsonFile;
 import dev.faststats.bukkit.BukkitMetrics;
@@ -36,6 +37,7 @@ import net.thenextlvl.portals.shape.BoundingBox;
 import net.thenextlvl.portals.view.PortalConfig;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
@@ -81,6 +83,8 @@ public final class PortalsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
 
@@ -135,5 +139,12 @@ public final class PortalsPlugin extends JavaPlugin {
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
                 .registerTypeHierarchyAdapter(Portal.class, new PortalAdapter(this))
                 .build();
+    }
+
+    public void connect(Player player, String server) {
+        var dataOutput = ByteStreams.newDataOutput();
+        dataOutput.writeUTF("Connect");
+        dataOutput.writeUTF(server);
+        player.sendPluginMessage(this, "BungeeCord", dataOutput.toByteArray());
     }
 }
