@@ -56,7 +56,7 @@ tasks.shadowJar {
 
 paper {
     name = "Portals"
-    main = "net.thenextlvl.portals.PortalsPlugin"
+    main = "net.thenextlvl.portals.plugin.PortalsPlugin"
     apiVersion = "1.21.4"
     description = "Create, delete and manage custom portals"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
