@@ -2,6 +2,7 @@ package net.thenextlvl.portals.action;
 
 import net.thenextlvl.binder.StaticBinder;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -21,8 +22,7 @@ public interface ActionTypeRegistry {
      * @return the action type registry
      * @since 0.1.0
      */
-    @Contract(pure = true)
-    static ActionTypeRegistry registry() {
+    static @CheckReturnValue ActionTypeRegistry registry() {
         return StaticBinder.getInstance(ActionTypeRegistry.class.getClassLoader()).find(ActionTypeRegistry.class);
     }
 

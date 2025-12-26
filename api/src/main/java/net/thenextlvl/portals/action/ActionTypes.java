@@ -5,6 +5,7 @@ import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.bounds.Bounds;
 import org.bukkit.Location;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.Contract;
 
 import java.net.InetSocketAddress;
@@ -22,8 +23,7 @@ public interface ActionTypes {
      * @return the action type registry
      * @since 0.1.0
      */
-    @Contract(pure = true)
-    static ActionTypes types() {
+    static @CheckReturnValue ActionTypes types() {
         return StaticBinder.getInstance(ActionTypes.class.getClassLoader()).find(ActionTypes.class);
     }
 
