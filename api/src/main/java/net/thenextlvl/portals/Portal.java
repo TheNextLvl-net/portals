@@ -4,6 +4,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.effect.PortalEffect;
 import net.thenextlvl.portals.notification.Notifications;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
@@ -252,6 +253,25 @@ public interface Portal extends PortalLike {
      */
     @Contract(pure = true)
     Notifications getNotifications();
+
+    /**
+     * Gets the portal effect of the portal.
+     *
+     * @return the portal effect
+     * @since 1.1.0
+     */
+    @Contract(pure = true)
+    Optional<PortalEffect> getPortalEffect();
+
+    /**
+     * Sets the portal effect of the portal.
+     *
+     * @param effect the portal effect
+     * @return {@code true} if the portal effect was changed, {@code false} otherwise
+     * @since 1.1.0
+     */
+    @Contract(mutates = "this")
+    boolean setPortalEffect(@Nullable PortalEffect effect);
 
     /**
      * Gets the data file of the portal.

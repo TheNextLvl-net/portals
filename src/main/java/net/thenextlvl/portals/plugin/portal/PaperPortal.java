@@ -20,6 +20,7 @@ import net.thenextlvl.portals.notification.Notifications;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.model.SimpleNotification;
 import net.thenextlvl.portals.plugin.utils.Debugger;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -60,6 +61,7 @@ public final class PaperPortal implements Portal {
     private Duration warmup = Duration.ZERO;
 
     private @Nullable EntryAction<?> entryAction = null;
+    private @Nullable PortalEffect portalEffect = null;
     private @Nullable String entryPermission = null;
     private @Nullable String currency = null;
 
@@ -231,6 +233,18 @@ public final class PaperPortal implements Portal {
     public boolean setEntryAction(@Nullable final EntryAction<?> action) {
         if (Objects.equals(this.entryAction, action)) return false;
         this.entryAction = action;
+        return true;
+    }
+
+    @Override
+    public Optional<PortalEffect> getPortalEffect() {
+        return Optional.ofNullable(portalEffect);
+    }
+
+    @Override
+    public boolean setPortalEffect(@Nullable PortalEffect effect) {
+        if (Objects.equals(this.portalEffect, effect)) return false;
+        this.portalEffect = effect;
         return true;
     }
 
