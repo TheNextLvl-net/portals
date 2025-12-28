@@ -4,6 +4,8 @@ import org.jspecify.annotations.NullMarked;
 module net.thenextlvl.portals {
     exports net.thenextlvl.portals.action;
     exports net.thenextlvl.portals.bounds;
+    exports net.thenextlvl.portals.effect;
+    exports net.thenextlvl.portals.effects;
     exports net.thenextlvl.portals.event;
     exports net.thenextlvl.portals.selection;
     exports net.thenextlvl.portals.shape;
