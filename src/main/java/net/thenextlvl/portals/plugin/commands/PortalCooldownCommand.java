@@ -2,13 +2,13 @@ package net.thenextlvl.portals.plugin.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import core.paper.brigadier.arguments.DurationArgumentType;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
+import net.thenextlvl.portals.plugin.commands.arguments.DurationArgumentType;
 import net.thenextlvl.portals.plugin.commands.brigadier.SimpleCommand;
 import org.jspecify.annotations.NullMarked;
 

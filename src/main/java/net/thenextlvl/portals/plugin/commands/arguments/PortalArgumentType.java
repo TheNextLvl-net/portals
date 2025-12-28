@@ -4,9 +4,10 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import core.paper.brigadier.exceptions.ComponentCommandExceptionType;
+import io.papermc.paper.command.brigadier.MessageComponentSerializer;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import net.kyori.adventure.text.Component;
 import net.thenextlvl.portals.Portal;
@@ -25,8 +26,8 @@ public final class PortalArgumentType implements CustomArgumentType.Converted<Po
 
     @Override
     public Portal convert(String nativeType) throws CommandSyntaxException {
-        return plugin.portalProvider().getPortal(nativeType).orElseThrow(() -> new ComponentCommandExceptionType(
-                Component.text("Unknown portal: " + nativeType)
+        return plugin.portalProvider().getPortal(nativeType).orElseThrow(() -> new SimpleCommandExceptionType(
+                MessageComponentSerializer.message().serialize(Component.text("Unknown portal: " + nativeType))
         ).create());
     }
 
