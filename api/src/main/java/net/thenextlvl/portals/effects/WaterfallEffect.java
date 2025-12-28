@@ -56,6 +56,8 @@ public interface WaterfallEffect extends PortalEffect {
     @Contract(pure = true)
     double getFallSpeed();
 
+    WaterfallEffect.Builder toBuilder();
+
     /**
      * Creates a new builder for waterfall effects.
      *

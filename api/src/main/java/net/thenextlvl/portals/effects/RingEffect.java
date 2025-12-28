@@ -56,6 +56,8 @@ public interface RingEffect extends PortalEffect {
     @Contract(pure = true)
     double getPulseSpeed();
 
+    RingEffect.Builder toBuilder();
+
     /**
      * Creates a new builder for ring effects.
      *
