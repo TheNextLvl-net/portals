@@ -56,6 +56,8 @@ public interface SphereEffect extends PortalEffect {
     @Contract(pure = true)
     boolean isPulse();
 
+    SphereEffect.Builder toBuilder();
+
     /**
      * Creates a new builder for sphere effects.
      *

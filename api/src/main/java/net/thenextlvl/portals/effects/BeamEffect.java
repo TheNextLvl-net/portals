@@ -57,6 +57,8 @@ public interface BeamEffect extends PortalEffect {
     @Contract(pure = true)
     double getAnimationSpeed();
 
+    BeamEffect.Builder toBuilder();
+
     /**
      * Creates a new builder for beam effects.
      *

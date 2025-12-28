@@ -56,6 +56,8 @@ public interface FountainEffect extends PortalEffect {
     @Contract(pure = true)
     boolean isArc();
 
+    FountainEffect.Builder toBuilder();
+
     /**
      * Creates a new builder for fountain effects.
      *

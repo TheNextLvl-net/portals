@@ -56,6 +56,8 @@ public interface VortexEffect extends PortalEffect {
     @Contract(pure = true)
     boolean isPullInward();
 
+    VortexEffect.Builder toBuilder();
+
     /**
      * Creates a new builder for vortex effects.
      *
