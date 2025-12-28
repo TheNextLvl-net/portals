@@ -56,6 +56,8 @@ public interface PulseEffect extends PortalEffect {
     @Contract(pure = true)
     int getWaves();
 
+    PulseEffect.Builder toBuilder();
+
     /**
      * Creates a new builder for pulse effects.
      *

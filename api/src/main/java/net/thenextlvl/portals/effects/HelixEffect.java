@@ -48,6 +48,8 @@ public interface HelixEffect extends PortalEffect {
     @Contract(pure = true)
     double getPitch();
 
+    HelixEffect.Builder toBuilder();
+
     /**
      * Creates a new builder for helix effects.
      *

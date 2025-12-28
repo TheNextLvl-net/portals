@@ -71,6 +71,13 @@ public interface PortalEffect {
     void play(Player player);
 
     /**
+     * Creates a builder for this effect.
+     *
+     * @return a new builder instance
+     */
+    Builder<?, ?> toBuilder();
+
+    /**
      * Base builder interface for effect configurations.
      *
      * @param <T> the type of effect config being built

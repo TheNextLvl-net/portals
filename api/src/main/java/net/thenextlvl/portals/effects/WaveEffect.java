@@ -55,6 +55,8 @@ public interface WaveEffect extends PortalEffect {
      */
     @Contract(pure = true)
     double getLength();
+    
+    WaveEffect.Builder toBuilder();
 
     /**
      * Creates a new builder for wave effects.

@@ -56,6 +56,8 @@ public interface SpiralEffect extends PortalEffect {
     @Contract(pure = true)
     double getRotationSpeed();
 
+    SpiralEffect.Builder toBuilder();
+
     /**
      * Creates a new builder for spiral effects.
      *
