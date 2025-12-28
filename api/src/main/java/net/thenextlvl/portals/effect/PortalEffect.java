@@ -143,8 +143,9 @@ public interface PortalEffect {
          * Builds the immutable effect configuration.
          *
          * @return the constructed effect config
+         * @throws IllegalArgumentException if {@link #color(Color)} or {@link #particle(Particle)} has not been set
          */
         @Contract(value = " -> new", pure = true)
-        T build();
+        T build() throws IllegalArgumentException;
     }
 }
