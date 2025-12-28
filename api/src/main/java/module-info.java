@@ -12,6 +12,7 @@ module net.thenextlvl.portals {
     exports net.thenextlvl.portals.view;
     exports net.thenextlvl.portals;
 
+    requires com.google.common;
     requires net.kyori.adventure.key;
     requires net.thenextlvl.binder;
     requires org.bukkit;
