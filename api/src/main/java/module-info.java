@@ -13,6 +13,7 @@ module net.thenextlvl.portals {
     exports net.thenextlvl.portals.view;
     exports net.thenextlvl.portals;
 
+    requires com.google.common;
     requires net.kyori.adventure.key;
     requires net.kyori.adventure.text.minimessage;
     requires net.kyori.adventure.text.serializer.plain;
