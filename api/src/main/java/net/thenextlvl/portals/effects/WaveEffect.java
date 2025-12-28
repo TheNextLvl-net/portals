@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Contract;
  * An immutable wave effect configuration that creates rippling or undulating particle patterns.
  * All properties are defined via the builder and cannot be changed after creation.
  */
-public interface WaveEffect extends PortalEffect {
+public sealed interface WaveEffect extends PortalEffect permits SimpleWaveEffect {
     /**
      * Gets the amplitude of the wave.
      *
@@ -65,13 +65,13 @@ public interface WaveEffect extends PortalEffect {
      */
     @Contract(value = " -> new", pure = true)
     static Builder builder() {
-        throw new UnsupportedOperationException("Not implemented");
+        return new SimpleWaveEffect.Builder();
     }
 
     /**
      * Builder for creating immutable wave effect configurations.
      */
-    interface Builder extends PortalEffect.Builder<WaveEffect, Builder> {
+    sealed interface Builder extends PortalEffect.Builder<WaveEffect, Builder> permits SimpleWaveEffect.Builder {
         /**
          * Sets the amplitude of the wave.
          *
