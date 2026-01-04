@@ -1,5 +1,6 @@
 package net.thenextlvl.portals.plugin.adapters.debug;
 
+import com.google.gson.ExclusionStrategy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -16,12 +17,17 @@ import java.net.InetSocketAddress;
 
 @NullMarked
 public final class EntryActionAdapter implements JsonSerializer<EntryAction<?>> {
-    private final Gson gson = new GsonBuilder()
-            .registerTypeHierarchyAdapter(World.class, new WorldAdapter())
-            .registerTypeHierarchyAdapter(PortalLike.class, new PortalLikeAdapter())
-            .registerTypeHierarchyAdapter(InetSocketAddress.class, new InetSocketAddressAdapter())
-            .disableJdkUnsafe()
-            .create();
+    private final Gson gson;
+
+    public EntryActionAdapter(ExclusionStrategy exclusionStrategy) {
+        this.gson = new GsonBuilder()
+                .registerTypeHierarchyAdapter(World.class, new WorldAdapter())
+                .registerTypeHierarchyAdapter(PortalLike.class, new PortalLikeAdapter())
+                .registerTypeHierarchyAdapter(InetSocketAddress.class, new InetSocketAddressAdapter())
+                .addSerializationExclusionStrategy(exclusionStrategy)
+                .disableJdkUnsafe()
+                .create();
+    }
 
     @Override
     public JsonElement serialize(EntryAction<?> action, Type typeOfSrc, JsonSerializationContext context) {
