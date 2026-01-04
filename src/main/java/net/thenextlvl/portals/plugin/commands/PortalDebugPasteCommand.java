@@ -43,9 +43,9 @@ final class PortalDebugPasteCommand extends SimpleCommand {
         var debugger = plugin.debugger;
 
         var debug = CompoundTag.builder();
-        var logs = ListTag.builder().contentType(StringTag.ID);
         var portals = ListTag.builder().contentType(CompoundTag.ID);
-        var debugs = ListTag.builder().contentType(StringTag.ID);
+        var logs = ListTag.builder().contentType(StringTag.ID);
+        var errors = ListTag.builder().contentType(StringTag.ID);
 
         debug.put("version", plugin.getPluginMeta().getVersion());
         debug.put("server", plugin.getServer().getName() + " " + plugin.getServer().getVersion());
@@ -58,7 +58,7 @@ final class PortalDebugPasteCommand extends SimpleCommand {
                 return plugin.nbt(portal.getWorld()).serialize(portal);
             } catch (Exception e) {
                 plugin.getComponentLogger().warn("Failed to serialize portal {}", portal.getName(), e);
-                debugs.add(StringTag.of("Failed to serialize portal " + portal.getName() + ": " + e.getMessage()));
+                errors.add(StringTag.of("Failed to serialize portal " + portal.getName() + ": " + e.getMessage()));
                 return null;
             }
         }).filter(Objects::nonNull).forEach(portals::add);
@@ -71,9 +71,9 @@ final class PortalDebugPasteCommand extends SimpleCommand {
                 .put("pushbackSpeed", plugin.config().pushbackSpeed())
                 .build());
 
-        debug.put("portals", portals.build());
-        debug.put("logs", logs.build());
-        debug.put("debugs", debugs.build());
+        if (!portals.isEmpty()) debug.put("portals", portals.build());
+        if (!logs.isEmpty()) debug.put("logs", logs.build());
+        if (!errors.isEmpty()) debug.put("errors", errors.build());
 
         plugin.bundle().sendMessage(sender, "portal.debug-paste",
                 Placeholder.parsed("debug", nbt.toString(debug.build())));
