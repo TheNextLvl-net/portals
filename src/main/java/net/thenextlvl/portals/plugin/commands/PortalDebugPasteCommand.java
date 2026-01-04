@@ -14,6 +14,7 @@ import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.adapters.debug.DurationAdapter;
 import net.thenextlvl.portals.plugin.adapters.debug.EntryActionAdapter;
+import net.thenextlvl.portals.plugin.adapters.debug.InetSocketAddressAdapter;
 import net.thenextlvl.portals.plugin.adapters.debug.LazyPortalAdapter;
 import net.thenextlvl.portals.plugin.adapters.debug.PathAdapter;
 import net.thenextlvl.portals.plugin.adapters.debug.WorldAdapter;
@@ -22,6 +23,7 @@ import net.thenextlvl.portals.plugin.model.LazyPortal;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
+import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
 
@@ -33,6 +35,7 @@ final class PortalDebugPasteCommand extends SimpleCommand {
             .registerTypeAdapter(EntryAction.class, new EntryActionAdapter())
             .registerTypeHierarchyAdapter(World.class, new WorldAdapter())
             .registerTypeAdapter(LazyPortal.class, new LazyPortalAdapter())
+            .registerTypeHierarchyAdapter(InetSocketAddress.class, new InetSocketAddressAdapter())
             .addSerializationExclusionStrategy(new DebugExclusionStrategy())
             .disableHtmlEscaping()
             .disableJdkUnsafe()
