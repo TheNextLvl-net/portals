@@ -9,6 +9,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.action.EntryAction;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 
@@ -21,9 +22,10 @@ public final class EntryActionAdapter implements JsonSerializer<EntryAction<?>> 
 
     public EntryActionAdapter(ExclusionStrategy exclusionStrategy) {
         this.gson = new GsonBuilder()
-                .registerTypeHierarchyAdapter(World.class, new WorldAdapter())
-                .registerTypeHierarchyAdapter(PortalLike.class, new PortalLikeAdapter())
                 .registerTypeHierarchyAdapter(InetSocketAddress.class, new InetSocketAddressAdapter())
+                .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
+                .registerTypeHierarchyAdapter(PortalLike.class, new PortalLikeAdapter())
+                .registerTypeHierarchyAdapter(World.class, new WorldAdapter())
                 .addSerializationExclusionStrategy(exclusionStrategy)
                 .disableJdkUnsafe()
                 .create();

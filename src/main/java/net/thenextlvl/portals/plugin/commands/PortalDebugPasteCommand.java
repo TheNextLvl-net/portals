@@ -14,10 +14,12 @@ import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.adapters.debug.DurationAdapter;
 import net.thenextlvl.portals.plugin.adapters.debug.EntryActionAdapter;
+import net.thenextlvl.portals.plugin.adapters.debug.LocationAdapter;
 import net.thenextlvl.portals.plugin.adapters.debug.PortalAdapter;
 import net.thenextlvl.portals.plugin.adapters.debug.WorldAdapter;
 import net.thenextlvl.portals.plugin.commands.brigadier.SimpleCommand;
 import net.thenextlvl.portals.plugin.portal.PaperPortal;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
@@ -55,6 +57,7 @@ final class PortalDebugPasteCommand extends SimpleCommand {
                 .registerTypeAdapter(PaperPortal.class, new PortalAdapter())
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
                 .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter(exclusionStrategy))
+                .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
                 .registerTypeHierarchyAdapter(World.class, new WorldAdapter())
                 .addSerializationExclusionStrategy(exclusionStrategy)
                 .disableHtmlEscaping()

@@ -1,7 +1,6 @@
 package net.thenextlvl.portals.plugin.adapters.debug;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.bukkit.World;
@@ -12,7 +11,7 @@ import java.lang.reflect.Type;
 @NullMarked
 public final class WorldAdapter implements JsonSerializer<World> {
     @Override
-    public JsonElement serialize(World world, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(world.getName());
+    public JsonElement serialize(World world, Type type, JsonSerializationContext context) {
+        return context.serialize(world.key());
     }
 }
