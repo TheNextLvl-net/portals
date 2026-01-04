@@ -1,26 +1,15 @@
 package net.thenextlvl.portals.plugin.commands;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.nbt.serialization.NBT;
+import net.thenextlvl.nbt.tag.CompoundTag;
+import net.thenextlvl.nbt.tag.ListTag;
+import net.thenextlvl.nbt.tag.StringTag;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
-import net.thenextlvl.portals.plugin.adapters.debug.DurationAdapter;
-import net.thenextlvl.portals.plugin.adapters.debug.EntryActionAdapter;
-import net.thenextlvl.portals.plugin.adapters.debug.LocationAdapter;
-import net.thenextlvl.portals.plugin.adapters.debug.PortalAdapter;
-import net.thenextlvl.portals.plugin.adapters.debug.WorldAdapter;
 import net.thenextlvl.portals.plugin.commands.brigadier.SimpleCommand;
-import net.thenextlvl.portals.plugin.portal.PaperPortal;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 
@@ -29,6 +18,11 @@ import java.util.Objects;
 
 @NullMarked
 final class PortalDebugPasteCommand extends SimpleCommand {
+    private final NBT nbt = NBT.builder()
+            .setPrettyPrinting(true)
+            .setIndents(2)
+            .build();
+
     private PortalDebugPasteCommand(PortalsPlugin plugin) {
         super(plugin, "debug-paste", "portals.command.debug-paste");
     }
@@ -46,72 +40,43 @@ final class PortalDebugPasteCommand extends SimpleCommand {
     @Override
     public int run(CommandContext<CommandSourceStack> context) {
         var sender = context.getSource().getSender();
+        var debugger = plugin.debugger;
 
-        var debug = new JsonObject();
-        var logs = new JsonArray();
-        var portals = new JsonArray();
-        var debugs = new JsonArray();
+        var debug = CompoundTag.builder();
+        var logs = ListTag.builder().contentType(StringTag.ID);
+        var portals = ListTag.builder().contentType(CompoundTag.ID);
+        var debugs = ListTag.builder().contentType(StringTag.ID);
 
-        var exclusionStrategy = new DebugExclusionStrategy(debugs);
-        var gson = new GsonBuilder()
-                .registerTypeAdapter(PaperPortal.class, new PortalAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter(exclusionStrategy))
-                .registerTypeHierarchyAdapter(Location.class, new LocationAdapter())
-                .registerTypeHierarchyAdapter(World.class, new WorldAdapter())
-                .addSerializationExclusionStrategy(exclusionStrategy)
-                .disableHtmlEscaping()
-                .disableJdkUnsafe()
-                .setPrettyPrinting()
-                .create();
+        debug.put("version", plugin.getPluginMeta().getVersion());
+        debug.put("server", plugin.getServer().getName() + " " + plugin.getServer().getVersion());
+        debug.put("uptime", debugger.durationToString(Duration.ofMillis(debugger.uptime())));
 
-        debug.addProperty("version", plugin.getPluginMeta().getVersion());
-        debug.addProperty("server", plugin.getServer().getName() + " " + plugin.getServer().getVersion());
-        debug.addProperty("uptime", DurationAdapter.toString(Duration.ofMillis(plugin.uptime())));
-
-        if (plugin.omittedLogs() > 0) logs.add(new JsonPrimitive(
-                "Omitted " + plugin.omittedLogs() + " logs"
-        ));
+        if (debugger.omittedLogs > 0) logs.add(StringTag.of("Omitted " + debugger.omittedLogs + " logs"));
 
         plugin.portalProvider().portals.stream().map(portal -> {
             try {
-                return gson.toJsonTree(portal);
+                return plugin.nbt(portal.getWorld()).serialize(portal);
             } catch (Exception e) {
                 plugin.getComponentLogger().warn("Failed to serialize portal {}", portal.getName(), e);
-                debugs.add("Failed to serialize portal " + portal.getName() + ": " + e.getMessage());
+                debugs.add(StringTag.of("Failed to serialize portal " + portal.getName() + ": " + e.getMessage()));
                 return null;
             }
         }).filter(Objects::nonNull).forEach(portals::add);
-        plugin.logs().map(JsonPrimitive::new).forEach(logs::add);
+        debugger.logs().map(StringTag::of).forEach(logs::add);
 
-        try {
-            debug.add("config", gson.toJsonTree(plugin.config()));
-        } catch (Exception e) {
-            plugin.getComponentLogger().warn("Failed to serialize config", e);
-            debugs.add("Failed to serialize config: " + e.getMessage());
-        }
+        debug.put("config", CompoundTag.builder()
+                .put("allowCaveSpawns", plugin.config().allowCaveSpawns())
+                .put("entryCosts", plugin.config().entryCosts())
+                .put("ignoreEntityMovement", plugin.config().ignoreEntityMovement())
+                .put("pushbackSpeed", plugin.config().pushbackSpeed())
+                .build());
 
-        debug.add("portals", portals);
-        debug.add("logs", logs);
-        debug.add("debugs", debugs);
+        debug.put("portals", portals.build());
+        debug.put("logs", logs.build());
+        debug.put("debugs", debugs.build());
 
         plugin.bundle().sendMessage(sender, "portal.debug-paste",
-                Placeholder.parsed("debug", gson.toJson(debug)));
+                Placeholder.parsed("debug", nbt.toString(debug.build())));
         return SINGLE_SUCCESS;
-    }
-
-    private record DebugExclusionStrategy(JsonArray debugs) implements ExclusionStrategy {
-
-        @Override
-        public boolean shouldSkipField(FieldAttributes f) {
-            if (f.getDeclaredClass().isPrimitive() || f.getDeclaredClass().isEnum()) return false;
-            debugs.add("Processing field (" + f.getDeclaredClass().getName() + ") " + f.getDeclaringClass().getName() + "#" + f.getName());
-            return false;
-        }
-
-        @Override
-        public boolean shouldSkipClass(Class<?> clazz) {
-            return clazz.equals(PortalsPlugin.class);
-        }
     }
 }
