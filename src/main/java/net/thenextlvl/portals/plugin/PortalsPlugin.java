@@ -34,6 +34,7 @@ import net.thenextlvl.portals.plugin.listeners.WorldListener;
 import net.thenextlvl.portals.plugin.model.SimplePortalConfig;
 import net.thenextlvl.portals.plugin.portal.PaperPortalProvider;
 import net.thenextlvl.portals.plugin.selections.WorldEditSelectionProvider;
+import net.thenextlvl.portals.plugin.utils.Debugger;
 import net.thenextlvl.portals.selection.SelectionProvider;
 import net.thenextlvl.portals.shape.BoundingBox;
 import net.thenextlvl.portals.view.PortalConfig;
@@ -42,16 +43,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.intellij.lang.annotations.PrintFormat;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayDeque;
 import java.util.Locale;
-import java.util.stream.Stream;
 
 @NullMarked
 public final class PortalsPlugin extends JavaPlugin {
@@ -79,13 +74,7 @@ public final class PortalsPlugin extends JavaPlugin {
             .placeholder("prefix", "prefix")
             .build();
 
-    private final int maxLogs = 250;
-    private final long startTime = System.currentTimeMillis();
-    private final ArrayDeque<String> logs = new ArrayDeque<>(maxLogs);
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-    private int transaction = 1;
-    private int omitted = 0;
+    public final Debugger debugger = new Debugger();
 
     public PortalsPlugin() {
         StaticBinder.getInstance(ActionTypes.class.getClassLoader()).bind(ActionTypes.class, SimpleActionTypes.INSTANCE);
@@ -162,29 +151,5 @@ public final class PortalsPlugin extends JavaPlugin {
         dataOutput.writeUTF("Connect");
         dataOutput.writeUTF(server);
         player.sendPluginMessage(this, "BungeeCord", dataOutput.toByteArray());
-    }
-
-    public void newTransaction() {
-        transaction++;
-    }
-
-    public void log(@PrintFormat String log, Object... args) {
-        if (logs.size() >= maxLogs) {
-            logs.removeFirst();
-            omitted++;
-        }
-        logs.add("[" + formatter.format(Instant.now().atZone(ZoneId.systemDefault())) + "] #" + transaction + " " + String.format(log, args));
-    }
-
-    public long uptime() {
-        return System.currentTimeMillis() - startTime;
-    }
-
-    public int omittedLogs() {
-        return omitted;
-    }
-
-    public Stream<String> logs() {
-        return logs.stream();
     }
 }
