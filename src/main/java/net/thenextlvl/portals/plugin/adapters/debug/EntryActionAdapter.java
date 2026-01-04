@@ -14,12 +14,7 @@ public final class EntryActionAdapter implements JsonSerializer<EntryAction<?>> 
     @Override
     public JsonElement serialize(EntryAction<?> action, Type typeOfSrc, JsonSerializationContext context) {
         var object = new JsonObject();
-        var type = new JsonObject();
-
-        type.addProperty("class", action.getActionType().getClass().getName());
-        type.addProperty("name", action.getActionType().getName());
-
-        object.add("type", type);
+        object.addProperty("type", action.getActionType().getName());
         object.add("input", context.serialize(action.getInput()));
         return object;
     }
