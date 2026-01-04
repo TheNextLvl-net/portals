@@ -2,10 +2,11 @@ package net.thenextlvl.portals.plugin.listeners;
 
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.event.EntityPortalEnterEvent;
 import net.thenextlvl.portals.event.EntityPortalExitEvent;
 import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
+import net.thenextlvl.portals.plugin.adapters.debug.DurationAdapter;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.jspecify.annotations.NullMarked;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,19 +71,46 @@ public final class PortalListener implements Listener {
                 .filter(portal -> portal.getBoundingBox().overlaps(boundingBox))
                 .findAny().map(portal -> {
                     if (portal.equals(lastPortal.get(entity.getUniqueId()))) return true;
+                    plugin.newTransaction();
+                    plugin.log("'%s' entered the portal '%s'", entity.getName(), portal.getName());
 
-                    if (!new PreEntityPortalEnterEvent(portal, entity).callEvent()) return false;
+                    if (!new PreEntityPortalEnterEvent(portal, entity).callEvent()) {
+                        plugin.log("PreEntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
+                        return false;
+                    }
 
-                    if (!portal.getEntryPermission().map(entity::hasPermission).orElse(true)) return false;
-                    if (portal.getCooldown().isPositive() && hasCooldown(portal, entity)) return false;
-                    if (portal.getEntryCost() > 0 && !withdrawEntryCost(portal, entity)) return false;
+                    if (!portal.getEntryPermission().map(entity::hasPermission).orElse(true)) {
+                        plugin.log("EntryPermission was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryPermission().orElse(null));
+                        return false;
+                    }
+                    if (portal.getCooldown().isPositive() && hasCooldown(portal, entity)) {
+                        plugin.log("Cooldown was not met for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), DurationAdapter.toString(getRemainingCooldown(portal, entity)));
+                        return false;
+                    }
+                    if (portal.getEntryCost() > 0 && !withdrawEntryCost(portal, entity)) {
+                        plugin.log("EntryCost was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryCost());
+                        return false;
+                    }
 
-                    if (!new EntityPortalEnterEvent(portal, entity).callEvent()) return false;
+                    if (!new EntityPortalEnterEvent(portal, entity).callEvent()) {
+                        plugin.log("EntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
+                        return false;
+                    }
 
                     if (portal.getCooldown().isPositive()) setLastEntry(portal, entity);
                     setLastPortal(entity, portal);
 
-                    return portal.getEntryAction().map(action -> action.onEntry(entity, portal)).orElse(true);
+                    return portal.getEntryAction().map(action -> {
+                        if (action.onEntry(entity, portal)) {
+                            plugin.log("EntryAction was successful for '%s' in '%s'", entity.getName(), portal.getName());
+                            return true;
+                        }
+                        plugin.log("EntryAction was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
+                        return false;
+                    }).orElseGet(() -> {
+                        plugin.log("No EntryAction for '%s' in '%s'", entity.getName(), portal.getName());
+                        return true;
+                    });
                 }).orElseGet(() -> {
                     var removed = lastPortal.remove(entity.getUniqueId());
                     if (removed != null) new EntityPortalExitEvent(removed, entity).callEvent();
@@ -118,10 +147,15 @@ public final class PortalListener implements Listener {
     }
 
     private static boolean hasCooldown(Portal portal, Entity entity) {
+        return getRemainingCooldown(portal, entity).isPositive();
+    }
+    
+    private static Duration getRemainingCooldown(Portal portal, Entity entity) {
         var entries = lastEntry.get(portal);
-        if (entries == null) return false;
+        if (entries == null) return Duration.ZERO;
         var lastEntry = entries.get(entity.getUniqueId());
-        return lastEntry != null && Instant.now().isBefore(lastEntry.plus(portal.getCooldown()));
+        if (lastEntry == null) return Duration.ZERO;
+        return Duration.between(Instant.now(), lastEntry.plus(portal.getCooldown()));
     }
 
     private static void setLastEntry(Portal portal, Entity entity) {

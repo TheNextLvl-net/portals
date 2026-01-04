@@ -19,7 +19,7 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.portals"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -90,6 +90,7 @@ paper {
         register("portals.command.list") { children = listOf("portals.command.portal") }
         register("portals.command.permission") { children = listOf("portals.command.portal") }
         register("portals.command.teleport") { children = listOf("portals.command.portal") }
+        register("portals.command.debug-paste") { children = listOf("portals.command.portal") }
     }
 }
 
