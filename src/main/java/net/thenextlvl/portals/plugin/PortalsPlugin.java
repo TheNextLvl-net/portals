@@ -74,7 +74,7 @@ public final class PortalsPlugin extends JavaPlugin {
             .placeholder("prefix", "prefix")
             .build();
 
-    public final Debugger debugger = new Debugger();
+    public final Debugger debugger = new Debugger(this);
 
     public PortalsPlugin() {
         StaticBinder.getInstance(ActionTypes.class.getClassLoader()).bind(ActionTypes.class, SimpleActionTypes.INSTANCE);
