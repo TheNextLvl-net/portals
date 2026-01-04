@@ -13,14 +13,18 @@ import java.time.Duration;
 public final class DurationAdapter implements JsonSerializer<Duration> {
     @Override
     public JsonElement serialize(Duration duration, Type type, JsonSerializationContext context) {
+        return new JsonPrimitive(toString(duration));
+    }
+    
+    public static String toString(Duration duration) {
         var millis = duration.toMillis();
-        if (millis < 1000) return new JsonPrimitive(millis + " milliseconds");
+        if (millis < 1000) return millis + " milliseconds";
         var seconds = duration.toSeconds();
-        if (Math.abs(seconds) < 60) return new JsonPrimitive(seconds + " seconds");
+        if (Math.abs(seconds) < 60) return seconds + " seconds";
         var minutes = duration.toMinutes();
-        if (Math.abs(minutes) < 60) return new JsonPrimitive(minutes + " minutes");
+        if (Math.abs(minutes) < 60) return minutes + " minutes";
         var hours = duration.toHours();
-        if (Math.abs(hours) < 24) return new JsonPrimitive(hours + " hours");
-        return new JsonPrimitive(duration.toDays() + " days");
+        if (Math.abs(hours) < 24) return hours + " hours";
+        return duration.toDays() + " days";
     }
 }
