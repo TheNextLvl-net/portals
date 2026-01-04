@@ -21,6 +21,7 @@ import net.thenextlvl.portals.plugin.adapters.debug.WorldAdapter;
 import net.thenextlvl.portals.plugin.commands.brigadier.SimpleCommand;
 import net.thenextlvl.portals.plugin.model.LazyPortal;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 
 import java.net.InetSocketAddress;
@@ -49,6 +50,11 @@ final class PortalDebugPasteCommand extends SimpleCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
         var command = new PortalDebugPasteCommand(plugin);
         return command.create().executes(command);
+    }
+
+    @Override
+    protected boolean canUse(CommandSourceStack source) {
+        return super.canUse(source) && source.getSender() instanceof Player;
     }
 
     @Override
