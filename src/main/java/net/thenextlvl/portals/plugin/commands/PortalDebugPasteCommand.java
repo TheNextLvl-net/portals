@@ -15,29 +15,23 @@ import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.adapters.debug.DurationAdapter;
 import net.thenextlvl.portals.plugin.adapters.debug.EntryActionAdapter;
-import net.thenextlvl.portals.plugin.adapters.debug.InetSocketAddressAdapter;
-import net.thenextlvl.portals.plugin.adapters.debug.LazyPortalAdapter;
-import net.thenextlvl.portals.plugin.adapters.debug.PathAdapter;
+import net.thenextlvl.portals.plugin.adapters.debug.PortalAdapter;
 import net.thenextlvl.portals.plugin.adapters.debug.WorldAdapter;
 import net.thenextlvl.portals.plugin.commands.brigadier.SimpleCommand;
-import net.thenextlvl.portals.plugin.model.LazyPortal;
+import net.thenextlvl.portals.plugin.portal.PaperPortal;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
 
-import java.net.InetSocketAddress;
-import java.nio.file.Path;
 import java.time.Duration;
 
 @NullMarked
-final class PortalDebugPasteCommand extends SimpleCommand {
+public final class PortalDebugPasteCommand extends SimpleCommand {
     private final Gson gson = new GsonBuilder()
-            .registerTypeHierarchyAdapter(Path.class, new PathAdapter())
+            .registerTypeAdapter(PaperPortal.class, new PortalAdapter())
             .registerTypeAdapter(Duration.class, new DurationAdapter())
-            .registerTypeAdapter(EntryAction.class, new EntryActionAdapter())
+            .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter())
             .registerTypeHierarchyAdapter(World.class, new WorldAdapter())
-            .registerTypeAdapter(LazyPortal.class, new LazyPortalAdapter())
-            .registerTypeHierarchyAdapter(InetSocketAddress.class, new InetSocketAddressAdapter())
             .addSerializationExclusionStrategy(new DebugExclusionStrategy())
             .disableHtmlEscaping()
             .disableJdkUnsafe()
@@ -83,7 +77,7 @@ final class PortalDebugPasteCommand extends SimpleCommand {
         return SINGLE_SUCCESS;
     }
 
-    private static final class DebugExclusionStrategy implements ExclusionStrategy {
+    public static final class DebugExclusionStrategy implements ExclusionStrategy {
         @Override
         public boolean shouldSkipField(FieldAttributes f) {
             return false;
