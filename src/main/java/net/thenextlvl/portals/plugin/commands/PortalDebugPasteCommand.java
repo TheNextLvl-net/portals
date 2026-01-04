@@ -37,13 +37,15 @@ final class PortalDebugPasteCommand extends SimpleCommand {
                     plugin.bundle().sendMessage(sender, "portal.debug-paste.failed.upload");
                     plugin.bundle().sendMessage(sender, "portal.debug-paste", Placeholder.parsed("debug", debug));
                 }
-                plugin.getComponentLogger().warn("Failed to upload debug", throwable);
+                var t = throwable.getCause() != null ? throwable.getCause() : throwable;
+                plugin.getComponentLogger().warn("Failed to upload debug", t);
                 return null;
             });
         }).exceptionally(throwable -> {
             if (!(sender instanceof ConsoleCommandSender))
                 plugin.bundle().sendMessage(sender, "portal.debug-paste.failed");
-            plugin.getComponentLogger().warn("Failed to build debug", throwable);
+            var t = throwable.getCause() != null ? throwable.getCause() : throwable;
+            plugin.getComponentLogger().warn("Failed to build debug", t);
             return null;
         }).orTimeout(1, TimeUnit.SECONDS);
 
