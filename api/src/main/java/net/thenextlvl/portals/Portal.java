@@ -1,6 +1,7 @@
 package net.thenextlvl.portals;
 
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.effect.PortalEffect;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.jetbrains.annotations.ApiStatus;
@@ -127,6 +128,25 @@ public interface Portal extends PortalLike {
      */
     @Contract(mutates = "this")
     boolean setEntryAction(@Nullable EntryAction<?> action);
+
+    /**
+     * Gets the portal effect of the portal.
+     *
+     * @return the portal effect
+     * @since 1.1.0
+     */
+    @Contract(pure = true)
+    Optional<PortalEffect> getPortalEffect();
+
+    /**
+     * Sets the portal effect of the portal.
+     *
+     * @param effect the portal effect
+     * @return {@code true} if the portal effect was changed, {@code false} otherwise
+     * @since 1.1.0
+     */
+    @Contract(mutates = "this")
+    boolean setPortalEffect(@Nullable PortalEffect effect);
 
     /**
      * Gets the data file of the portal.

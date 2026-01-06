@@ -3,8 +3,9 @@ package net.thenextlvl.portals.plugin.portal;
 import com.google.common.base.Preconditions;
 import net.thenextlvl.nbt.NBTOutputStream;
 import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.effect.PortalEffect;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
@@ -27,8 +28,9 @@ public final class PaperPortal implements Portal {
     private BoundingBox boundingBox;
     private Duration cooldown = Duration.ZERO;
 
-    private @Nullable String entryPermission = null;
     private @Nullable EntryAction<?> entryAction = null;
+    private @Nullable PortalEffect portalEffect = null;
+    private @Nullable String entryPermission = null;
 
     private double entryCost = 0.0;
     private boolean persistent = true;
@@ -141,6 +143,18 @@ public final class PaperPortal implements Portal {
     public boolean setEntryAction(@Nullable EntryAction<?> action) {
         if (Objects.equals(this.entryAction, action)) return false;
         this.entryAction = action;
+        return true;
+    }
+
+    @Override
+    public Optional<PortalEffect> getPortalEffect() {
+        return Optional.ofNullable(portalEffect);
+    }
+
+    @Override
+    public boolean setPortalEffect(@Nullable PortalEffect effect) {
+        if (Objects.equals(this.portalEffect, effect)) return false;
+        this.portalEffect = effect;
         return true;
     }
 
