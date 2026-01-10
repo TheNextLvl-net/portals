@@ -38,7 +38,7 @@ dependencies {
     }
 
     compileOnly("net.thenextlvl:vault-api:1.7.1")
-    compileOnly("net.thenextlvl:service-io:2.4.0")
+    compileOnly("net.thenextlvl:service-io:2.5.0")
 
     implementation("net.thenextlvl.core:files:4.0.0-pre1")
     implementation("net.thenextlvl:i18n:1.1.0")
