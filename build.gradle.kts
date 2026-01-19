@@ -19,7 +19,6 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.portals"
-version = "1.1.1"
 
 repositories {
     mavenCentral()
