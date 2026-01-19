@@ -4,6 +4,7 @@ import com.google.common.io.ByteStreams;
 import core.file.FileIO;
 import core.file.formats.GsonFile;
 import dev.faststats.bukkit.BukkitMetrics;
+import dev.faststats.core.ErrorTracker;
 import io.papermc.paper.math.Position;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
@@ -50,7 +51,8 @@ import java.util.Locale;
 
 @NullMarked
 public final class PortalsPlugin extends JavaPlugin {
-    public static final String ISSUES = "https://github.com/TheNextLvl-net/portals/issues/new";
+    public static final ErrorTracker ERROR_TRACKER = ErrorTracker.contextAware();
+    public static final String ISSUES = "https://github.com/TheNextLvl-net/portals/issues/new?template=bug_report.yml";
 
     private final PaperPortalProvider portalProvider = new PaperPortalProvider(this);
     private EconomyProvider economyProvider = new EmptyEconomyProvider();
@@ -58,6 +60,7 @@ public final class PortalsPlugin extends JavaPlugin {
     private final Metrics metrics = new Metrics(this, 27514);
     private final dev.faststats.core.Metrics fastStats = BukkitMetrics.factory()
             .token("871d4095811865739273cb8ce0e65302")
+            .errorTracker(ERROR_TRACKER)
             .create(this);
 
     private final FileIO<SimplePortalConfig> portalConfig = new GsonFile<>(

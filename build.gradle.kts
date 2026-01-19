@@ -19,7 +19,6 @@ tasks.compileJava {
 }
 
 group = "net.thenextlvl.portals"
-version = "1.1.1"
 
 repositories {
     mavenCentral()
@@ -44,7 +43,7 @@ dependencies {
     implementation("net.thenextlvl:i18n:1.1.0")
     implementation("net.thenextlvl:nbt:4.3.1")
 
-    implementation("dev.faststats.metrics:bukkit:0.9.0")
+    implementation("dev.faststats.metrics:bukkit:0.10.1")
     implementation("org.bstats:bstats-bukkit:3.1.0")
 }
 

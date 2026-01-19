@@ -22,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
+
 @NullMarked
 public final class Debugger {
     private final int maxLogs = Integer.getInteger("portals.debug.max-logs", 250);
@@ -93,7 +95,9 @@ public final class Debugger {
                         .build();
             } catch (Exception e) {
                 plugin.getComponentLogger().warn("Failed to serialize portal {}", portal.getName(), e);
+                plugin.getComponentLogger().warn("Please look for similar issues or report this on GitHub: {}", ISSUES);
                 errors.add(StringTag.of("Failed to serialize portal " + portal.getName() + ": " + e.getMessage()));
+                PortalsPlugin.ERROR_TRACKER.trackError(e);
                 return null;
             }
         }).filter(Objects::nonNull).forEach(portals::add);
