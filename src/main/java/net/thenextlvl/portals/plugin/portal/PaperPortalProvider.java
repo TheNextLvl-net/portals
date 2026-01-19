@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
+
 @NullMarked
 public final class PaperPortalProvider implements PortalProvider {
     public final Set<Portal> portals = new HashSet<>();
@@ -73,6 +75,8 @@ public final class PaperPortalProvider implements PortalProvider {
             return true;
         } catch (IOException e) {
             plugin.getComponentLogger().error("Failed to delete portal {}", portal.getName(), e);
+            plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            PortalsPlugin.ERROR_TRACKER.trackError(e);
             return false;
         }
     }

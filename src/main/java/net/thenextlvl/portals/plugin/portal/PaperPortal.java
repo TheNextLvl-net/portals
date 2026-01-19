@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
 
 @NullMarked
 public final class PaperPortal implements Portal {
@@ -85,6 +86,8 @@ public final class PaperPortal implements Portal {
             if (Files.exists(getBackupFile())) Files.move(getBackupFile(), backupFile, REPLACE_EXISTING);
         } catch (IOException e) {
             plugin.getComponentLogger().error("Failed to move portal data files for {}", getName(), e);
+            plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            PortalsPlugin.ERROR_TRACKER.trackError(e);
             return false;
         }
 
@@ -186,7 +189,8 @@ public final class PaperPortal implements Portal {
                 plugin.getComponentLogger().error("Failed to restore portal {}", getName(), e);
             }
             plugin.getComponentLogger().error("Failed to save portal {}", getName(), t);
-            plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", PortalsPlugin.ISSUES);
+            plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            PortalsPlugin.ERROR_TRACKER.trackError(t);
             return false;
         }
     }

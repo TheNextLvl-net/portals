@@ -39,6 +39,8 @@ public final class WorldListener implements Listener {
             files.forEach(path -> loadSafe(path, event.getWorld()));
         } catch (IOException e) {
             plugin.getComponentLogger().error("Failed to load all portals in world {}", event.getWorld().getName(), e);
+            plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            PortalsPlugin.ERROR_TRACKER.trackError(e);
         }
     }
 
@@ -79,6 +81,7 @@ public final class WorldListener implements Listener {
         } catch (Exception e) {
             plugin.getComponentLogger().error("Failed to load portal from {}", file, e);
             plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
+            PortalsPlugin.ERROR_TRACKER.trackError(e);
             return null;
         }
     }
