@@ -4,8 +4,8 @@ import io.papermc.paper.entity.TeleportFlag;
 import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.action.ActionType;
 import net.thenextlvl.portals.action.ActionTypes;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.bounds.Bounds;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.listeners.PortalListener;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -35,9 +35,10 @@ public final class SimpleActionTypes implements ActionTypes {
     });
 
     private final ActionType<String> runConsoleCommand = ActionType.create("run_console_command", String.class, (entity, portal, input) -> {
-        if (!(entity instanceof Player player)) return false;
-        var command = input.replace("<player>", player.getName());
-        player.getServer().dispatchCommand(player.getServer().getConsoleSender(), command);
+        var command = entity instanceof Player player ? input.replace("<player>", player.getName()) : input;
+        plugin.getServer().getGlobalRegionScheduler().run(plugin, ignored -> {
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+        });
         return true;
     });
 
