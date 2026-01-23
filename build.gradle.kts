@@ -40,7 +40,7 @@ dependencies {
     compileOnly("net.thenextlvl:service-io:2.5.1")
 
     implementation("net.thenextlvl.core:files:4.0.0-pre1")
-    implementation("net.thenextlvl:i18n:1.1.0")
+    implementation("net.thenextlvl:i18n:1.2.0")
     implementation("net.thenextlvl:nbt:4.3.3")
 
     implementation("dev.faststats.metrics:bukkit:0.12.0")
