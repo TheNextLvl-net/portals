@@ -90,6 +90,29 @@ public interface Portal extends PortalLike {
     boolean setCooldown(Duration cooldown) throws IllegalArgumentException;
 
     /**
+     * Gets the warmup time of the portal.
+     * <p>
+     * If positive, the portals entry action is executed after this delay.
+     * The warmup can be cancelled by player actions (plugin-side logic).
+     *
+     * @return the warmup time
+     * @since 0.3.0
+     */
+    @Contract(pure = true)
+    Duration getWarmup();
+
+    /**
+     * Sets the warmup time of the portal.
+     *
+     * @param warmup the warmup time
+     * @return {@code true} if the warmup time was changed, {@code false} otherwise
+     * @throws IllegalArgumentException if the warmup is negative
+     * @since 0.3.0
+     */
+    @Contract(mutates = "this")
+    boolean setWarmup(Duration warmup) throws IllegalArgumentException;
+
+    /**
      * Gets the entry cost of the portal.
      *
      * @return the entry cost

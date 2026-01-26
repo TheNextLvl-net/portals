@@ -27,6 +27,7 @@ public final class PaperPortal implements Portal {
 
     private BoundingBox boundingBox;
     private Duration cooldown = Duration.ZERO;
+    private Duration warmup = Duration.ZERO;
 
     private @Nullable String entryPermission = null;
     private @Nullable EntryAction<?> entryAction = null;
@@ -123,6 +124,19 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
+    public Duration getWarmup() {
+        return warmup;
+    }
+
+    @Override
+    public boolean setWarmup(Duration warmup) throws IllegalArgumentException {
+        Preconditions.checkArgument(!warmup.isNegative(), "Warmup cannot be negative");
+        if (this.warmup.equals(warmup)) return false;
+        this.warmup = warmup;
+        return true;
+    }
+
+    @Override
     public double getEntryCost() {
         return entryCost;
     }
@@ -201,6 +215,7 @@ public final class PaperPortal implements Portal {
                 "name='" + name + '\'' +
                 ", boundingBox=" + boundingBox +
                 ", cooldown=" + cooldown +
+                ", warmup=" + warmup +
                 ", entryPermission='" + entryPermission + '\'' +
                 ", entryCost=" + entryCost +
                 ", persistent=" + persistent +

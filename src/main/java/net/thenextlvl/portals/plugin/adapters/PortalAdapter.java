@@ -33,6 +33,7 @@ public final class PortalAdapter implements TagAdapter<Portal> {
         var portal = new PaperPortal(plugin, name, boundingBox);
 
         root.optional("cooldown").map(tag1 -> context.deserialize(tag1, Duration.class)).ifPresent(portal::setCooldown);
+        root.optional("warmup").map(tag1 -> context.deserialize(tag1, Duration.class)).ifPresent(portal::setWarmup);
         root.optional("entryAction").map(tag1 -> context.deserialize(tag1, EntryAction.class)).ifPresent(portal::setEntryAction);
         root.optional("entryCost").map(tag1 -> context.deserialize(tag1, Double.class)).ifPresent(portal::setEntryCost);
         root.optional("entryPermission").map(tag1 -> context.deserialize(tag1, String.class)).ifPresent(portal::setEntryPermission);
@@ -51,6 +52,7 @@ public final class PortalAdapter implements TagAdapter<Portal> {
         portal.getEntryPermission().ifPresent(permission -> tag.put("entryPermission", permission));
 
         tag.put("cooldown", context.serialize(portal.getCooldown()));
+        tag.put("warmup", context.serialize(portal.getWarmup()));
         tag.put("entryCost", portal.getEntryCost());
 
         return tag.build();
