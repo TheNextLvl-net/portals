@@ -12,15 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.jspecify.annotations.NullMarked;
 
@@ -49,7 +41,7 @@ public final class PortalListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
-        if (processMovement(event.getPlayer(), event.getTo(), true)) return;
+        if (processMovement(event.getPlayer(), event.getTo())) return;
         pushAway(event.getPlayer(), event.getTo());
         event.setCancelled(true);
     }
@@ -57,62 +49,12 @@ public final class PortalListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
         if (event.isSneaking()) return;
-        if (processMovement(event.getPlayer(), event.getPlayer().getLocation(), false)) return;
+        if (processMovement(event.getPlayer(), event.getPlayer().getLocation())) return;
         event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerDropItem(PlayerDropItemEvent event) {
-        if (!isInWarmup(event.getPlayer())) return;
-        resetWarmupIfPresent(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (!isInWarmup(event.getPlayer())) return;
-        resetWarmupIfPresent(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        if (!isInWarmup(event.getPlayer())) return;
-        resetWarmupIfPresent(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) return;
-        if (!isInWarmup(player)) return;
-        resetWarmupIfPresent(player);
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onInventoryDrag(InventoryDragEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) return;
-        if (!isInWarmup(player)) return;
-        resetWarmupIfPresent(player);
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onSwapHandItems(PlayerSwapHandItemsEvent event) {
-        if (!isInWarmup(event.getPlayer())) return;
-        resetWarmupIfPresent(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
-        if (!isInWarmup(event.getPlayer())) return;
-        resetWarmupIfPresent(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-        if (!isInWarmup(event.getPlayer())) return;
-        resetWarmupIfPresent(event.getPlayer());
-    }
-
-    private boolean processMovement(Entity entity, Location to, boolean handleWarmup) {
-        if (handleWarmup && isInWarmup(entity)) {
+    private boolean processMovement(Entity entity, Location to) {
+        if (isInWarmup(entity)) {
             resetWarmupIfPresent(entity);
             return true;
         }
