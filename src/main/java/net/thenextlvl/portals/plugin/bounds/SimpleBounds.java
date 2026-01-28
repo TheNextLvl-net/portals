@@ -60,6 +60,7 @@ record SimpleBounds(
         var world = world().orElse(null);
         if (world == null) return CompletableFuture.completedFuture(null);
 
+        // Clamp bounds to world border
         var border = world.getWorldBorder();
         var borderSize = Math.min((int) border.getSize() / 2, plugin.getServer().getMaxWorldSize());
         var centerX = border.getCenter().getBlockX();
@@ -77,19 +78,23 @@ record SimpleBounds(
         var initialX = clampedMinX == clampedMaxX ? clampedMaxX : random.nextInt(clampedMinX, clampedMaxX);
         var initialZ = clampedMinZ == clampedMaxZ ? clampedMaxZ : random.nextInt(clampedMinZ, clampedMaxZ);
 
+        // Try initial X and Z position
         return searchSafeLocationAtXZ(random, world, initialX, initialZ).thenCompose(location -> {
             if (location != null) return CompletableFuture.completedFuture(location);
 
+            // Try different X position
             var newX = getAlternativeCoordinate(random, initialX, clampedMinX, clampedMaxX);
             return searchSafeLocationAtXZ(random, world, newX, initialZ);
         }).thenCompose(location -> {
             if (location != null) return CompletableFuture.completedFuture(location);
 
+            // Try different Z position
             var newZ = getAlternativeCoordinate(random, initialZ, clampedMinZ, clampedMaxZ);
             return searchSafeLocationAtXZ(random, world, initialX, newZ);
         }).thenCompose(location -> {
             if (location != null) return CompletableFuture.completedFuture(location);
 
+            // Try both new X and Z
             var newX = getAlternativeCoordinate(random, initialX, clampedMinX, clampedMaxX);
             var newZ = getAlternativeCoordinate(random, initialZ, clampedMinZ, clampedMaxZ);
             return searchSafeLocationAtXZ(random, world, newX, newZ);
@@ -97,18 +102,22 @@ record SimpleBounds(
     }
 
     private CompletableFuture<@Nullable Location> searchSafeLocationAtXZ(Random random, World world, int x, int z) {
+        // Clamp to world height limits
         var minY = Math.max(this.minY, world.getMinHeight());
         var maxY = Math.min(this.maxY, world.getLogicalHeight());
 
         var startY = minY == maxY ? maxY : random.nextInt(minY, maxY + 1);
 
+        // Load chunk asynchronously before accessing blocks
         return world.getChunkAtAsync(x >> 4, z >> 4).thenApply(chunk -> {
+            // Search upward from startY
             for (int y = startY; y <= maxY; y++) {
                 if (isSafeLocation(world, x, y, z)) {
                     return new Location(world, x + 0.5, y, z + 0.5);
                 }
             }
 
+            // Search downward from startY
             for (int y = startY - 1; y >= minY; y--) {
                 if (isSafeLocation(world, x, y, z)) {
                     return new Location(world, x + 0.5, y, z + 0.5);
@@ -138,7 +147,7 @@ record SimpleBounds(
         if (block.getLightFromSky() == 0 && !plugin.config().allowCaveSpawns()) return true;
         return !block.isPassable() || block.isLiquid() || block.getType().equals(Material.KELP);
     }
-    
+
     private boolean isTagged(Block block, TagKey<BlockType> tag) {
         return RegistryAccess.registryAccess().getRegistry(RegistryKey.BLOCK)
                 .getTagValues(tag).contains(block.getType().asBlockType());

@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -25,8 +24,8 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.jspecify.annotations.NullMarked;
 
-import io.papermc.paper.event.entity.EntityMoveEvent;
 import io.papermc.paper.util.Tick;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.title.Title;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.event.EntityPortalEnterEvent;
@@ -48,26 +47,9 @@ public final class PortalListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEntityMove(EntityMoveEvent event) {
-        if (!event.hasChangedPosition()) return;
-        if (isInWarmup(event.getEntity())) {
-            resetWarmupIfPresent(event.getEntity());
-            return; 
-        }
-        if (plugin.config().ignoreEntityMovement()) return;
-        if (processMovement(event.getEntity(), event.getTo())) return;
-        pushAway(event.getEntity(), event.getTo());
-        event.setCancelled(true);
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
-        if (isInWarmup(event.getPlayer())) {
-            resetWarmupIfPresent(event.getPlayer());
-            return; 
-        }
-        if (processMovement(event.getPlayer(), event.getTo())) return;
+        if (processMovement(event.getPlayer(), event.getTo(), true)) return;
         pushAway(event.getPlayer(), event.getTo());
         event.setCancelled(true);
     }
@@ -75,7 +57,7 @@ public final class PortalListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
         if (event.isSneaking()) return;
-        if (processMovement(event.getPlayer(), event.getPlayer().getLocation())) return;
+        if (processMovement(event.getPlayer(), event.getPlayer().getLocation(), false)) return;
         event.setCancelled(true);
     }
 
@@ -83,12 +65,6 @@ public final class PortalListener implements Listener {
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         if (!isInWarmup(event.getPlayer())) return;
         resetWarmupIfPresent(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEntityPickupItem(EntityPickupItemEvent event) {
-        if (!isInWarmup(event.getEntity())) return;
-        resetWarmupIfPresent(event.getEntity());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -135,14 +111,11 @@ public final class PortalListener implements Listener {
         resetWarmupIfPresent(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onEntityPortalEnter(org.bukkit.event.entity.EntityPortalEnterEvent event) {
-        plugin.portalProvider().getPortals(event.getLocation().getWorld())
-                .filter(portal -> portal.getBoundingBox().contains(event.getLocation()))
-                .findAny().ifPresent(portal -> event.setCancelled(true));
-    }
-
-    private boolean processMovement(Entity entity, Location to) {
+    private boolean processMovement(Entity entity, Location to, boolean handleWarmup) {
+        if (handleWarmup && isInWarmup(entity)) {
+            resetWarmupIfPresent(entity);
+            return true;
+        }
         var boundingBox = translate(entity.getBoundingBox(), to);
         return plugin.portalProvider().getPortals(entity.getWorld())
                 .filter(portal -> portal.getBoundingBox().overlaps(boundingBox))
@@ -211,7 +184,7 @@ public final class PortalListener implements Listener {
 
         if (entity instanceof Player player) {
             plugin.bundle().sendMessage(player, "portal.warmup.start",
-                    net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number("warmup", warmup.toMillis() / 1000d));
+                    Formatter.number("warmup", warmup.toMillis() / 1000d));
         }
 
         scheduleWarmupCheck(entity, portal, debugger, warmup);
@@ -270,12 +243,12 @@ public final class PortalListener implements Listener {
         if (elapsed.toMillis() < total.toMillis() * 0.4) return;
 
         plugin.bundle().sendMessage(player, "portal.warmup.reset",
-                net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number("warmup", total.toMillis() / 1000d));
+                Formatter.number("warmup", total.toMillis() / 1000d));
 
         var title = plugin.bundle().component("portal.warmup.reset.title", player,
-                net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number("warmup", total.toMillis() / 1000d));
+                Formatter.number("warmup", total.toMillis() / 1000d));
         var subtitle = plugin.bundle().component("portal.warmup.reset.subtitle", player,
-                net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number("warmup", total.toMillis() / 1000d));
+                Formatter.number("warmup", total.toMillis() / 1000d));
         player.showTitle(Title.title(title, subtitle));
     }
 

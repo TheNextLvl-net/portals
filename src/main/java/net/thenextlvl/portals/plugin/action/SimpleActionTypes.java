@@ -1,14 +1,5 @@
 package net.thenextlvl.portals.plugin.action;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.ThreadLocalRandom;
-
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.jspecify.annotations.NullMarked;
-
 import io.papermc.paper.entity.TeleportFlag;
 import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.action.ActionType;
@@ -16,6 +7,14 @@ import net.thenextlvl.portals.action.ActionTypes;
 import net.thenextlvl.portals.bounds.Bounds;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.listeners.PortalListener;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jspecify.annotations.NullMarked;
+
+import java.net.InetSocketAddress;
+import java.util.concurrent.ThreadLocalRandom;
 
 @NullMarked
 public final class SimpleActionTypes implements ActionTypes {
@@ -54,10 +53,13 @@ public final class SimpleActionTypes implements ActionTypes {
             var targetBB = targetPortal.getBoundingBox();
             var from = entity.getLocation();
 
+            // Source extents
             var sMin = new double[]{sourceBB.getMinX(), sourceBB.getMinY(), sourceBB.getMinZ()};
             var sMax = new double[]{sourceBB.getMaxX(), sourceBB.getMaxY(), sourceBB.getMaxZ()};
             var sSize = new double[]{sMax[0] - sMin[0], sMax[1] - sMin[1], sMax[2] - sMin[2]};
 
+            // Identify source axis roles by size:
+            // W = thickness (smallest), U = largest (width), V = middle (height)
             var sW = 0;
             if (sSize[1] < sSize[sW]) sW = 1;
             if (sSize[2] < sSize[sW]) sW = 2;
@@ -69,21 +71,26 @@ public final class SimpleActionTypes implements ActionTypes {
                 sV = tmp;
             }
 
+            // Fractions inside source portal along U/V/W
             var eps = 1.0e-6;
-            var margin = 1.0e-3; 
+            var margin = 1.0e-3; // keep slightly inside to avoid edge issues
 
             var pos = new double[]{from.getX(), from.getY(), from.getZ()};
             var fu = (sSize[sU] < eps) ? 0 : (pos[sU] - sMin[sU]) / Math.max(sSize[sU], eps);
             var fv = (sSize[sV] < eps) ? 0 : (pos[sV] - sMin[sV]) / Math.max(sSize[sV], eps);
             var fw = (sSize[sW] < eps) ? 0 : (pos[sW] - sMin[sW]) / Math.max(sSize[sW], eps);
 
+            // Clamp to always be strictly inside
             fu = Math.min(1 - margin, Math.max(margin, fu));
+            // fv = Math.min(1 - margin, Math.max(margin, fv));
             fw = Math.min(1 - margin, Math.max(margin, fw));
 
+            // Target extents
             var tMin = new double[]{targetBB.getMinX(), targetBB.getMinY(), targetBB.getMinZ()};
             var tMax = new double[]{targetBB.getMaxX(), targetBB.getMaxY(), targetBB.getMaxZ()};
             var tSize = new double[]{tMax[0] - tMin[0], tMax[1] - tMin[1], tMax[2] - tMin[2]};
 
+            // Identify target axis roles by size (match roles, not absolute axes)
             var tW = 0;
             if (tSize[1] < tSize[tW]) tW = 1;
             if (tSize[2] < tSize[tW]) tW = 2;
@@ -95,6 +102,7 @@ public final class SimpleActionTypes implements ActionTypes {
                 tV = tmp;
             }
 
+            // Map U/V/W fractions from source to target roles
             var dest = new double[3];
             dest[tU] = tMin[tU] + fu * tSize[tU];
             dest[tV] = tMin[tV] + fv * tSize[tV];
