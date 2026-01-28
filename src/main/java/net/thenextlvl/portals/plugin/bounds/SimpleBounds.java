@@ -1,13 +1,9 @@
 package net.thenextlvl.portals.plugin.bounds;
 
-import io.papermc.paper.math.BlockPosition;
-import io.papermc.paper.math.Position;
-import io.papermc.paper.registry.RegistryAccess;
-import io.papermc.paper.registry.RegistryKey;
-import io.papermc.paper.registry.tag.TagKey;
-import net.kyori.adventure.key.Key;
-import net.thenextlvl.portals.bounds.Bounds;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
+import java.util.Optional;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -17,9 +13,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
+import io.papermc.paper.math.BlockPosition;
+import io.papermc.paper.math.Position;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.tag.TagKey;
+import net.kyori.adventure.key.Key;
+import net.thenextlvl.portals.bounds.Bounds;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 
 @NullMarked
 record SimpleBounds(
@@ -146,7 +147,7 @@ record SimpleBounds(
         if (block.getLightFromSky() == 0 && !plugin.config().allowCaveSpawns()) return true;
         return !block.isPassable() || block.isLiquid() || block.getType().equals(Material.KELP);
     }
-    
+
     private boolean isTagged(Block block, TagKey<BlockType> tag) {
         return RegistryAccess.registryAccess().getRegistry(RegistryKey.BLOCK)
                 .getTagValues(tag).contains(block.getType().asBlockType());
