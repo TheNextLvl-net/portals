@@ -1,13 +1,11 @@
 package net.thenextlvl.portals.plugin.listeners;
 
-import io.papermc.paper.event.entity.EntityMoveEvent;
-import io.papermc.paper.util.Tick;
-import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.event.EntityPortalEnterEvent;
-import net.thenextlvl.portals.event.EntityPortalExitEvent;
-import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
-import net.thenextlvl.portals.plugin.utils.Debugger;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -27,11 +25,15 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.jspecify.annotations.NullMarked;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import io.papermc.paper.event.entity.EntityMoveEvent;
+import io.papermc.paper.util.Tick;
+import net.kyori.adventure.title.Title;
+import net.thenextlvl.portals.Portal;
+import net.thenextlvl.portals.event.EntityPortalEnterEvent;
+import net.thenextlvl.portals.event.EntityPortalExitEvent;
+import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
+import net.thenextlvl.portals.plugin.utils.Debugger;
 
 @NullMarked
 public final class PortalListener implements Listener {
@@ -49,9 +51,8 @@ public final class PortalListener implements Listener {
     public void onEntityMove(EntityMoveEvent event) {
         if (!event.hasChangedPosition()) return;
         if (isInWarmup(event.getEntity())) {
-            event.setCancelled(true);
             resetWarmupIfPresent(event.getEntity());
-            return;
+            return; // do not cancel movement -> avoids client rubberbanding
         }
         if (plugin.config().ignoreEntityMovement()) return;
         if (processMovement(event.getEntity(), event.getTo())) return;
@@ -63,9 +64,8 @@ public final class PortalListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
         if (isInWarmup(event.getPlayer())) {
-            event.setCancelled(true);
             resetWarmupIfPresent(event.getPlayer());
-            return;
+            return; // do not cancel movement -> avoids client rubberbanding
         }
         if (processMovement(event.getPlayer(), event.getTo())) return;
         pushAway(event.getPlayer(), event.getTo());
@@ -82,28 +82,24 @@ public final class PortalListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         if (!isInWarmup(event.getPlayer())) return;
-        event.setCancelled(true);
         resetWarmupIfPresent(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityPickupItem(EntityPickupItemEvent event) {
         if (!isInWarmup(event.getEntity())) return;
-        event.setCancelled(true);
         resetWarmupIfPresent(event.getEntity());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (!isInWarmup(event.getPlayer())) return;
-        event.setCancelled(true);
         resetWarmupIfPresent(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (!isInWarmup(event.getPlayer())) return;
-        event.setCancelled(true);
         resetWarmupIfPresent(event.getPlayer());
     }
 
@@ -111,7 +107,6 @@ public final class PortalListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         if (!isInWarmup(player)) return;
-        event.setCancelled(true);
         resetWarmupIfPresent(player);
     }
 
@@ -119,28 +114,24 @@ public final class PortalListener implements Listener {
     public void onInventoryDrag(InventoryDragEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         if (!isInWarmup(player)) return;
-        event.setCancelled(true);
         resetWarmupIfPresent(player);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSwapHandItems(PlayerSwapHandItemsEvent event) {
         if (!isInWarmup(event.getPlayer())) return;
-        event.setCancelled(true);
         resetWarmupIfPresent(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
         if (!isInWarmup(event.getPlayer())) return;
-        event.setCancelled(true);
         resetWarmupIfPresent(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         if (!isInWarmup(event.getPlayer())) return;
-        event.setCancelled(true);
         resetWarmupIfPresent(event.getPlayer());
     }
 
@@ -268,7 +259,25 @@ public final class PortalListener implements Listener {
     private void resetWarmupIfPresent(Entity entity) {
         var warmup = warmups.get(entity.getUniqueId());
         if (warmup == null) return;
+        var startedAt = warmup.startedAt();
         warmup.reset();
+        if (startedAt.equals(Instant.EPOCH)) return;
+        if (!(entity instanceof Player player)) return;
+
+        var total = warmup.portal().getWarmup();
+        if (!total.isPositive()) return;
+
+        var elapsed = Duration.between(startedAt, Instant.now());
+        if (elapsed.toMillis() < total.toMillis() * 0.4) return;
+
+        plugin.bundle().sendMessage(player, "portal.warmup.reset",
+                net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number("warmup", total.toMillis() / 1000d));
+
+        var title = plugin.bundle().component("portal.warmup.reset.title", player,
+                net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number("warmup", total.toMillis() / 1000d));
+        var subtitle = plugin.bundle().component("portal.warmup.reset.subtitle", player,
+                net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number("warmup", total.toMillis() / 1000d));
+        player.showTitle(Title.title(title, subtitle));
     }
 
     private boolean isInWarmup(Entity entity) {
