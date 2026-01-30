@@ -13,28 +13,28 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public final class PortalCommand extends BrigadierCommand {
-    public PortalCommand(PortalsPlugin plugin) {
+    public PortalCommand(final PortalsPlugin plugin) {
         super(plugin, "portal", "portals.command.portal");
     }
 
-    public static LiteralCommandNode<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new PortalCommand(plugin);
+    public static LiteralCommandNode<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new PortalCommand(plugin);
         return command.create()
                 .then(PortalActionCommand.create(plugin))
                 .then(PortalCooldownCommand.create(plugin))
                 .then(PortalCostCommand.create(plugin))
-                .then(PortalWarmupCommand.create(plugin))
                 .then(PortalCreateCommand.create(plugin))
+                .then(PortalDebugPasteCommand.create(plugin))
                 .then(PortalDeleteCommand.create(plugin))
                 .then(PortalListCommand.create(plugin))
                 .then(PortalPermissionCommand.create(plugin))
                 .then(PortalRedefineCommand.create(plugin))
                 .then(PortalTeleportCommand.create(plugin))
-                .then(PortalDebugPasteCommand.create(plugin))
+                .then(PortalWarmupCommand.create(plugin))
                 .build();
     }
 
-    public static RequiredArgumentBuilder<CommandSourceStack, Portal> portalArgument(PortalsPlugin plugin) {
+    public static RequiredArgumentBuilder<CommandSourceStack, Portal> portalArgument(final PortalsPlugin plugin) {
         return Commands.argument("portal", new PortalArgumentType(plugin));
     }
 }
