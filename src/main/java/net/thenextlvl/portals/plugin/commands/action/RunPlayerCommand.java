@@ -5,8 +5,8 @@ import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked

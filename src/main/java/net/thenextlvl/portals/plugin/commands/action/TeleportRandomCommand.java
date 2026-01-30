@@ -12,9 +12,9 @@ import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolv
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
 import net.thenextlvl.portals.bounds.Bounds;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
 

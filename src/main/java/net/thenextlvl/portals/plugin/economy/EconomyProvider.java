@@ -16,6 +16,6 @@ public interface EconomyProvider {
     default String format(final Locale locale, final double amount) {
         return String.format(locale, "%.2f", amount);
     }
-    
+
     boolean withdraw(Player player, double amount);
 }

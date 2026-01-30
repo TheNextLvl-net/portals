@@ -8,8 +8,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypes;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 import org.jspecify.annotations.NullMarked;
 
 import java.net.InetSocketAddress;

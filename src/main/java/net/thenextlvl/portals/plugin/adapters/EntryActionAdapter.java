@@ -10,10 +10,10 @@ import net.thenextlvl.nbt.serialization.TagSerializationContext;
 import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.nbt.tag.Tag;
 import net.thenextlvl.portals.PortalLike;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionTypeRegistry;
 import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.bounds.Bounds;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 import org.bukkit.Location;
 import org.jspecify.annotations.NullMarked;
 

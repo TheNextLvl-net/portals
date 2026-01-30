@@ -3,9 +3,9 @@ package net.thenextlvl.portals.plugin.commands.action;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.action.ActionType;
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.commands.brigadier.SimpleCommand;
 import org.jspecify.annotations.NullMarked;
 
