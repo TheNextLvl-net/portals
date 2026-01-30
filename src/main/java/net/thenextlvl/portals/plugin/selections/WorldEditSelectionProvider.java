@@ -21,41 +21,41 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
     private final WorldEdit worldEdit = WorldEdit.getInstance();
 
     @Override
-    public Optional<BoundingBox> getSelection(Player player) {
-        var manager = worldEdit.getSessionManager();
-        var owner = BukkitAdapter.adapt(player);
-        var session = manager.getIfPresent(owner);
+    public Optional<BoundingBox> getSelection(final Player player) {
+        final var manager = worldEdit.getSessionManager();
+        final var owner = BukkitAdapter.adapt(player);
+        final var session = manager.getIfPresent(owner);
         if (session == null) return Optional.empty();
         try {
-            if (!(session.getSelection() instanceof CuboidRegion cuboid)) return Optional.empty();
-            var world = cuboid.getWorld() instanceof BukkitWorld bukkit ? bukkit.getWorld() : player.getWorld();
-            var min = toPosition(cuboid.getMinimumPoint());
-            var max = toPosition(cuboid.getMaximumPoint()).offset(1, 1, 1);
+            if (!(session.getSelection() instanceof final CuboidRegion cuboid)) return Optional.empty();
+            final var world = cuboid.getWorld() instanceof final BukkitWorld bukkit ? bukkit.getWorld() : player.getWorld();
+            final var min = toPosition(cuboid.getMinimumPoint());
+            final var max = toPosition(cuboid.getMaximumPoint()).offset(1, 1, 1);
             return Optional.of(BoundingBox.of(world, min, max));
-        } catch (IncompleteRegionException e) {
+        } catch (final IncompleteRegionException e) {
             return Optional.empty();
         }
     }
 
     @Override
-    public boolean clearSelection(Player player) {
-        var manager = worldEdit.getSessionManager();
-        var owner = BukkitAdapter.adapt(player);
+    public boolean clearSelection(final Player player) {
+        final var manager = worldEdit.getSessionManager();
+        final var owner = BukkitAdapter.adapt(player);
         if (!manager.contains(owner)) return false;
         manager.remove(owner);
         return true;
     }
 
     @Override
-    public boolean hasSelection(Player player) {
+    public boolean hasSelection(final Player player) {
         return getSelection(player).isPresent();
     }
 
     @Override
-    public void setSelection(Player player, BoundingBox boundingBox) {
-        var manager = worldEdit.getSessionManager();
-        var session = manager.get(BukkitAdapter.adapt(player));
-        var selector = new CuboidRegionSelector(
+    public void setSelection(final Player player, final BoundingBox boundingBox) {
+        final var manager = worldEdit.getSessionManager();
+        final var session = manager.get(BukkitAdapter.adapt(player));
+        final var selector = new CuboidRegionSelector(
                 BukkitAdapter.adapt(boundingBox.getWorld()),
                 toBlockVector(boundingBox.getMinPosition()),
                 toBlockVector(boundingBox.getMaxPosition())
@@ -63,11 +63,11 @@ public final class WorldEditSelectionProvider implements SelectionProvider {
         session.setRegionSelector(BukkitAdapter.adapt(boundingBox.getWorld()), selector);
     }
 
-    private BlockPosition toPosition(BlockVector3 vector) {
+    private BlockPosition toPosition(final BlockVector3 vector) {
         return Position.block(vector.x(), vector.y(), vector.z());
     }
 
-    private BlockVector3 toBlockVector(Position position) {
+    private BlockVector3 toBlockVector(final Position position) {
         return BlockVector3.at(position.blockX(), position.blockY(), position.blockZ());
     }
 }

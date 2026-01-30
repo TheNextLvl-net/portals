@@ -14,23 +14,23 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class TeleportPortalCommand extends ActionCommand<PortalLike> {
-    private TeleportPortalCommand(PortalsPlugin plugin) {
+    private TeleportPortalCommand(final PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().teleportPortal(), "teleport-portal");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new TeleportPortalCommand(plugin);
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new TeleportPortalCommand(plugin);
         return command.create().then(Commands.argument("target", new PortalArgumentType(plugin)).executes(command));
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var target = context.getArgument("target", Portal.class);
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var target = context.getArgument("target", Portal.class);
         return addAction(context, target);
     }
 
     @Override
-    protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, PortalLike input) {
+    protected void onSuccess(final CommandContext<CommandSourceStack> context, final Portal portal, final PortalLike input) {
         plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.teleport-portal",
                 Placeholder.parsed("portal", portal.getName()),
                 Placeholder.parsed("target", input.getName()));

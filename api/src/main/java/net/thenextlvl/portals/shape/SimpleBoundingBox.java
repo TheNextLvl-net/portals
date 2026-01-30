@@ -7,15 +7,15 @@ import org.bukkit.entity.Entity;
 
 record SimpleBoundingBox(World world, Position minPosition, Position maxPosition) implements BoundingBox {
 
-    SimpleBoundingBox(World world, Position minPosition, Position maxPosition) {
+    SimpleBoundingBox(final World world, final Position minPosition, final Position maxPosition) {
         this.world = world;
-        var minX = Math.min(minPosition.x(), maxPosition.x());
-        var minY = Math.min(minPosition.y(), maxPosition.y());
-        var minZ = Math.min(minPosition.z(), maxPosition.z());
+        final var minX = Math.min(minPosition.x(), maxPosition.x());
+        final var minY = Math.min(minPosition.y(), maxPosition.y());
+        final var minZ = Math.min(minPosition.z(), maxPosition.z());
         this.minPosition = Position.fine(minX, minY, minZ);
-        var maxX = Math.max(minPosition.x(), maxPosition.x());
-        var maxY = Math.max(minPosition.y(), maxPosition.y());
-        var maxZ = Math.max(minPosition.z(), maxPosition.z());
+        final var maxX = Math.max(minPosition.x(), maxPosition.x());
+        final var maxY = Math.max(minPosition.y(), maxPosition.y());
+        final var maxZ = Math.max(minPosition.z(), maxPosition.z());
         this.maxPosition = Position.fine(maxX, maxY, maxZ);
     }
 
@@ -80,19 +80,19 @@ record SimpleBoundingBox(World world, Position minPosition, Position maxPosition
     }
 
     @Override
-    public boolean contains(Position position) {
+    public boolean contains(final Position position) {
         return position.x() >= getMinX() && position.x() <= getMaxX() &&
                 position.y() >= getMinY() && position.y() <= getMaxY() &&
                 position.z() >= getMinZ() && position.z() <= getMaxZ();
     }
 
     @Override
-    public boolean contains(Entity entity) {
+    public boolean contains(final Entity entity) {
         return entity.getWorld().equals(world) && overlaps(entity.getBoundingBox());
     }
 
     @Override
-    public boolean intersects(BoundingBox boundingBox) {
+    public boolean intersects(final BoundingBox boundingBox) {
         return world.equals(boundingBox.getWorld()) &&
                 getMinX() <= boundingBox.getMaxX() &&
                 getMaxX() >= boundingBox.getMinX() &&
@@ -103,7 +103,7 @@ record SimpleBoundingBox(World world, Position minPosition, Position maxPosition
     }
 
     @Override
-    public boolean overlaps(org.bukkit.util.BoundingBox boundingBox) {
+    public boolean overlaps(final org.bukkit.util.BoundingBox boundingBox) {
         return boundingBox.overlaps(minPosition().toVector(), maxPosition().toVector());
     }
 }

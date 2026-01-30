@@ -20,12 +20,12 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class TeleportRandomCommand extends ActionCommand<Bounds> {
-    private TeleportRandomCommand(PortalsPlugin plugin) {
+    private TeleportRandomCommand(final PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().teleportRandom(), "teleport-random");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new TeleportRandomCommand(plugin);
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new TeleportRandomCommand(plugin);
         return command.create().then(Commands.argument("world", ArgumentTypes.world())
                 .then(command.boundsArgument())
                 .then(command.radiusArgument())
@@ -33,31 +33,31 @@ final class TeleportRandomCommand extends ActionCommand<Bounds> {
     }
 
     private ArgumentBuilder<CommandSourceStack, ?> radiusArgument() {
-        var center = Commands.argument("center", ArgumentTypes.blockPosition());
-        var radius = Commands.argument("radius", IntegerArgumentType.integer(1));
-        var height = Commands.argument("height", IntegerArgumentType.integer(1));
+        final var center = Commands.argument("center", ArgumentTypes.blockPosition());
+        final var radius = Commands.argument("radius", IntegerArgumentType.integer(1));
+        final var height = Commands.argument("height", IntegerArgumentType.integer(1));
         return center.then(radius.then(height.executes(this)));
     }
 
     private ArgumentBuilder<CommandSourceStack, ?> boundsArgument() {
-        var from = Commands.argument("from", ArgumentTypes.blockPosition());
-        var to = Commands.argument("to", ArgumentTypes.blockPosition());
+        final var from = Commands.argument("from", ArgumentTypes.blockPosition());
+        final var to = Commands.argument("to", ArgumentTypes.blockPosition());
         return from.then(to.executes(this));
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var world = context.getArgument("world", World.class);
+    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var world = context.getArgument("world", World.class);
 
         var bounds = resolveArgument(context, "center", BlockPositionResolver.class).map(center -> {
-            var radius = context.getArgument("radius", int.class);
-            var height = context.getArgument("height", int.class);
+            final var radius = context.getArgument("radius", int.class);
+            final var height = context.getArgument("height", int.class);
             return Bounds.factory().radius(world, center, radius, height);
         }).orElse(null);
 
         if (bounds == null) {
-            var from = resolveArgument(context, "from", BlockPositionResolver.class).orElse(null);
-            var to = resolveArgument(context, "to", BlockPositionResolver.class).orElse(null);
+            final var from = resolveArgument(context, "from", BlockPositionResolver.class).orElse(null);
+            final var to = resolveArgument(context, "to", BlockPositionResolver.class).orElse(null);
             if (from != null && to != null) bounds = Bounds.factory().of(world, from, to);
         }
 
@@ -70,7 +70,7 @@ final class TeleportRandomCommand extends ActionCommand<Bounds> {
     }
 
     @Override
-    protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, Bounds input) {
+    protected void onSuccess(final CommandContext<CommandSourceStack> context, final Portal portal, final Bounds input) {
         plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.teleport-random",
                 Placeholder.parsed("portal", portal.getName()),
                 Placeholder.parsed("world", input.world().map(World::getName).orElse(input.worldKey().asString())),

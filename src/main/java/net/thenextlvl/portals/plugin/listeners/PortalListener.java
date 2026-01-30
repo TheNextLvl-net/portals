@@ -36,7 +36,7 @@ public final class PortalListener implements Listener {
 
     private final PortalsPlugin plugin;
 
-    public PortalListener(PortalsPlugin plugin) {
+    public PortalListener(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -50,7 +50,7 @@ public final class PortalListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerMove(PlayerMoveEvent event) {
+    public void onPlayerMove(final PlayerMoveEvent event) {
         if (!event.hasChangedPosition()) return;
         if (processMovement(event.getPlayer(), event.getTo())) return;
         pushAway(event.getPlayer(), event.getTo());
@@ -58,26 +58,26 @@ public final class PortalListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
+    public void onPlayerToggleSneak(final PlayerToggleSneakEvent event) {
         if (event.isSneaking()) return;
         if (processMovement(event.getPlayer(), event.getPlayer().getLocation())) return;
         event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onEntityPortalEnter(org.bukkit.event.entity.EntityPortalEnterEvent event) {
+    public void onEntityPortalEnter(final org.bukkit.event.entity.EntityPortalEnterEvent event) {
         plugin.portalProvider().getPortals(event.getLocation().getWorld())
                 .filter(portal -> portal.getBoundingBox().contains(event.getLocation()))
                 .findAny().ifPresent(portal -> event.setCancelled(true));
     }
 
-    private boolean processMovement(Entity entity, Location to) {
-        var boundingBox = translate(entity.getBoundingBox(), to);
+    private boolean processMovement(final Entity entity, final Location to) {
+        final var boundingBox = translate(entity.getBoundingBox(), to);
         return plugin.portalProvider().getPortals(entity.getWorld())
                 .filter(portal -> portal.getBoundingBox().overlaps(boundingBox))
                 .findAny().map(portal -> {
                     if (portal.equals(lastPortal.get(entity.getUniqueId()))) return true;
-                    var debugger = plugin.debugger;
+                    final var debugger = plugin.debugger;
                     debugger.newTransaction();
                     debugger.log("'%s' entered the portal '%s'", entity.getName(), portal.getName());
 
@@ -126,20 +126,20 @@ public final class PortalListener implements Listener {
                     });
                 }).orElseGet(() -> {
                     resetWarmupIfPresent(entity);
-                    var removed = lastPortal.remove(entity.getUniqueId());
+                    final var removed = lastPortal.remove(entity.getUniqueId());
                     if (removed != null) new EntityPortalExitEvent(removed, entity).callEvent();
                     return true;
                 });
     }
 
-    private void startWarmup(Entity entity, Portal portal) {
-        var scheduledTask = scheduleWarmupCheck(entity, portal, portal.getWarmup());
+    private void startWarmup(final Entity entity, final Portal portal) {
+        final var scheduledTask = scheduleWarmupCheck(entity, portal, portal.getWarmup());
         if (scheduledTask == null) return;
 
-        var finished = Instant.now().plus(portal.getWarmup());
+        final var finished = Instant.now().plus(portal.getWarmup());
         warmups.put(entity.getUniqueId(), new Warmup(portal, finished, scheduledTask));
 
-        var seconds = portal.getWarmup().toMillis() / 1000d;
+        final var seconds = portal.getWarmup().toMillis() / 1000d;
         plugin.bundle().sendMessage(entity, "portal.warmup.start",
                 Formatter.number("warmup", seconds),
                 Formatter.booleanChoice("plural", seconds != 1));
@@ -147,8 +147,8 @@ public final class PortalListener implements Listener {
         new EntityPortalWarmupEvent(portal, entity).callEvent();
     }
 
-    private @Nullable ScheduledTask scheduleWarmupCheck(Entity entity, Portal portal, Duration delay) {
-        var debugger = plugin.debugger;
+    private @Nullable ScheduledTask scheduleWarmupCheck(final Entity entity, final Portal portal, final Duration delay) {
+        final var debugger = plugin.debugger;
 
         debugger.log("Starting warmup for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), debugger.durationToString(delay));
 
@@ -170,40 +170,40 @@ public final class PortalListener implements Listener {
         }, Math.max(1, Tick.tick().fromDuration(delay)));
     }
 
-    private void resetWarmupIfPresent(Entity entity) {
-        var warmup = warmups.remove(entity.getUniqueId());
+    private void resetWarmupIfPresent(final Entity entity) {
+        final var warmup = warmups.remove(entity.getUniqueId());
         if (warmup == null) return;
 
         warmup.task().cancel();
 
-        var remaining = Duration.between(Instant.now(), warmup.finished());
+        final var remaining = Duration.between(Instant.now(), warmup.finished());
         new EntityPortalWarmupCancelEvent(warmup.portal(), entity, remaining).callEvent();
 
-        var debugger = plugin.debugger;
+        final var debugger = plugin.debugger;
         debugger.log("Cancelled warmup for '%s' in '%s' (%s left)", entity.getName(), warmup.portal().getName(), debugger.durationToString(remaining));
     }
 
-    private void pushAway(Entity entity, Location to) {
-        var speed = plugin.config().pushbackSpeed();
+    private void pushAway(final Entity entity, final Location to) {
+        final var speed = plugin.config().pushbackSpeed();
         if (speed > 0) entity.getScheduler().run(plugin, task -> {
-            var direction = entity.getLocation().toVector().subtract(to.toVector()).normalize();
+            final var direction = entity.getLocation().toVector().subtract(to.toVector()).normalize();
             entity.setVelocity(direction.multiply(speed));
         }, null);
     }
 
-    private boolean withdrawEntryCost(Portal portal, Entity entity) {
+    private boolean withdrawEntryCost(final Portal portal, final Entity entity) {
         if (!plugin.config().entryCosts()) return true;
-        if (!(entity instanceof Player player)) return true;
+        if (!(entity instanceof final Player player)) return true;
         return plugin.economyProvider().withdraw(player, portal.getEntryCost());
     }
 
-    public static void setLastPortal(Entity entity, Portal portal) {
+    public static void setLastPortal(final Entity entity, final Portal portal) {
         lastPortal.put(entity.getUniqueId(), portal);
     }
 
-    private static org.bukkit.util.BoundingBox translate(org.bukkit.util.BoundingBox boundingBox, Location location) {
-        var widthX = boundingBox.getWidthX() / 2;
-        var widthZ = boundingBox.getWidthZ() / 2;
+    private static org.bukkit.util.BoundingBox translate(final org.bukkit.util.BoundingBox boundingBox, final Location location) {
+        final var widthX = boundingBox.getWidthX() / 2;
+        final var widthZ = boundingBox.getWidthZ() / 2;
 
         return new org.bukkit.util.BoundingBox(
                 location.getX() - widthX, location.getY(), location.getZ() - widthZ,
@@ -211,19 +211,19 @@ public final class PortalListener implements Listener {
         );
     }
 
-    private static boolean hasCooldown(Portal portal, Entity entity) {
+    private static boolean hasCooldown(final Portal portal, final Entity entity) {
         return getRemainingCooldown(portal, entity).isPositive();
     }
 
-    private static Duration getRemainingCooldown(Portal portal, Entity entity) {
-        var entries = lastEntry.get(portal);
+    private static Duration getRemainingCooldown(final Portal portal, final Entity entity) {
+        final var entries = lastEntry.get(portal);
         if (entries == null) return Duration.ZERO;
-        var lastEntry = entries.get(entity.getUniqueId());
+        final var lastEntry = entries.get(entity.getUniqueId());
         if (lastEntry == null) return Duration.ZERO;
         return Duration.between(Instant.now(), lastEntry.plus(portal.getCooldown()));
     }
 
-    private static void setLastEntry(Portal portal, Entity entity) {
+    private static void setLastEntry(final Portal portal, final Entity entity) {
         lastEntry.computeIfAbsent(portal, ignored -> new HashMap<>())
                 .put(entity.getUniqueId(), Instant.now());
     }

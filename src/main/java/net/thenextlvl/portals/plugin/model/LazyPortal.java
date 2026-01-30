@@ -15,7 +15,7 @@ public final class LazyPortal implements PortalLike {
     private @Nullable WeakReference<Portal> portal = null;
     private final String name;
 
-    public LazyPortal(String name) {
+    public LazyPortal(final String name) {
         this.name = name;
     }
 
@@ -26,12 +26,12 @@ public final class LazyPortal implements PortalLike {
 
     @Override
     public Optional<Portal> getPortal() {
-        var plugin = JavaPlugin.getPlugin(PortalsPlugin.class);
+        final var plugin = JavaPlugin.getPlugin(PortalsPlugin.class);
         if (this.portal != null) {
-            var portal = this.portal.get();
+            final var portal = this.portal.get();
             if (portal != null) return Optional.of(portal);
         }
-        var portal = plugin.portalProvider().getPortal(this.name);
+        final var portal = plugin.portalProvider().getPortal(this.name);
         this.portal = portal.map(WeakReference::new).orElse(null);
         return portal;
     }

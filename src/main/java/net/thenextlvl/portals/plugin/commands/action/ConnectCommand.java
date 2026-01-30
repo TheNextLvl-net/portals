@@ -11,16 +11,16 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class ConnectCommand extends StringActionCommand {
-    private ConnectCommand(PortalsPlugin plugin) {
+    private ConnectCommand(final PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().connect(), "connect", "server");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
         return new ConnectCommand(plugin).create();
     }
 
     @Override
-    protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, String input) {
+    protected void onSuccess(final CommandContext<CommandSourceStack> context, final Portal portal, final String input) {
         plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.connect",
                 Placeholder.parsed("portal", portal.getName()),
                 Placeholder.parsed("server", input));

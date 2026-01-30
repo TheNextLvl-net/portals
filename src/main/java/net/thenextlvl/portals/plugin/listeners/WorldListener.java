@@ -25,19 +25,19 @@ import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
 public final class WorldListener implements Listener {
     private final PortalsPlugin plugin;
 
-    public WorldListener(PortalsPlugin plugin) {
+    public WorldListener(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onWorldLoad(WorldLoadEvent event) {
-        var dataFolder = plugin.portalProvider().getDataFolder(event.getWorld());
+    public void onWorldLoad(final WorldLoadEvent event) {
+        final var dataFolder = plugin.portalProvider().getDataFolder(event.getWorld());
         if (!Files.isDirectory(dataFolder)) return;
-        try (var files = Files.find(dataFolder, 1, (path, attributes) -> {
+        try (final var files = Files.find(dataFolder, 1, (path, attributes) -> {
             return attributes.isRegularFile() && path.getFileName().toString().endsWith(".dat");
         })) {
             files.forEach(path -> loadSafe(path, event.getWorld()));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             plugin.getComponentLogger().error("Failed to load all portals in world {}", event.getWorld().getName(), e);
             plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             PortalsPlugin.ERROR_TRACKER.trackError(e);
@@ -45,12 +45,12 @@ public final class WorldListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onWorldSave(WorldSaveEvent event) {
+    public void onWorldSave(final WorldSaveEvent event) {
         plugin.portalProvider().getPortals(event.getWorld()).forEach(Portal::persist);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onWorldUnload(WorldUnloadEvent event) {
+    public void onWorldUnload(final WorldUnloadEvent event) {
         plugin.portalProvider().portals.removeIf(portal -> {
             if (portal.getWorld().equals(event.getWorld())) {
                 portal.persist();
@@ -59,26 +59,26 @@ public final class WorldListener implements Listener {
         });
     }
 
-    private @Nullable Portal loadSafe(Path file, World world) {
+    private @Nullable Portal loadSafe(final Path file, final World world) {
         try {
-            try (var inputStream = NBTInputStream.create(file)) {
+            try (final var inputStream = NBTInputStream.create(file)) {
                 return load(inputStream, world);
-            } catch (Exception e) {
-                var backup = file.resolveSibling(file.getFileName() + "_old");
+            } catch (final Exception e) {
+                final var backup = file.resolveSibling(file.getFileName() + "_old");
                 if (!Files.isRegularFile(backup)) throw e;
                 plugin.getComponentLogger().warn("Failed to load portal from {}", file, e);
                 plugin.getComponentLogger().warn("Falling back to {}", backup);
-                try (var inputStream = NBTInputStream.create(backup)) {
+                try (final var inputStream = NBTInputStream.create(backup)) {
                     return load(inputStream, world);
                 }
             }
-        } catch (ParserException e) {
+        } catch (final ParserException e) {
             plugin.getComponentLogger().warn("Failed to load portal from {}: {}", file, e.getMessage());
             return null;
-        } catch (EOFException e) {
+        } catch (final EOFException e) {
             plugin.getComponentLogger().error("The portal file {} is irrecoverably broken", file);
             return null;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             plugin.getComponentLogger().error("Failed to load portal from {}", file, e);
             plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             PortalsPlugin.ERROR_TRACKER.trackError(e);
@@ -86,8 +86,8 @@ public final class WorldListener implements Listener {
         }
     }
 
-    private @Nullable Portal load(NBTInputStream inputStream, World world) throws IOException {
-        var portal = plugin.nbt(world).deserialize(inputStream.readTag(), Portal.class);
+    private @Nullable Portal load(final NBTInputStream inputStream, final World world) throws IOException {
+        final var portal = plugin.nbt(world).deserialize(inputStream.readTag(), Portal.class);
         if (plugin.portalProvider().portals.add(portal)) return portal;
         plugin.getComponentLogger().warn("A portal with the name '{}' is already loaded", portal.getName());
         return null;

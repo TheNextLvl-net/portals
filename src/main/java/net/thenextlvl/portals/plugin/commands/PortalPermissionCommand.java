@@ -16,13 +16,13 @@ import static net.thenextlvl.portals.plugin.commands.PortalCommand.portalArgumen
 
 @NullMarked
 final class PortalPermissionCommand extends SimpleCommand {
-    public PortalPermissionCommand(PortalsPlugin plugin) {
+    public PortalPermissionCommand(final PortalsPlugin plugin) {
         super(plugin, "permission", "portals.command.permission");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new PortalPermissionCommand(plugin);
-        var permission = Commands.argument("permission", StringArgumentType.string())
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new PortalPermissionCommand(plugin);
+        final var permission = Commands.argument("permission", StringArgumentType.string())
                 .suggests(new PermissionSuggestionProvider<>(plugin));
         return command.create().then(portalArgument(plugin)
                 .then(Commands.literal("remove").executes(command::set))
@@ -30,12 +30,12 @@ final class PortalPermissionCommand extends SimpleCommand {
                 .executes(command));
     }
 
-    private int set(CommandContext<CommandSourceStack> context) {
-        var portal = context.getArgument("portal", Portal.class);
-        var permission = tryGetArgument(context, "permission", String.class).orElse(null);
+    private int set(final CommandContext<CommandSourceStack> context) {
+        final var portal = context.getArgument("portal", Portal.class);
+        final var permission = tryGetArgument(context, "permission", String.class).orElse(null);
 
-        var success = portal.setEntryPermission(permission);
-        var message = !success ? "nothing.changed" : permission != null
+        final var success = portal.setEntryPermission(permission);
+        final var message = !success ? "nothing.changed" : permission != null
                 ? "portal.permission.set" : "portal.permission.cleared";
 
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
@@ -45,11 +45,11 @@ final class PortalPermissionCommand extends SimpleCommand {
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var portal = context.getArgument("portal", Portal.class);
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var portal = context.getArgument("portal", Portal.class);
 
-        var permission = portal.getEntryPermission().orElse(null);
-        var message = permission != null ? "portal.permission" : "portal.permission.none";
+        final var permission = portal.getEntryPermission().orElse(null);
+        final var message = permission != null ? "portal.permission" : "portal.permission.none";
 
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("portal", portal.getName()),

@@ -21,7 +21,7 @@ import org.jspecify.annotations.NullMarked;
 public final class EntryActionAdapter implements TagAdapter<EntryAction<?>> {
     private final NBT nbt;
 
-    public EntryActionAdapter(PortalsPlugin plugin) {
+    public EntryActionAdapter(final PortalsPlugin plugin) {
         this.nbt = NBT.builder()
                 .registerTypeHierarchyAdapter(BlockPosition.class, new BlockPositionAdapter())
                 .registerTypeHierarchyAdapter(Bounds.class, new BoundsAdapter())
@@ -32,17 +32,17 @@ public final class EntryActionAdapter implements TagAdapter<EntryAction<?>> {
     }
 
     @Override
-    public EntryAction<?> deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
-        var root = tag.getAsCompound();
-        var typeName = root.get("type").getAsString();
-        var actionType = ActionTypeRegistry.registry().getByName(typeName)
+    public EntryAction<?> deserialize(final Tag tag, final TagDeserializationContext context) throws ParserException {
+        final var root = tag.getAsCompound();
+        final var typeName = root.get("type").getAsString();
+        final var actionType = ActionTypeRegistry.registry().getByName(typeName)
                 .orElseThrow(() -> new ParserException("Unknown action type: " + typeName));
-        var input = nbt.deserialize(root.get("input"), actionType.getType());
+        final var input = nbt.deserialize(root.get("input"), actionType.getType());
         return EntryAction.create(actionType, input);
     }
 
     @Override
-    public Tag serialize(EntryAction<?> action, TagSerializationContext context) throws ParserException {
+    public Tag serialize(final EntryAction<?> action, final TagSerializationContext context) throws ParserException {
         return CompoundTag.builder()
                 .put("type", action.getActionType().getName())
                 .put("input", nbt.serialize(action.getInput(), action.getActionType().getType()))

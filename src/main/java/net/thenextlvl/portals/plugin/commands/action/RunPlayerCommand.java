@@ -11,16 +11,16 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class RunPlayerCommand extends StringActionCommand {
-    private RunPlayerCommand(PortalsPlugin plugin) {
+    private RunPlayerCommand(final PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().runCommand(), "run-command", "command");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
         return new RunPlayerCommand(plugin).create();
     }
 
     @Override
-    protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, String input) {
+    protected void onSuccess(final CommandContext<CommandSourceStack> context, final Portal portal, final String input) {
         plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.run-command",
                 Placeholder.parsed("portal", portal.getName()),
                 Placeholder.parsed("command", input));

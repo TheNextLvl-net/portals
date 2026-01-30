@@ -15,20 +15,20 @@ import org.jspecify.annotations.NullMarked;
 public final class PortalLikeAdapter implements TagAdapter<PortalLike> {
     private final PortalsPlugin plugin;
 
-    public PortalLikeAdapter(PortalsPlugin plugin) {
+    public PortalLikeAdapter(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public PortalLike deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
-        var name = tag.getAsString();
+    public PortalLike deserialize(final Tag tag, final TagDeserializationContext context) throws ParserException {
+        final var name = tag.getAsString();
         return plugin.portalProvider().getPortal(name)
                 .<PortalLike>map(portal -> portal)
                 .orElseGet(() -> new LazyPortal(name));
     }
 
     @Override
-    public Tag serialize(PortalLike portal, TagSerializationContext context) throws ParserException {
+    public Tag serialize(final PortalLike portal, final TagSerializationContext context) throws ParserException {
         return StringTag.of(portal.getName());
     }
 }

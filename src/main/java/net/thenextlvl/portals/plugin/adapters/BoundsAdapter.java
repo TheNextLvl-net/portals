@@ -14,16 +14,16 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class BoundsAdapter implements TagAdapter<Bounds> {
     @Override
-    public Bounds deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
-        var root = tag.getAsCompound();
-        var world = context.deserialize(root.get("world"), Key.class);
-        var min = context.deserialize(root.get("min"), BlockPosition.class);
-        var max = context.deserialize(root.get("max"), BlockPosition.class);
+    public Bounds deserialize(final Tag tag, final TagDeserializationContext context) throws ParserException {
+        final var root = tag.getAsCompound();
+        final var world = context.deserialize(root.get("world"), Key.class);
+        final var min = context.deserialize(root.get("min"), BlockPosition.class);
+        final var max = context.deserialize(root.get("max"), BlockPosition.class);
         return Bounds.factory().of(world, min, max);
     }
 
     @Override
-    public Tag serialize(Bounds bounds, TagSerializationContext context) throws ParserException {
+    public Tag serialize(final Bounds bounds, final TagSerializationContext context) throws ParserException {
         return CompoundTag.builder()
                 .put("world", context.serialize(bounds.worldKey(), Key.class))
                 .put("min", context.serialize(bounds.minPosition()))

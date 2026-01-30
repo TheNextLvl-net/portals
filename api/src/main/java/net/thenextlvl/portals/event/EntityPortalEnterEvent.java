@@ -23,7 +23,7 @@ public final class EntityPortalEnterEvent extends PortalEvent implements Cancell
     private boolean cancelled = false;
 
     @ApiStatus.Internal
-    public EntityPortalEnterEvent(Portal portal, Entity entity) {
+    public EntityPortalEnterEvent(final Portal portal, final Entity entity) {
         super(portal);
         this.entity = entity;
     }
@@ -47,7 +47,7 @@ public final class EntityPortalEnterEvent extends PortalEvent implements Cancell
 
     @Override
     @Contract(mutates = "this")
-    public void setCancelled(boolean cancelled) {
+    public void setCancelled(final boolean cancelled) {
         this.cancelled = cancelled;
     }
 

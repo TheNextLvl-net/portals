@@ -70,7 +70,7 @@ public sealed interface ActionType<T> permits SimpleActionType {
      * @since 0.1.0
      */
     @Contract(value = "_, _, _ -> new", pure = true)
-    static <T> ActionType<T> create(@KeyPattern.Value String name, Class<T> type, Action<T> action) {
+    static <T> ActionType<T> create(@KeyPattern.Value final String name, final Class<T> type, final Action<T> action) {
         return new SimpleActionType<>(name, type, action);
     }
 }

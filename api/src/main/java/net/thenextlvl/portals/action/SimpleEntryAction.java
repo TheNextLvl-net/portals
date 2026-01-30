@@ -9,7 +9,7 @@ final class SimpleEntryAction<T> implements EntryAction<T> {
     private final ActionType<T> type;
     private T input;
 
-    public SimpleEntryAction(ActionType<T> type, T input) {
+    public SimpleEntryAction(final ActionType<T> type, final T input) {
         this.type = type;
         this.input = input;
     }
@@ -25,14 +25,14 @@ final class SimpleEntryAction<T> implements EntryAction<T> {
     }
 
     @Override
-    public boolean setInput(T input) {
+    public boolean setInput(final T input) {
         if (Objects.equals(this.input, input)) return false;
         this.input = input;
         return true;
     }
 
     @Override
-    public boolean onEntry(Entity entity, Portal portal) {
+    public boolean onEntry(final Entity entity, final Portal portal) {
         return type.getAction().invoke(entity, portal, input);
     }
 }

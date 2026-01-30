@@ -17,7 +17,7 @@ public final class EntityPortalExitEvent extends PortalEvent {
     private final Entity entity;
 
     @ApiStatus.Internal
-    public EntityPortalExitEvent(Portal portal, Entity entity) {
+    public EntityPortalExitEvent(final Portal portal, final Entity entity) {
         super(portal);
         this.entity = entity;
     }

@@ -15,7 +15,7 @@ public abstract class PortalEvent extends Event {
     private final Portal portal;
 
     @ApiStatus.Internal
-    protected PortalEvent(Portal portal) {
+    protected PortalEvent(final Portal portal) {
         this.portal = portal;
     }
 

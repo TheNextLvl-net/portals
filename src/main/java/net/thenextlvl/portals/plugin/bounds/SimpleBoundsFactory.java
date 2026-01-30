@@ -12,27 +12,27 @@ public final class SimpleBoundsFactory implements BoundsFactory {
     public static final SimpleBoundsFactory INSTANCE = new SimpleBoundsFactory();
 
     @Override
-    public Bounds of(Key world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+    public Bounds of(final Key world, final int minX, final int minY, final int minZ, final int maxX, final int maxY, final int maxZ) {
         return new SimpleBounds(world, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @Override
-    public Bounds of(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+    public Bounds of(final World world, final int minX, final int minY, final int minZ, final int maxX, final int maxY, final int maxZ) {
         return of(world.key(), minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @Override
-    public Bounds of(Key key, Position min, Position max) {
+    public Bounds of(final Key key, final Position min, final Position max) {
         return of(key, min.blockX(), min.blockY(), min.blockZ(), max.blockX(), max.blockY(), max.blockZ());
     }
 
     @Override
-    public Bounds of(World world, Position min, Position max) {
+    public Bounds of(final World world, final Position min, final Position max) {
         return of(world.key(), min, max);
     }
 
     @Override
-    public Bounds radius(Key world, Position center, int radius, int height) {
+    public Bounds radius(final Key world, final Position center, final int radius, final int height) {
         return of(world,
                 center.blockX() - radius,
                 center.blockY() - height / 2,
@@ -44,7 +44,7 @@ public final class SimpleBoundsFactory implements BoundsFactory {
     }
 
     @Override
-    public Bounds radius(World world, Position center, int radius, int height) {
+    public Bounds radius(final World world, final Position center, final int radius, final int height) {
         return radius(world.key(), center, radius, height);
     }
 }

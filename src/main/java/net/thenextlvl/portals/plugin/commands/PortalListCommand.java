@@ -14,27 +14,27 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class PortalListCommand extends SimpleCommand {
-    public PortalListCommand(PortalsPlugin plugin) {
+    public PortalListCommand(final PortalsPlugin plugin) {
         super(plugin, "list", "portals.command.list");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new PortalListCommand(plugin);
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new PortalListCommand(plugin);
         return command.create()
                 .then(Commands.argument("world", ArgumentTypes.world()).executes(command))
                 .executes(command);
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
-        var world = tryGetArgument(context, "world", World.class);
-        var portals = world.map(plugin.portalProvider()::getPortals)
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
+        final var world = tryGetArgument(context, "world", World.class);
+        final var portals = world.map(plugin.portalProvider()::getPortals)
                 .orElseGet(plugin.portalProvider()::getPortals)
                 .map(portal -> plugin.bundle().component("portal.list.entry", sender,
                         Placeholder.parsed("portal", portal.getName())))
                 .toList();
-        var message = world.map(ignored -> portals.isEmpty() ? "portal.list.empty.world" : "portal.list.world")
+        final var message = world.map(ignored -> portals.isEmpty() ? "portal.list.empty.world" : "portal.list.world")
                 .orElseGet(() -> portals.isEmpty() ? "portal.list.empty" : "portal.list");
         plugin.bundle().sendMessage(sender, message,
                 Placeholder.parsed("world", world.map(World::getName).orElse("")),

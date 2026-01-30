@@ -12,7 +12,7 @@ import java.util.Optional;
 public final class VaultEconomyProvider implements EconomyProvider {
     private final PortalsPlugin plugin;
 
-    public VaultEconomyProvider(PortalsPlugin plugin) {
+    public VaultEconomyProvider(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -21,13 +21,13 @@ public final class VaultEconomyProvider implements EconomyProvider {
     }
 
     @Override
-    public String format(Locale locale, double amount) {
+    public String format(final Locale locale, final double amount) {
         return getEconomy().map(economy -> economy.format(amount))
                 .orElseGet(() -> EconomyProvider.super.format(locale, amount));
     }
 
     @Override
-    public boolean withdraw(Player player, double amount) {
+    public boolean withdraw(final Player player, final double amount) {
         return getEconomy().map(economy -> {
             return economy.withdrawPlayer(player, amount).transactionSuccess();
         }).orElse(false);

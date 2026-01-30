@@ -41,7 +41,7 @@ public final class Debugger {
 
     private final PortalsPlugin plugin;
 
-    public Debugger(PortalsPlugin plugin) {
+    public Debugger(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -49,12 +49,12 @@ public final class Debugger {
         transaction++;
     }
 
-    public void log(@PrintFormat String log, Object... args) {
+    public void log(@PrintFormat final String log, final Object... args) {
         if (logs.size() >= maxLogs) {
             logs.removeFirst();
             omittedLogs++;
         }
-        var time = formatter.format(Instant.now().atZone(ZoneId.systemDefault()));
+        final var time = formatter.format(Instant.now().atZone(ZoneId.systemDefault()));
         logs.add("[" + time + "] #" + transaction + " " + String.format(log, args));
     }
 
@@ -62,23 +62,23 @@ public final class Debugger {
         return logs.stream();
     }
 
-    public String durationToString(Duration duration) {
-        var millis = duration.toMillis();
+    public String durationToString(final Duration duration) {
+        final var millis = duration.toMillis();
         if (millis < 1000) return millis + " milliseconds";
-        var seconds = duration.toSeconds();
+        final var seconds = duration.toSeconds();
         if (Math.abs(seconds) < 60) return seconds + " seconds";
-        var minutes = duration.toMinutes();
+        final var minutes = duration.toMinutes();
         if (Math.abs(minutes) < 60) return minutes + " minutes";
-        var hours = duration.toHours();
+        final var hours = duration.toHours();
         if (Math.abs(hours) < 24) return hours + " hours";
         return duration.toDays() + " days";
     }
 
     public String buildPaste() {
-        var debug = CompoundTag.builder();
-        var portals = ListTag.builder().contentType(CompoundTag.ID);
-        var logs = ListTag.builder().contentType(StringTag.ID);
-        var errors = ListTag.builder().contentType(StringTag.ID);
+        final var debug = CompoundTag.builder();
+        final var portals = ListTag.builder().contentType(CompoundTag.ID);
+        final var logs = ListTag.builder().contentType(StringTag.ID);
+        final var errors = ListTag.builder().contentType(StringTag.ID);
 
         debug.put("version", plugin.getPluginMeta().getVersion());
         debug.put("server", plugin.getServer().getName() + " " + plugin.getServer().getVersion());
@@ -88,12 +88,12 @@ public final class Debugger {
 
         plugin.portalProvider().portals.stream().map(portal -> {
             try {
-                var nbt = plugin.nbt(portal.getWorld());
+                final var nbt = plugin.nbt(portal.getWorld());
                 return CompoundTag.builder()
                         .put("world", nbt.serialize(portal.getWorld().getKey()))
                         .putAll(nbt.serialize(portal).getAsCompound())
                         .build();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 plugin.getComponentLogger().warn("Failed to serialize portal {}", portal.getName(), e);
                 plugin.getComponentLogger().warn("Please look for similar issues or report this on GitHub: {}", ISSUES);
                 errors.add(StringTag.of("Failed to serialize portal " + portal.getName() + ": " + e.getMessage()));
@@ -117,9 +117,9 @@ public final class Debugger {
         return nbt.toString(debug.build());
     }
 
-    public CompletableFuture<String> uploadPaste(String content) {
-        try (var client = HttpClient.newHttpClient()) {
-            var request = HttpRequest.newBuilder()
+    public CompletableFuture<String> uploadPaste(final String content) {
+        try (final var client = HttpClient.newHttpClient()) {
+            final var request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.pastes.dev/post"))
                     .header("Content-Type", "text/plain")
                     .POST(HttpRequest.BodyPublishers.ofString(content))
@@ -128,7 +128,7 @@ public final class Debugger {
 
             return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(response -> {
                 if (response.statusCode() == 201) {
-                    var trim = response.body().trim();
+                    final var trim = response.body().trim();
                     return "https://pastes.dev/" + trim.substring(8, trim.length() - 2);
                 }
                 throw new RuntimeException("Failed to upload paste (" + response.statusCode() + "): " + response.body());

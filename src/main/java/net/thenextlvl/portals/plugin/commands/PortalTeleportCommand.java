@@ -12,27 +12,27 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class PortalTeleportCommand extends SimpleCommand {
-    public PortalTeleportCommand(PortalsPlugin plugin) {
+    public PortalTeleportCommand(final PortalsPlugin plugin) {
         super(plugin, "teleport", "portals.command.teleport");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new PortalTeleportCommand(plugin);
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new PortalTeleportCommand(plugin);
         return command.create().then(PortalCommand.portalArgument(plugin).executes(command));
     }
 
     @Override
-    protected boolean canUse(CommandSourceStack source) {
+    protected boolean canUse(final CommandSourceStack source) {
         return super.canUse(source) && source.getSender() instanceof Player;
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var portal = context.getArgument("portal", Portal.class);
-        var player = (Player) context.getSource().getSender();
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var portal = context.getArgument("portal", Portal.class);
+        final var player = (Player) context.getSource().getSender();
 
         player.teleportAsync(portal.getBoundingBox().getCenter()).thenAccept(success -> {
-            var message = success ? "portal.teleport.success" : "portal.teleport.failed";
+            final var message = success ? "portal.teleport.success" : "portal.teleport.failed";
             plugin.bundle().sendMessage(player, message, Placeholder.parsed("portal", portal.getName()));
         }).exceptionally(throwable -> {
             plugin.getComponentLogger().error("Failed to teleport player to portal", throwable);

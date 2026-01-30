@@ -15,18 +15,18 @@ import java.util.concurrent.TimeUnit;
 
 @NullMarked
 final class PortalDebugPasteCommand extends SimpleCommand {
-    private PortalDebugPasteCommand(PortalsPlugin plugin) {
+    private PortalDebugPasteCommand(final PortalsPlugin plugin) {
         super(plugin, "debug-paste", "portals.command.debug-paste");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new PortalDebugPasteCommand(plugin);
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new PortalDebugPasteCommand(plugin);
         return command.create().executes(command);
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
 
         CompletableFuture.supplyAsync(plugin.debugger::buildPaste).thenAccept(debug -> {
             plugin.bundle().sendMessage(sender, "portal.debug-paste.uploading");
@@ -37,14 +37,14 @@ final class PortalDebugPasteCommand extends SimpleCommand {
                     plugin.bundle().sendMessage(sender, "portal.debug-paste.failed.upload");
                     plugin.bundle().sendMessage(sender, "portal.debug-paste", Placeholder.parsed("debug", debug));
                 }
-                var t = throwable.getCause() != null ? throwable.getCause() : throwable;
+                final var t = throwable.getCause() != null ? throwable.getCause() : throwable;
                 plugin.getComponentLogger().warn("Failed to upload debug", t);
                 return null;
             });
         }).exceptionally(throwable -> {
             if (!(sender instanceof ConsoleCommandSender))
                 plugin.bundle().sendMessage(sender, "portal.debug-paste.failed");
-            var t = throwable.getCause() != null ? throwable.getCause() : throwable;
+            final var t = throwable.getCause() != null ? throwable.getCause() : throwable;
             plugin.getComponentLogger().warn("Failed to build debug", t);
             return null;
         }).orTimeout(1, TimeUnit.SECONDS);

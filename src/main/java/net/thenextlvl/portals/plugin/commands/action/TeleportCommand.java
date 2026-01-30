@@ -20,23 +20,23 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class TeleportCommand extends ActionCommand<Location> {
-    private TeleportCommand(PortalsPlugin plugin) {
+    private TeleportCommand(final PortalsPlugin plugin) {
         super(plugin, ActionTypes.types().teleport(), "teleport");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new TeleportCommand(plugin);
-        var position = Commands.argument("position", ArgumentTypes.finePosition()).executes(command);
-        var rotation = Commands.argument("rotation", ArgumentTypes.rotation()).executes(command);
-        var world = Commands.argument("world", ArgumentTypes.world()).executes(command);
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new TeleportCommand(plugin);
+        final var position = Commands.argument("position", ArgumentTypes.finePosition()).executes(command);
+        final var rotation = Commands.argument("rotation", ArgumentTypes.rotation()).executes(command);
+        final var world = Commands.argument("world", ArgumentTypes.world()).executes(command);
         return command.create().then(world.then(position.then(rotation)));
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var world = context.getArgument("world", World.class);
+    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var world = context.getArgument("world", World.class);
 
-        var location = resolveArgument(context, "position", FinePositionResolver.class)
+        final var location = resolveArgument(context, "position", FinePositionResolver.class)
                 .orElseGet(world::getSpawnLocation)
                 .toLocation(world);
         resolveArgument(context, "rotation", RotationResolver.class)
@@ -46,7 +46,7 @@ final class TeleportCommand extends ActionCommand<Location> {
     }
 
     @Override
-    protected void onSuccess(CommandContext<CommandSourceStack> context, Portal portal, Location input) {
+    protected void onSuccess(final CommandContext<CommandSourceStack> context, final Portal portal, final Location input) {
         plugin.bundle().sendMessage(context.getSource().getSender(), "portal.action.teleport",
                 Placeholder.parsed("portal", portal.getName()),
                 Placeholder.parsed("world", input.getWorld().getName()),

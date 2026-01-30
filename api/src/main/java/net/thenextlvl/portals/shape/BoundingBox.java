@@ -170,7 +170,7 @@ public sealed interface BoundingBox permits SimpleBoundingBox {
      * @since 0.1.0
      */
     @Contract(value = "_, _, _ -> new", pure = true)
-    static BoundingBox of(World world, Position min, Position max) {
+    static BoundingBox of(final World world, final Position min, final Position max) {
         return new SimpleBoundingBox(world, min, max);
     }
 }

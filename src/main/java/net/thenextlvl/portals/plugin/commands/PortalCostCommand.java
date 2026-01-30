@@ -15,24 +15,24 @@ import static net.thenextlvl.portals.plugin.commands.PortalCommand.portalArgumen
 
 @NullMarked
 final class PortalCostCommand extends SimpleCommand {
-    public PortalCostCommand(PortalsPlugin plugin) {
+    public PortalCostCommand(final PortalsPlugin plugin) {
         super(plugin, "cost", "portals.command.cost");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new PortalCostCommand(plugin);
-        var cost = Commands.argument("cost", DoubleArgumentType.doubleArg(0));
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new PortalCostCommand(plugin);
+        final var cost = Commands.argument("cost", DoubleArgumentType.doubleArg(0));
         return command.create().then(portalArgument(plugin)
                 .then(cost.executes(command))
                 .executes(command));
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
 
-        var portal = context.getArgument("portal", Portal.class);
-        var cost = tryGetArgument(context, "cost", Double.class).orElse(null);
+        final var portal = context.getArgument("portal", Portal.class);
+        final var cost = tryGetArgument(context, "cost", Double.class).orElse(null);
 
         if (cost == null) {
             plugin.bundle().sendMessage(sender, "portal.cost.current",
@@ -41,8 +41,8 @@ final class PortalCostCommand extends SimpleCommand {
             return SINGLE_SUCCESS;
         }
 
-        var success = portal.setEntryCost(cost);
-        var message = success ? "portal.cost.set" : "nothing.changed";
+        final var success = portal.setEntryCost(cost);
+        final var message = success ? "portal.cost.set" : "nothing.changed";
 
         plugin.bundle().sendMessage(sender, message,
                 Placeholder.parsed("cost", plugin.economyProvider().format(sender, cost)),

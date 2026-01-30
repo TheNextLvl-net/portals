@@ -11,20 +11,20 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 final class RemoveCommand extends SimpleCommand {
-    private RemoveCommand(PortalsPlugin plugin) {
+    private RemoveCommand(final PortalsPlugin plugin) {
         super(plugin, "remove", null);
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new RemoveCommand(plugin);
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new RemoveCommand(plugin);
         return command.create().executes(command);
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var portal = context.getArgument("portal", Portal.class);
-        var success = portal.setEntryAction(null);
-        var message = success ? "portal.action.removed" : "nothing.changed";
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var portal = context.getArgument("portal", Portal.class);
+        final var success = portal.setEntryAction(null);
+        final var message = success ? "portal.action.removed" : "nothing.changed";
         plugin.bundle().sendMessage(context.getSource().getSender(), message,
                 Placeholder.parsed("portal", portal.getName()));
         return success ? SINGLE_SUCCESS : 0;

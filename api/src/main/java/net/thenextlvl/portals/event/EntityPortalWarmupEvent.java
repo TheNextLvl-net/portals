@@ -20,7 +20,7 @@ public final class EntityPortalWarmupEvent extends PortalEvent {
     private final Entity entity;
 
     @ApiStatus.Internal
-    public EntityPortalWarmupEvent(Portal portal, Entity entity) {
+    public EntityPortalWarmupEvent(final Portal portal, final Entity entity) {
         super(portal);
         this.entity = entity;
         this.warmup = portal.getWarmup();

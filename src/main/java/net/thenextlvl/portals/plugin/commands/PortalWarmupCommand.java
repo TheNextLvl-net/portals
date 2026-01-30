@@ -18,24 +18,24 @@ import static net.thenextlvl.portals.plugin.commands.PortalCommand.portalArgumen
 
 @NullMarked
 final class PortalWarmupCommand extends SimpleCommand {
-    public PortalWarmupCommand(PortalsPlugin plugin) {
+    public PortalWarmupCommand(final PortalsPlugin plugin) {
         super(plugin, "warmup", "portals.command.warmup");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new PortalWarmupCommand(plugin);
-        var warmup = Commands.argument("warmup", DurationArgumentType.duration());
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new PortalWarmupCommand(plugin);
+        final var warmup = Commands.argument("warmup", DurationArgumentType.duration());
         return command.create().then(portalArgument(plugin)
                 .then(warmup.executes(command))
                 .executes(command));
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) {
-        var sender = context.getSource().getSender();
+    public int run(final CommandContext<CommandSourceStack> context) {
+        final var sender = context.getSource().getSender();
 
-        var portal = context.getArgument("portal", Portal.class);
-        var warmup = tryGetArgument(context, "warmup", Duration.class).orElse(null);
+        final var portal = context.getArgument("portal", Portal.class);
+        final var warmup = tryGetArgument(context, "warmup", Duration.class).orElse(null);
 
         if (warmup == null) {
             plugin.bundle().sendMessage(sender, "portal.warmup.current",
@@ -44,8 +44,8 @@ final class PortalWarmupCommand extends SimpleCommand {
             return SINGLE_SUCCESS;
         }
 
-        var success = portal.setWarmup(warmup);
-        var message = success ? "portal.warmup.set" : "nothing.changed";
+        final var success = portal.setWarmup(warmup);
+        final var message = success ? "portal.warmup.set" : "nothing.changed";
 
         plugin.bundle().sendMessage(sender, message,
                 Placeholder.parsed("portal", portal.getName()),

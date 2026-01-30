@@ -12,7 +12,7 @@ import java.util.Optional;
 public final class ServiceEconomyProvider implements EconomyProvider {
     private final PortalsPlugin plugin;
 
-    public ServiceEconomyProvider(PortalsPlugin plugin) {
+    public ServiceEconomyProvider(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -21,13 +21,13 @@ public final class ServiceEconomyProvider implements EconomyProvider {
     }
 
     @Override
-    public String format(Locale locale, double amount) {
+    public String format(final Locale locale, final double amount) {
         return getController().map(controller -> controller.format(amount))
                 .orElseGet(() -> EconomyProvider.super.format(locale, amount));
     }
 
     @Override
-    public boolean withdraw(Player player, double amount) {
+    public boolean withdraw(final Player player, final double amount) {
         return getController().flatMap(controller -> controller.getAccount(player).map(account -> {
             return !account.getBalance().equals(account.withdraw(amount));
         })).orElse(false);

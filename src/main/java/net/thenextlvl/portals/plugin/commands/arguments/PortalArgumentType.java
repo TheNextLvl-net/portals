@@ -20,19 +20,19 @@ import java.util.concurrent.CompletableFuture;
 public final class PortalArgumentType implements CustomArgumentType.Converted<Portal, String> {
     private final PortalsPlugin plugin;
 
-    public PortalArgumentType(PortalsPlugin plugin) {
+    public PortalArgumentType(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public Portal convert(String nativeType) throws CommandSyntaxException {
+    public Portal convert(final String nativeType) throws CommandSyntaxException {
         return plugin.portalProvider().getPortal(nativeType).orElseThrow(() -> new SimpleCommandExceptionType(
                 MessageComponentSerializer.message().serialize(Component.text("Unknown portal: " + nativeType))
         ).create());
     }
 
     @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
         plugin.portalProvider().getPortals()
                 .map(Portal::getName)
                 .map(StringArgumentType::escapeIfRequired)

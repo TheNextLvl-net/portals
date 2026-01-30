@@ -9,11 +9,11 @@ import java.util.Locale;
 
 @NullMarked
 public interface EconomyProvider {
-    default String format(Audience audience, double amount) {
+    default String format(final Audience audience, final double amount) {
         return format(audience.get(Identity.LOCALE).orElse(Locale.US), amount);
     }
 
-    default String format(Locale locale, double amount) {
+    default String format(final Locale locale, final double amount) {
         return String.format(locale, "%.2f", amount);
     }
     

@@ -10,12 +10,12 @@ import static net.thenextlvl.portals.plugin.commands.PortalCommand.portalArgumen
 
 @NullMarked
 public final class PortalActionCommand extends BrigadierCommand {
-    private PortalActionCommand(PortalsPlugin plugin) {
+    private PortalActionCommand(final PortalsPlugin plugin) {
         super(plugin, "action", "portals.command.action");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new PortalActionCommand(plugin);
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new PortalActionCommand(plugin);
         return command.create().then(portalArgument(plugin)
                 .then(ConnectCommand.create(plugin))
                 .then(RemoveCommand.create(plugin))

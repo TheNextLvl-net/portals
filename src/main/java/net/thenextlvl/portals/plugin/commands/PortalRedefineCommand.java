@@ -16,30 +16,30 @@ import static net.thenextlvl.portals.plugin.commands.PortalCreateCommand.getBoun
 
 @NullMarked
 final class PortalRedefineCommand extends SimpleCommand {
-    private PortalRedefineCommand(PortalsPlugin plugin) {
+    private PortalRedefineCommand(final PortalsPlugin plugin) {
         super(plugin, "redefine", "portals.command.redefine");
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(PortalsPlugin plugin) {
-        var command = new PortalRedefineCommand(plugin);
+    public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
+        final var command = new PortalRedefineCommand(plugin);
         return command.create().then(portalArgument(plugin)
                 .then(boundsArgument(command))
                 .executes(command));
     }
 
     @Override
-    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var sender = context.getSource().getSender();
+    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var sender = context.getSource().getSender();
 
-        var boundingBox = getBounds(this, context);
+        final var boundingBox = getBounds(this, context);
 
         if (boundingBox == null) {
             plugin.bundle().sendMessage(sender, "portal.selection");
             return 0;
         }
 
-        var portal = context.getArgument("portal", Portal.class);
-        var success = portal.setBoundingBox(boundingBox);
+        final var portal = context.getArgument("portal", Portal.class);
+        final var success = portal.setBoundingBox(boundingBox);
 
         plugin.bundle().sendMessage(sender, success ? "portal.redefine.success" : "nothing.changed",
                 Placeholder.parsed("portal", portal.getName()));

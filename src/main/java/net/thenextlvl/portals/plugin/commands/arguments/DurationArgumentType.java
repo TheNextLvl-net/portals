@@ -13,7 +13,7 @@ import java.time.Duration;
 public final class DurationArgumentType implements CustomArgumentType.Converted<Duration, Integer> {
     private final Duration minimum;
 
-    private DurationArgumentType(Duration minimum) {
+    private DurationArgumentType(final Duration minimum) {
         this.minimum = minimum;
     }
 
@@ -23,12 +23,12 @@ public final class DurationArgumentType implements CustomArgumentType.Converted<
     }
 
     @Contract(value = "_ -> new", pure = true)
-    public static DurationArgumentType duration(Duration minimum) {
+    public static DurationArgumentType duration(final Duration minimum) {
         return new DurationArgumentType(minimum);
     }
 
     @Override
-    public Duration convert(Integer nativeType) {
+    public Duration convert(final Integer nativeType) {
         return Tick.of(nativeType);
     }
 

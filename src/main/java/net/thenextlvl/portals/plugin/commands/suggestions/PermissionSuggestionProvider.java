@@ -15,12 +15,12 @@ import java.util.concurrent.CompletableFuture;
 public final class PermissionSuggestionProvider<T> implements SuggestionProvider<T> {
     private final PortalsPlugin plugin;
 
-    public PermissionSuggestionProvider(PortalsPlugin plugin) {
+    public PermissionSuggestionProvider(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<T> context, SuggestionsBuilder builder) {
+    public CompletableFuture<Suggestions> getSuggestions(final CommandContext<T> context, final SuggestionsBuilder builder) {
         plugin.getServer().getPluginManager().getPermissions().stream()
                 .map(Permission::getName)
                 .map(StringArgumentType::escapeIfRequired)

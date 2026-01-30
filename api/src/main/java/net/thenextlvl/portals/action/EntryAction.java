@@ -58,7 +58,7 @@ public sealed interface EntryAction<T> permits SimpleEntryAction {
      * @since 0.1.0
      */
     @Contract(value = "_, _ -> new", pure = true)
-    static <T> EntryAction<T> create(ActionType<T> type, T input) {
+    static <T> EntryAction<T> create(final ActionType<T> type, final T input) {
         return new SimpleEntryAction<>(type, input);
     }
 }

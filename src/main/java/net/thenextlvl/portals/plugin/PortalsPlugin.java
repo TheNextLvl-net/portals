@@ -139,7 +139,7 @@ public final class PortalsPlugin extends JavaPlugin {
     }
 
     @Contract(value = "_ -> new", pure = true)
-    public NBT nbt(World world) {
+    public NBT nbt(final World world) {
         return NBT.builder()
                 .registerTypeHierarchyAdapter(BoundingBox.class, new BoundingBoxAdapter(world))
                 .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter(this))
@@ -149,8 +149,8 @@ public final class PortalsPlugin extends JavaPlugin {
                 .build();
     }
 
-    public void connect(Player player, String server) {
-        var dataOutput = ByteStreams.newDataOutput();
+    public void connect(final Player player, final String server) {
+        final var dataOutput = ByteStreams.newDataOutput();
         dataOutput.writeUTF("Connect");
         dataOutput.writeUTF(server);
         player.sendPluginMessage(this, "BungeeCord", dataOutput.toByteArray());

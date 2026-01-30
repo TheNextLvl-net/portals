@@ -13,16 +13,16 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class BlockPositionAdapter implements TagAdapter<BlockPosition> {
     @Override
-    public BlockPosition deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
-        var root = tag.getAsCompound();
-        var x = root.get("x").getAsInt();
-        var y = root.get("y").getAsInt();
-        var z = root.get("z").getAsInt();
+    public BlockPosition deserialize(final Tag tag, final TagDeserializationContext context) throws ParserException {
+        final var root = tag.getAsCompound();
+        final var x = root.get("x").getAsInt();
+        final var y = root.get("y").getAsInt();
+        final var z = root.get("z").getAsInt();
         return Position.block(x, y, z);
     }
 
     @Override
-    public Tag serialize(BlockPosition position, TagSerializationContext context) throws ParserException {
+    public Tag serialize(final BlockPosition position, final TagSerializationContext context) throws ParserException {
         return CompoundTag.builder()
                 .put("x", position.blockX())
                 .put("y", position.blockY())

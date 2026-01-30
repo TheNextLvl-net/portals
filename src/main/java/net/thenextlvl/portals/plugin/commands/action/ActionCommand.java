@@ -13,16 +13,16 @@ import org.jspecify.annotations.NullMarked;
 abstract class ActionCommand<T> extends SimpleCommand {
     private final ActionType<T> actionType;
 
-    protected ActionCommand(PortalsPlugin plugin, ActionType<T> actionType, String name) {
+    protected ActionCommand(final PortalsPlugin plugin, final ActionType<T> actionType, final String name) {
         super(plugin, name, null);
         this.actionType = actionType;
     }
 
-    protected int addAction(CommandContext<CommandSourceStack> context, T input) {
-        var sender = context.getSource().getSender();
-        var portal = context.getArgument("portal", Portal.class);
+    protected int addAction(final CommandContext<CommandSourceStack> context, final T input) {
+        final var sender = context.getSource().getSender();
+        final var portal = context.getArgument("portal", Portal.class);
 
-        var success = !portal.getEntryAction().map(action -> {
+        final var success = !portal.getEntryAction().map(action -> {
             return action.getActionType().equals(actionType) && action.getInput().equals(input);
         }).orElse(false);
 

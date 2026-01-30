@@ -20,7 +20,7 @@ public final class EntityPortalWarmupCancelEvent extends PortalEvent {
     private final Entity entity;
 
     @ApiStatus.Internal
-    public EntityPortalWarmupCancelEvent(Portal portal, Entity entity, Duration remaining) {
+    public EntityPortalWarmupCancelEvent(final Portal portal, final Entity entity, final Duration remaining) {
         super(portal);
         this.entity = entity;
         this.remaining = remaining;

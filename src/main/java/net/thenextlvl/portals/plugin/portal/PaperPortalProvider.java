@@ -24,17 +24,17 @@ public final class PaperPortalProvider implements PortalProvider {
     public final Set<Portal> portals = new HashSet<>();
     private final PortalsPlugin plugin;
 
-    public PaperPortalProvider(PortalsPlugin plugin) {
+    public PaperPortalProvider(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public Path getDataFolder(World world) {
+    public Path getDataFolder(final World world) {
         return world.getWorldPath().resolve("portals");
     }
 
     @Override
-    public Optional<Portal> getPortal(String name) {
+    public Optional<Portal> getPortal(final String name) {
         return getPortals().filter(portal -> portal.getName().equals(name)).findAny();
     }
 
@@ -44,36 +44,36 @@ public final class PaperPortalProvider implements PortalProvider {
     }
 
     @Override
-    public Stream<Portal> getPortals(World world) {
+    public Stream<Portal> getPortals(final World world) {
         return getPortals().filter(portal -> portal.getWorld().equals(world));
     }
 
     @Override
-    public Portal createPortal(String name, BoundingBox boundingBox) throws IllegalArgumentException {
+    public Portal createPortal(final String name, final BoundingBox boundingBox) throws IllegalArgumentException {
         Preconditions.checkArgument(!hasPortal(name), "Portal with name '%s' already exists", name);
-        var portal = new PaperPortal(plugin, name, boundingBox);
+        final var portal = new PaperPortal(plugin, name, boundingBox);
         portals.add(portal);
         return portal;
     }
 
     @Override
-    public boolean hasPortal(Portal portal) {
+    public boolean hasPortal(final Portal portal) {
         return portals.contains(portal);
     }
 
     @Override
-    public boolean hasPortal(String name) {
+    public boolean hasPortal(final String name) {
         return getPortals().anyMatch(portal -> portal.getName().equals(name));
     }
 
     @Override
-    public boolean deletePortal(Portal portal) {
+    public boolean deletePortal(final Portal portal) {
         try {
             if (!portals.remove(portal)) return false;
             Files.deleteIfExists(portal.getDataFile());
             Files.deleteIfExists(portal.getBackupFile());
             return true;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             plugin.getComponentLogger().error("Failed to delete portal {}", portal.getName(), e);
             plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             PortalsPlugin.ERROR_TRACKER.trackError(e);
@@ -82,12 +82,12 @@ public final class PaperPortalProvider implements PortalProvider {
     }
 
     @Override
-    public boolean deletePortal(String name) {
+    public boolean deletePortal(final String name) {
         return getPortal(name).map(this::deletePortal).orElse(false);
     }
 
     @Override
-    public void forEachPortal(Consumer<Portal> action) {
+    public void forEachPortal(final Consumer<Portal> action) {
         portals.forEach(action);
     }
 }
