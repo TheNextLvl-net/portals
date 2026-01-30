@@ -91,9 +91,6 @@ public interface Portal extends PortalLike {
 
     /**
      * Gets the warmup time of the portal.
-     * <p>
-     * If positive, the portals entry action is executed after this delay.
-     * The warmup can be cancelled by player actions (plugin-side logic).
      *
      * @return the warmup time
      * @since 1.2.0
@@ -103,6 +100,9 @@ public interface Portal extends PortalLike {
 
     /**
      * Sets the warmup time of the portal.
+     * <p>
+     * The duration required for an entity to stand in the portal
+     * before the {@link #getEntryAction() action} is performed.
      *
      * @param warmup the warmup time
      * @return {@code true} if the warmup time was changed, {@code false} otherwise
