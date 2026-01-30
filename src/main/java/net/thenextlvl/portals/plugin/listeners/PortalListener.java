@@ -105,6 +105,7 @@ public final class PortalListener implements Listener {
                     if (portal.getCooldown().isPositive()) setLastEntry(portal, entity);
                     setLastPortal(entity, portal);
 
+                    resetWarmupIfPresent(entity);
                     if (portal.getWarmup().isPositive()) {
                         startWarmup(entity, portal);
                         return true;
@@ -130,8 +131,6 @@ public final class PortalListener implements Listener {
     }
 
     private void startWarmup(Entity entity, Portal portal) {
-        resetWarmupIfPresent(entity);
-
         var scheduledTask = scheduleWarmupCheck(entity, portal, portal.getWarmup());
         if (scheduledTask == null) return;
 
