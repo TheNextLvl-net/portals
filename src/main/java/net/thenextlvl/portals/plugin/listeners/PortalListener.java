@@ -1,9 +1,9 @@
 package net.thenextlvl.portals.plugin.listeners;
 
 import io.papermc.paper.event.entity.EntityMoveEvent;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import io.papermc.paper.util.Tick;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
-import net.kyori.adventure.title.Title;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.event.EntityPortalEnterEvent;
 import net.thenextlvl.portals.event.EntityPortalExitEvent;
@@ -18,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -61,11 +62,14 @@ public final class PortalListener implements Listener {
         event.setCancelled(true);
     }
 
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onEntityPortalEnter(org.bukkit.event.entity.EntityPortalEnterEvent event) {
+        plugin.portalProvider().getPortals(event.getLocation().getWorld())
+                .filter(portal -> portal.getBoundingBox().contains(event.getLocation()))
+                .findAny().ifPresent(portal -> event.setCancelled(true));
+    }
+
     private boolean processMovement(Entity entity, Location to) {
-        if (isInWarmup(entity)) {
-            resetWarmupIfPresent(entity);
-            return true;
-        }
         var boundingBox = translate(entity.getBoundingBox(), to);
         return plugin.portalProvider().getPortals(entity.getWorld())
                 .filter(portal -> portal.getBoundingBox().overlaps(boundingBox))
@@ -118,92 +122,56 @@ public final class PortalListener implements Listener {
                         return true;
                     });
                 }).orElseGet(() -> {
+                    resetWarmupIfPresent(entity);
                     var removed = lastPortal.remove(entity.getUniqueId());
-                    warmups.remove(entity.getUniqueId());
                     if (removed != null) new EntityPortalExitEvent(removed, entity).callEvent();
                     return true;
                 });
     }
 
     private void startWarmup(Entity entity, Portal portal) {
-        var warmup = portal.getWarmup();
-        var uuid = entity.getUniqueId();
-
-        warmups.put(uuid, new Warmup(portal));
         resetWarmupIfPresent(entity);
 
-        if (entity instanceof Player player) {
-            plugin.bundle().sendMessage(player, "portal.warmup.start",
-                    Formatter.number("warmup", warmup.toMillis() / 1000d));
-        }
+        var scheduledTask = scheduleWarmupCheck(entity, portal, portal.getWarmup());
+        if (scheduledTask == null) return;
 
-        scheduleWarmupCheck(entity, portal, warmup);
+        var finished = Instant.now().plus(portal.getWarmup());
+        warmups.put(entity.getUniqueId(), new Warmup(finished, scheduledTask));
+
+        var seconds = portal.getWarmup().toMillis() / 1000d;
+        plugin.bundle().sendMessage(entity, "portal.warmup.start",
+                Formatter.number("warmup", seconds),
+                Formatter.booleanChoice("plural", seconds != 1));
     }
 
-    private void scheduleWarmupCheck(Entity entity, Portal portal, Duration delay) {
-        var uuid = entity.getUniqueId();
-        var ticks = Tick.tick().fromDuration(delay);
-        if (ticks <= 0) ticks = 1;
+    private @Nullable ScheduledTask scheduleWarmupCheck(Entity entity, Portal portal, Duration delay) {
+        var debugger = plugin.debugger;
 
-        entity.getScheduler().runDelayed(plugin, task -> {
-            var current = warmups.get(uuid);
-            if (current == null || !current.portal().equals(portal)) return;
+        debugger.log("Starting warmup for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), debugger.durationToString(delay));
 
-            if (!portal.getBoundingBox().contains(entity.getLocation())) {
-                warmups.remove(uuid);
-                return;
-            }
+        return entity.getScheduler().runDelayed(plugin, task -> {
+            warmups.remove(entity.getUniqueId());
 
-            var elapsed = Duration.between(current.startedAt(), Instant.now());
-            var remaining = portal.getWarmup().minus(elapsed);
-            if (remaining.isPositive()) {
-                scheduleWarmupCheck(entity, portal, remaining);
-                return;
-            }
-
-            var success = portal.getEntryAction().map(action -> {
+            portal.getEntryAction().ifPresentOrElse(action -> {
                 if (action.onEntry(entity, portal)) {
-                    plugin.debugger.log("EntryAction was successful for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
-                    return true;
+                    debugger.log("EntryAction was successful for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                } else {
+                    debugger.log("EntryAction was cancelled for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
                 }
-                plugin.debugger.log("EntryAction was cancelled for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
-                return false;
-            }).orElseGet(() -> {
-                plugin.debugger.log("No EntryAction for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
-                return true;
+            }, () -> {
+                debugger.log("No EntryAction for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
             });
-
-            warmups.remove(uuid);
-            if (!success) return;
-        }, null, ticks);
+        }, () -> {
+            debugger.log("Cancelled warmup for '%s' in '%s' (retired)", entity.getName(), portal.getName());
+            warmups.remove(entity.getUniqueId());
+        }, Math.max(1, Tick.tick().fromDuration(delay)));
     }
 
     private void resetWarmupIfPresent(Entity entity) {
-        var warmup = warmups.get(entity.getUniqueId());
+        var warmup = warmups.remove(entity.getUniqueId());
         if (warmup == null) return;
-        var startedAt = warmup.startedAt();
-        warmup.reset();
-        if (startedAt.equals(Instant.EPOCH)) return;
-        if (!(entity instanceof Player player)) return;
-
-        var total = warmup.portal().getWarmup();
-        if (!total.isPositive()) return;
-
-        var elapsed = Duration.between(startedAt, Instant.now());
-        if (elapsed.toMillis() < total.toMillis() * 0.4) return;
-
-        plugin.bundle().sendMessage(player, "portal.warmup.reset",
-                Formatter.number("warmup", total.toMillis() / 1000d));
-
-        var title = plugin.bundle().component("portal.warmup.reset.title", player,
-                Formatter.number("warmup", total.toMillis() / 1000d));
-        var subtitle = plugin.bundle().component("portal.warmup.reset.subtitle", player,
-                Formatter.number("warmup", total.toMillis() / 1000d));
-        player.showTitle(Title.title(title, subtitle));
-    }
-
-    private boolean isInWarmup(Entity entity) {
-        return warmups.containsKey(entity.getUniqueId());
+        plugin.debugger.log("Cancelled warmup for '%s'", entity.getName());
+        warmup.task().cancel();
     }
 
     private void pushAway(Entity entity, Location to) {
@@ -251,24 +219,6 @@ public final class PortalListener implements Listener {
                 .put(entity.getUniqueId(), Instant.now());
     }
 
-    private static final class Warmup {
-        private final Portal portal;
-        private Instant startedAt = Instant.EPOCH;
-
-        private Warmup(Portal portal) {
-            this.portal = portal;
-        }
-
-        private Portal portal() {
-            return portal;
-        }
-
-        private Instant startedAt() {
-            return startedAt;
-        }
-
-        private void reset() {
-            this.startedAt = Instant.now();
-        }
+    private record Warmup(Instant finished, ScheduledTask task) {
     }
 }
