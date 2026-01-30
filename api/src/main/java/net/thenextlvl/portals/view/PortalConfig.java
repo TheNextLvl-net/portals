@@ -46,6 +46,14 @@ public interface PortalConfig {
     boolean ignoreEntityMovement();
 
     /**
+     * Whether to show a message when the warmup starts.
+     *
+     * @return {@code true} if a message is shown, {@code false} otherwise
+     * @since 1.2.0
+     */
+    boolean warmupMessage();
+
+    /**
      * Speed at which entities are pushed back.
      * <p>
      * A value of 0 and below means this feature is disabled.

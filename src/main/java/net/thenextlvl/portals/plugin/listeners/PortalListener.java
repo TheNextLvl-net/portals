@@ -1,9 +1,14 @@
 package net.thenextlvl.portals.plugin.listeners;
 
 import io.papermc.paper.event.entity.EntityMoveEvent;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import io.papermc.paper.util.Tick;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.event.EntityPortalEnterEvent;
 import net.thenextlvl.portals.event.EntityPortalExitEvent;
+import net.thenextlvl.portals.event.EntityPortalWarmupCancelEvent;
+import net.thenextlvl.portals.event.EntityPortalWarmupEvent;
 import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import org.bukkit.Location;
@@ -15,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -26,6 +32,7 @@ import java.util.UUID;
 public final class PortalListener implements Listener {
     private static final Map<Portal, Map<UUID, Instant>> lastEntry = new HashMap<>();
     private static final Map<UUID, Portal> lastPortal = new HashMap<>();
+    private static final Map<UUID, Warmup> warmups = new HashMap<>();
 
     private final PortalsPlugin plugin;
 
@@ -34,7 +41,7 @@ public final class PortalListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEntityMove(EntityMoveEvent event) {
+    public void onEntityMove(final EntityMoveEvent event) {
         if (!event.hasChangedPosition()) return;
         if (plugin.config().ignoreEntityMovement()) return;
         if (processMovement(event.getEntity(), event.getTo())) return;
@@ -100,6 +107,12 @@ public final class PortalListener implements Listener {
                     if (portal.getCooldown().isPositive()) setLastEntry(portal, entity);
                     setLastPortal(entity, portal);
 
+                    resetWarmupIfPresent(entity);
+                    if (portal.getWarmup().isPositive()) {
+                        startWarmup(entity, portal);
+                        return true;
+                    }
+
                     return portal.getEntryAction().map(action -> {
                         if (action.onEntry(entity, portal)) {
                             debugger.log("EntryAction was successful for '%s' in '%s'", entity.getName(), portal.getName());
@@ -112,10 +125,62 @@ public final class PortalListener implements Listener {
                         return true;
                     });
                 }).orElseGet(() -> {
+                    resetWarmupIfPresent(entity);
                     var removed = lastPortal.remove(entity.getUniqueId());
                     if (removed != null) new EntityPortalExitEvent(removed, entity).callEvent();
                     return true;
                 });
+    }
+
+    private void startWarmup(Entity entity, Portal portal) {
+        var scheduledTask = scheduleWarmupCheck(entity, portal, portal.getWarmup());
+        if (scheduledTask == null) return;
+
+        var finished = Instant.now().plus(portal.getWarmup());
+        warmups.put(entity.getUniqueId(), new Warmup(portal, finished, scheduledTask));
+
+        var seconds = portal.getWarmup().toMillis() / 1000d;
+        plugin.bundle().sendMessage(entity, "portal.warmup.start",
+                Formatter.number("warmup", seconds),
+                Formatter.booleanChoice("plural", seconds != 1));
+
+        new EntityPortalWarmupEvent(portal, entity).callEvent();
+    }
+
+    private @Nullable ScheduledTask scheduleWarmupCheck(Entity entity, Portal portal, Duration delay) {
+        var debugger = plugin.debugger;
+
+        debugger.log("Starting warmup for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), debugger.durationToString(delay));
+
+        return entity.getScheduler().runDelayed(plugin, task -> {
+            warmups.remove(entity.getUniqueId());
+
+            portal.getEntryAction().ifPresentOrElse(action -> {
+                if (action.onEntry(entity, portal)) {
+                    debugger.log("EntryAction was successful for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                } else {
+                    debugger.log("EntryAction was cancelled for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                }
+            }, () -> {
+                debugger.log("No EntryAction for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+            });
+        }, () -> {
+            debugger.log("Cancelled warmup for '%s' in '%s' (retired)", entity.getName(), portal.getName());
+            warmups.remove(entity.getUniqueId());
+        }, Math.max(1, Tick.tick().fromDuration(delay)));
+    }
+
+    private void resetWarmupIfPresent(Entity entity) {
+        var warmup = warmups.remove(entity.getUniqueId());
+        if (warmup == null) return;
+
+        warmup.task().cancel();
+
+        var remaining = Duration.between(Instant.now(), warmup.finished());
+        new EntityPortalWarmupCancelEvent(warmup.portal(), entity, remaining).callEvent();
+
+        var debugger = plugin.debugger;
+        debugger.log("Cancelled warmup for '%s' in '%s' (%s left)", entity.getName(), warmup.portal().getName(), debugger.durationToString(remaining));
     }
 
     private void pushAway(Entity entity, Location to) {
@@ -161,5 +226,8 @@ public final class PortalListener implements Listener {
     private static void setLastEntry(Portal portal, Entity entity) {
         lastEntry.computeIfAbsent(portal, ignored -> new HashMap<>())
                 .put(entity.getUniqueId(), Instant.now());
+    }
+
+    private record Warmup(Portal portal, Instant finished, ScheduledTask task) {
     }
 }

@@ -3,8 +3,8 @@ package net.thenextlvl.portals.plugin.portal;
 import com.google.common.base.Preconditions;
 import net.thenextlvl.nbt.NBTOutputStream;
 import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.jspecify.annotations.NullMarked;
@@ -27,6 +27,7 @@ public final class PaperPortal implements Portal {
 
     private BoundingBox boundingBox;
     private Duration cooldown = Duration.ZERO;
+    private Duration warmup = Duration.ZERO;
 
     private @Nullable String entryPermission = null;
     private @Nullable EntryAction<?> entryAction = null;
@@ -37,12 +38,12 @@ public final class PaperPortal implements Portal {
     private Path dataFile;
     private Path backupFile;
 
-    public PaperPortal(PortalsPlugin plugin, String name, BoundingBox boundingBox) {
+    public PaperPortal(final PortalsPlugin plugin, final String name, final BoundingBox boundingBox) {
         this.plugin = plugin;
         this.name = name;
         this.boundingBox = boundingBox;
 
-        var dataFolder = plugin.portalProvider().getDataFolder(getWorld());
+        final var dataFolder = plugin.portalProvider().getDataFolder(getWorld());
         this.dataFile = dataFolder.resolve(name + ".dat");
         this.backupFile = dataFolder.resolve(name + ".dat_old");
     }
@@ -68,7 +69,7 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public boolean setBoundingBox(BoundingBox boundingBox) {
+    public boolean setBoundingBox(final BoundingBox boundingBox) {
         if (this.boundingBox.equals(boundingBox)) return false;
 
         if (boundingBox.getWorld().equals(getWorld())) {
@@ -76,15 +77,15 @@ public final class PaperPortal implements Portal {
             return true;
         }
 
-        var target = plugin.portalProvider().getDataFolder(boundingBox.getWorld());
-        var dataFile = target.resolve(getDataFile().getFileName());
-        var backupFile = target.resolve(getBackupFile().getFileName());
+        final var target = plugin.portalProvider().getDataFolder(boundingBox.getWorld());
+        final var dataFile = target.resolve(getDataFile().getFileName());
+        final var backupFile = target.resolve(getBackupFile().getFileName());
 
         try {
             Files.createDirectories(target);
             if (Files.exists(getDataFile())) Files.move(getDataFile(), dataFile, REPLACE_EXISTING);
             if (Files.exists(getBackupFile())) Files.move(getBackupFile(), backupFile, REPLACE_EXISTING);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             plugin.getComponentLogger().error("Failed to move portal data files for {}", getName(), e);
             plugin.getComponentLogger().error("Please look for similar issues or report this on GitHub: {}", ISSUES);
             PortalsPlugin.ERROR_TRACKER.trackError(e);
@@ -103,7 +104,7 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public boolean setEntryPermission(@Nullable String permission) {
+    public boolean setEntryPermission(@Nullable final String permission) {
         if (Objects.equals(this.entryPermission, permission)) return false;
         this.entryPermission = permission;
         return true;
@@ -115,10 +116,23 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public boolean setCooldown(Duration cooldown) throws IllegalArgumentException {
+    public boolean setCooldown(final Duration cooldown) throws IllegalArgumentException {
         Preconditions.checkArgument(!cooldown.isNegative(), "Cooldown cannot be negative");
         if (this.cooldown.equals(cooldown)) return false;
         this.cooldown = cooldown;
+        return true;
+    }
+
+    @Override
+    public Duration getWarmup() {
+        return warmup;
+    }
+
+    @Override
+    public boolean setWarmup(final Duration warmup) throws IllegalArgumentException {
+        Preconditions.checkArgument(!warmup.isNegative(), "Warmup cannot be negative");
+        if (this.warmup.equals(warmup)) return false;
+        this.warmup = warmup;
         return true;
     }
 
@@ -128,7 +142,7 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public boolean setEntryCost(double cost) throws IllegalArgumentException {
+    public boolean setEntryCost(final double cost) throws IllegalArgumentException {
         Preconditions.checkArgument(cost >= 0, "Entry cost cannot be negative");
         if (this.entryCost == cost) return false;
         this.entryCost = cost;
@@ -141,7 +155,7 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public boolean setEntryAction(@Nullable EntryAction<?> action) {
+    public boolean setEntryAction(@Nullable final EntryAction<?> action) {
         if (Objects.equals(this.entryAction, action)) return false;
         this.entryAction = action;
         return true;
@@ -163,7 +177,7 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public boolean setPersistent(boolean persistent) {
+    public boolean setPersistent(final boolean persistent) {
         if (this.persistent == persistent) return false;
         this.persistent = persistent;
         return true;
@@ -172,20 +186,20 @@ public final class PaperPortal implements Portal {
     @Override
     public boolean persist() {
         if (!isPersistent()) return false;
-        var file = getDataFile();
-        var backup = getBackupFile();
+        final var file = getDataFile();
+        final var backup = getBackupFile();
         try {
             if (Files.isRegularFile(file)) Files.move(file, backup, REPLACE_EXISTING);
             else Files.createDirectories(file.getParent());
-            try (var outputStream = NBTOutputStream.create(file)) {
+            try (final var outputStream = NBTOutputStream.create(file)) {
                 outputStream.writeTag(getName(), plugin.nbt(getWorld()).serialize(this));
                 return true;
             }
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             if (Files.isRegularFile(backup)) try {
                 Files.copy(backup, file, REPLACE_EXISTING);
                 plugin.getComponentLogger().warn("Recovered portal {} from potential data loss", getName());
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 plugin.getComponentLogger().error("Failed to restore portal {}", getName(), e);
             }
             plugin.getComponentLogger().error("Failed to save portal {}", getName(), t);
@@ -201,6 +215,7 @@ public final class PaperPortal implements Portal {
                 "name='" + name + '\'' +
                 ", boundingBox=" + boundingBox +
                 ", cooldown=" + cooldown +
+                ", warmup=" + warmup +
                 ", entryPermission='" + entryPermission + '\'' +
                 ", entryCost=" + entryCost +
                 ", persistent=" + persistent +
@@ -208,9 +223,9 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        PaperPortal that = (PaperPortal) o;
+        final PaperPortal that = (PaperPortal) o;
         return Objects.equals(name, that.name);
     }
 
