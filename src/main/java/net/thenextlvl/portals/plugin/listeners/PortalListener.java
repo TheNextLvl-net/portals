@@ -1,11 +1,15 @@
 package net.thenextlvl.portals.plugin.listeners;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import io.papermc.paper.event.entity.EntityMoveEvent;
+import io.papermc.paper.util.Tick;
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
+import net.kyori.adventure.title.Title;
+import net.thenextlvl.portals.Portal;
+import net.thenextlvl.portals.event.EntityPortalEnterEvent;
+import net.thenextlvl.portals.event.EntityPortalExitEvent;
+import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
+import net.thenextlvl.portals.plugin.PortalsPlugin;
+import net.thenextlvl.portals.plugin.utils.Debugger;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -16,15 +20,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.jspecify.annotations.NullMarked;
 
-import io.papermc.paper.util.Tick;
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
-import net.kyori.adventure.title.Title;
-import net.thenextlvl.portals.Portal;
-import net.thenextlvl.portals.event.EntityPortalEnterEvent;
-import net.thenextlvl.portals.event.EntityPortalExitEvent;
-import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
-import net.thenextlvl.portals.plugin.PortalsPlugin;
-import net.thenextlvl.portals.plugin.utils.Debugger;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @NullMarked
 public final class PortalListener implements Listener {
