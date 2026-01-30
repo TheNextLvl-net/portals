@@ -1,4 +1,4 @@
-package net.thenextlvl.portals.plugin.commands;
+package net.thenextlvl.portals.plugin.commands.debug;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @NullMarked
 final class PortalDebugPasteCommand extends SimpleCommand {
     private PortalDebugPasteCommand(final PortalsPlugin plugin) {
-        super(plugin, "debug-paste", "portals.command.debug-paste");
+        super(plugin, "paste", "portals.command.debug.paste");
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
@@ -29,13 +29,13 @@ final class PortalDebugPasteCommand extends SimpleCommand {
         final var sender = context.getSource().getSender();
 
         CompletableFuture.supplyAsync(plugin.debugger::buildPaste).thenAccept(debug -> {
-            plugin.bundle().sendMessage(sender, "portal.debug-paste.uploading");
+            plugin.bundle().sendMessage(sender, "portal.debug.paste.uploading");
             plugin.debugger.uploadPaste(debug).thenAccept(url -> {
-                plugin.bundle().sendMessage(sender, "portal.debug-paste.uploaded", Placeholder.parsed("url", url));
+                plugin.bundle().sendMessage(sender, "portal.debug.paste.uploaded", Placeholder.parsed("url", url));
             }).exceptionally(throwable -> {
                 if (sender instanceof Player) {
-                    plugin.bundle().sendMessage(sender, "portal.debug-paste.failed.upload");
-                    plugin.bundle().sendMessage(sender, "portal.debug-paste", Placeholder.parsed("debug", debug));
+                    plugin.bundle().sendMessage(sender, "portal.debug.paste.failed.upload");
+                    plugin.bundle().sendMessage(sender, "portal.debug.paste", Placeholder.parsed("debug", debug));
                 }
                 final var t = throwable.getCause() != null ? throwable.getCause() : throwable;
                 plugin.getComponentLogger().warn("Failed to upload debug", t);
@@ -43,7 +43,7 @@ final class PortalDebugPasteCommand extends SimpleCommand {
             });
         }).exceptionally(throwable -> {
             if (!(sender instanceof ConsoleCommandSender))
-                plugin.bundle().sendMessage(sender, "portal.debug-paste.failed");
+                plugin.bundle().sendMessage(sender, "portal.debug.paste.failed");
             final var t = throwable.getCause() != null ? throwable.getCause() : throwable;
             plugin.getComponentLogger().warn("Failed to build debug", t);
             return null;

@@ -9,6 +9,7 @@ import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.commands.action.PortalActionCommand;
 import net.thenextlvl.portals.plugin.commands.arguments.PortalArgumentType;
 import net.thenextlvl.portals.plugin.commands.brigadier.BrigadierCommand;
+import net.thenextlvl.portals.plugin.commands.debug.PortalDebugCommand;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -24,7 +25,7 @@ public final class PortalCommand extends BrigadierCommand {
                 .then(PortalCooldownCommand.create(plugin))
                 .then(PortalCostCommand.create(plugin))
                 .then(PortalCreateCommand.create(plugin))
-                .then(PortalDebugPasteCommand.create(plugin))
+                .then(PortalDebugCommand.create(plugin))
                 .then(PortalDeleteCommand.create(plugin))
                 .then(PortalListCommand.create(plugin))
                 .then(PortalPermissionCommand.create(plugin))
