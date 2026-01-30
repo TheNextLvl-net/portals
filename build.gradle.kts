@@ -92,7 +92,15 @@ paper {
         register("portals.command.list") { children = listOf("portals.command.portal") }
         register("portals.command.permission") { children = listOf("portals.command.portal") }
         register("portals.command.teleport") { children = listOf("portals.command.portal") }
-        register("portals.command.debug-paste") { children = listOf("portals.command.portal") }
+
+        register("portals.debug") {
+            description = "Grants the permission to view debugs"
+        }
+
+        register("portals.command.debug-paste") {
+            description = "Backwards compatibility for the new 'portals.command.debug.paste' permission"
+            children = listOf("portals.command.debug.paste")
+        }
     }
 }
 
