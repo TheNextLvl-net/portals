@@ -11,6 +11,8 @@ import net.thenextlvl.portals.event.EntityPortalWarmupCancelEvent;
 import net.thenextlvl.portals.event.EntityPortalWarmupEvent;
 import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
+import net.thenextlvl.portals.plugin.utils.Debugger;
+import net.thenextlvl.portals.plugin.utils.Debugger.Transaction;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -77,30 +79,29 @@ public final class PortalListener implements Listener {
                 .filter(portal -> portal.getBoundingBox().overlaps(boundingBox))
                 .findAny().map(portal -> {
                     if (portal.equals(lastPortal.get(entity.getUniqueId()))) return true;
-                    final var debugger = plugin.debugger;
-                    debugger.newTransaction();
-                    debugger.log("'%s' entered the portal '%s'", entity.getName(), portal.getName());
+                    final var transaction = plugin.debugger.newTransaction();
+                    transaction.log("'%s' entered the portal '%s'", entity.getName(), portal.getName());
 
                     if (!new PreEntityPortalEnterEvent(portal, entity).callEvent()) {
-                        debugger.log("PreEntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
+                        transaction.log("PreEntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
                         return false;
                     }
 
                     if (!portal.getEntryPermission().map(entity::hasPermission).orElse(true)) {
-                        debugger.log("EntryPermission was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryPermission().orElse(null));
+                        transaction.log("EntryPermission was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryPermission().orElse(null));
                         return false;
                     }
                     if (portal.getCooldown().isPositive() && hasCooldown(portal, entity)) {
-                        debugger.log("Cooldown was not met for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), debugger.durationToString(getRemainingCooldown(portal, entity)));
+                        transaction.log("Cooldown was not met for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), Debugger.durationToString(getRemainingCooldown(portal, entity)));
                         return false;
                     }
                     if (portal.getEntryCost() > 0 && !withdrawEntryCost(portal, entity)) {
-                        debugger.log("EntryCost was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryCost());
+                        transaction.log("EntryCost was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryCost());
                         return false;
                     }
 
                     if (!new EntityPortalEnterEvent(portal, entity).callEvent()) {
-                        debugger.log("EntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
+                        transaction.log("EntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
                         return false;
                     }
 
@@ -109,19 +110,19 @@ public final class PortalListener implements Listener {
 
                     resetWarmupIfPresent(entity);
                     if (portal.getWarmup().isPositive()) {
-                        startWarmup(entity, portal);
+                        startWarmup(entity, portal, transaction);
                         return true;
                     }
 
                     return portal.getEntryAction().map(action -> {
                         if (action.onEntry(entity, portal)) {
-                            debugger.log("EntryAction was successful for '%s' in '%s'", entity.getName(), portal.getName());
+                            transaction.log("EntryAction was successful for '%s' in '%s'", entity.getName(), portal.getName());
                             return true;
                         }
-                        debugger.log("EntryAction was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
+                        transaction.log("EntryAction was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
                         return false;
                     }).orElseGet(() -> {
-                        debugger.log("No EntryAction for '%s' in '%s'", entity.getName(), portal.getName());
+                        transaction.log("No EntryAction for '%s' in '%s'", entity.getName(), portal.getName());
                         return true;
                     });
                 }).orElseGet(() -> {
@@ -132,12 +133,12 @@ public final class PortalListener implements Listener {
                 });
     }
 
-    private void startWarmup(final Entity entity, final Portal portal) {
-        final var scheduledTask = scheduleWarmupCheck(entity, portal, portal.getWarmup());
+    private void startWarmup(final Entity entity, final Portal portal, final Transaction transaction) {
+        final var scheduledTask = scheduleWarmupCheck(entity, portal, portal.getWarmup(), transaction);
         if (scheduledTask == null) return;
 
         final var finished = Instant.now().plus(portal.getWarmup());
-        warmups.put(entity.getUniqueId(), new Warmup(portal, finished, scheduledTask));
+        warmups.put(entity.getUniqueId(), new Warmup(portal, finished, scheduledTask, transaction));
 
         final var seconds = portal.getWarmup().toMillis() / 1000d;
         plugin.bundle().sendMessage(entity, "portal.warmup.start",
@@ -147,25 +148,23 @@ public final class PortalListener implements Listener {
         new EntityPortalWarmupEvent(portal, entity).callEvent();
     }
 
-    private @Nullable ScheduledTask scheduleWarmupCheck(final Entity entity, final Portal portal, final Duration delay) {
-        final var debugger = plugin.debugger;
-
-        debugger.log("Starting warmup for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), debugger.durationToString(delay));
+    private @Nullable ScheduledTask scheduleWarmupCheck(final Entity entity, final Portal portal, final Duration delay, final Transaction transaction) {
+        transaction.log("Starting warmup for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), Debugger.durationToString(delay));
 
         return entity.getScheduler().runDelayed(plugin, task -> {
             warmups.remove(entity.getUniqueId());
 
             portal.getEntryAction().ifPresentOrElse(action -> {
                 if (action.onEntry(entity, portal)) {
-                    debugger.log("EntryAction was successful for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                    transaction.log("EntryAction was successful for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
                 } else {
-                    debugger.log("EntryAction was cancelled for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                    transaction.log("EntryAction was cancelled for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
                 }
             }, () -> {
-                debugger.log("No EntryAction for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                transaction.log("No EntryAction for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
             });
         }, () -> {
-            debugger.log("Cancelled warmup for '%s' in '%s' (retired)", entity.getName(), portal.getName());
+            transaction.log("Cancelled warmup for '%s' in '%s' (retired)", entity.getName(), portal.getName());
             warmups.remove(entity.getUniqueId());
         }, Math.max(1, Tick.tick().fromDuration(delay)));
     }
@@ -179,8 +178,8 @@ public final class PortalListener implements Listener {
         final var remaining = Duration.between(Instant.now(), warmup.finished());
         new EntityPortalWarmupCancelEvent(warmup.portal(), entity, remaining).callEvent();
 
-        final var debugger = plugin.debugger;
-        debugger.log("Cancelled warmup for '%s' in '%s' (%s left)", entity.getName(), warmup.portal().getName(), debugger.durationToString(remaining));
+        warmup.transaction().log("Cancelled warmup for '%s' in '%s' (%s left)",
+                entity.getName(), warmup.portal().getName(), Debugger.durationToString(remaining));
     }
 
     private void pushAway(final Entity entity, final Location to) {
@@ -228,6 +227,6 @@ public final class PortalListener implements Listener {
                 .put(entity.getUniqueId(), Instant.now());
     }
 
-    private record Warmup(Portal portal, Instant finished, ScheduledTask task) {
+    private record Warmup(Portal portal, Instant finished, ScheduledTask task, Transaction transaction) {
     }
 }

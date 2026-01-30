@@ -1,5 +1,7 @@
 package net.thenextlvl.portals.plugin.utils;
 
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.nbt.serialization.NBT;
 import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.nbt.tag.ListTag;
@@ -16,11 +18,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
 
@@ -28,11 +32,12 @@ import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
 public final class Debugger {
     private final int maxLogs = Integer.getInteger("portals.debug.max-logs", 250);
     private final long startTime = System.currentTimeMillis();
-    private final ArrayDeque<String> logs = new ArrayDeque<>(maxLogs);
+    private final Deque<String> logs = new LinkedBlockingDeque<>(maxLogs);
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    private int transaction = 1;
-    public int omittedLogs = 0;
+    private final AtomicBoolean broadcast = new AtomicBoolean(true);
+    private final AtomicInteger omittedLogs = new AtomicInteger();
+    private final AtomicInteger transaction = new AtomicInteger();
 
     private final NBT nbt = NBT.builder()
             .setPrettyPrinting(true)
@@ -45,33 +50,46 @@ public final class Debugger {
         this.plugin = plugin;
     }
 
-    public void newTransaction() {
-        transaction++;
+    public boolean getBroadcast() {
+        return broadcast.get();
     }
 
-    public void log(@PrintFormat final String log, final Object... args) {
-        if (logs.size() >= maxLogs) {
-            logs.removeFirst();
-            omittedLogs++;
+    public void setBroadcast(final boolean broadcast) {
+        this.broadcast.set(broadcast);
+    }
+
+    public Transaction newTransaction() {
+        return new Transaction(transaction.incrementAndGet());
+    }
+
+    public final class Transaction {
+        private final int id;
+
+        public Transaction(final int id) {
+            this.id = id;
         }
-        final var time = formatter.format(Instant.now().atZone(ZoneId.systemDefault()));
-        logs.add("[" + time + "] #" + transaction + " " + String.format(log, args));
-    }
 
-    public Stream<String> logs() {
-        return logs.stream();
-    }
+        public void log(@PrintFormat final String log, final Object... args) {
+            final var message = String.format(log, args);
+            final var time = formatter.format(Instant.now().atZone(ZoneId.systemDefault()));
+            final var entry = "[" + time + "] #" + id + " " + message;
 
-    public String durationToString(final Duration duration) {
-        final var millis = duration.toMillis();
-        if (millis < 1000) return millis + " milliseconds";
-        final var seconds = duration.toSeconds();
-        if (Math.abs(seconds) < 60) return seconds + " seconds";
-        final var minutes = duration.toMinutes();
-        if (Math.abs(minutes) < 60) return minutes + " minutes";
-        final var hours = duration.toHours();
-        if (Math.abs(hours) < 24) return hours + " hours";
-        return duration.toDays() + " days";
+            if (getBroadcast()) broadcast(message);
+
+            while (!logs.offer(entry)) {
+                logs.pollFirst();
+                omittedLogs.incrementAndGet();
+            }
+        }
+
+        private void broadcast(final String message) {
+            final var placeholder1 = Placeholder.parsed("message", message);
+            final var placeholder2 = Formatter.number("id", id);
+            plugin.getServer().getOnlinePlayers().forEach(player -> {
+                if (!player.hasPermission("portals.debug")) return;
+                plugin.bundle().sendMessage(player, "portal.debug", placeholder1, placeholder2);
+            });
+        }
     }
 
     public String buildPaste() {
@@ -84,7 +102,8 @@ public final class Debugger {
         debug.put("server", plugin.getServer().getName() + " " + plugin.getServer().getVersion());
         debug.put("uptime", durationToString(Duration.ofMillis(System.currentTimeMillis() - startTime)));
 
-        if (omittedLogs > 0) logs.add(StringTag.of("Omitted " + omittedLogs + " logs"));
+        final var omitted = omittedLogs.get();
+        if (omitted > 0) logs.add(StringTag.of("Omitted " + omitted + " logs"));
 
         plugin.portalProvider().portals.stream().map(portal -> {
             try {
@@ -101,7 +120,7 @@ public final class Debugger {
                 return null;
             }
         }).filter(Objects::nonNull).forEach(portals::add);
-        logs().map(StringTag::of).forEach(logs::add);
+        this.logs.stream().map(StringTag::of).forEach(logs::add);
 
         debug.put("config", CompoundTag.builder()
                 .put("allowCaveSpawns", plugin.config().allowCaveSpawns())
@@ -134,5 +153,17 @@ public final class Debugger {
                 throw new RuntimeException("Failed to upload paste (" + response.statusCode() + "): " + response.body());
             }).orTimeout(5, TimeUnit.SECONDS);
         }
+    }
+
+    public static String durationToString(final Duration duration) {
+        final var millis = duration.toMillis();
+        if (millis < 1000) return millis + " milliseconds";
+        final var seconds = duration.toSeconds();
+        if (Math.abs(seconds) < 60) return seconds + " seconds";
+        final var minutes = duration.toMinutes();
+        if (Math.abs(minutes) < 60) return minutes + " minutes";
+        final var hours = duration.toHours();
+        if (Math.abs(hours) < 24) return hours + " hours";
+        return duration.toDays() + " days";
     }
 }
