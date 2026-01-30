@@ -9,7 +9,6 @@ import net.thenextlvl.portals.event.EntityPortalEnterEvent;
 import net.thenextlvl.portals.event.EntityPortalExitEvent;
 import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
-import net.thenextlvl.portals.plugin.utils.Debugger;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -103,7 +102,7 @@ public final class PortalListener implements Listener {
                     setLastPortal(entity, portal);
 
                     if (portal.getWarmup().isPositive()) {
-                        startWarmup(entity, portal, debugger);
+                        startWarmup(entity, portal);
                         return true;
                     }
 
@@ -126,7 +125,7 @@ public final class PortalListener implements Listener {
                 });
     }
 
-    private void startWarmup(Entity entity, Portal portal, Debugger debugger) {
+    private void startWarmup(Entity entity, Portal portal) {
         var warmup = portal.getWarmup();
         var uuid = entity.getUniqueId();
 
@@ -138,10 +137,10 @@ public final class PortalListener implements Listener {
                     Formatter.number("warmup", warmup.toMillis() / 1000d));
         }
 
-        scheduleWarmupCheck(entity, portal, debugger, warmup);
+        scheduleWarmupCheck(entity, portal, warmup);
     }
 
-    private void scheduleWarmupCheck(Entity entity, Portal portal, Debugger debugger, Duration delay) {
+    private void scheduleWarmupCheck(Entity entity, Portal portal, Duration delay) {
         var uuid = entity.getUniqueId();
         var ticks = Tick.tick().fromDuration(delay);
         if (ticks <= 0) ticks = 1;
@@ -158,19 +157,19 @@ public final class PortalListener implements Listener {
             var elapsed = Duration.between(current.startedAt(), Instant.now());
             var remaining = portal.getWarmup().minus(elapsed);
             if (remaining.isPositive()) {
-                scheduleWarmupCheck(entity, portal, debugger, remaining);
+                scheduleWarmupCheck(entity, portal, remaining);
                 return;
             }
 
             var success = portal.getEntryAction().map(action -> {
                 if (action.onEntry(entity, portal)) {
-                    debugger.log("EntryAction was successful for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                    plugin.debugger.log("EntryAction was successful for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
                     return true;
                 }
-                debugger.log("EntryAction was cancelled for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                plugin.debugger.log("EntryAction was cancelled for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
                 return false;
             }).orElseGet(() -> {
-                debugger.log("No EntryAction for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                plugin.debugger.log("No EntryAction for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
                 return true;
             });
 
