@@ -19,31 +19,31 @@ import java.time.Duration;
 public final class PortalAdapter implements TagAdapter<Portal> {
     private final PortalsPlugin plugin;
 
-    public PortalAdapter(PortalsPlugin plugin) {
+    public PortalAdapter(final PortalsPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public Portal deserialize(Tag tag, TagDeserializationContext context) throws ParserException {
-        var root = tag.getAsCompound();
+    public Portal deserialize(final Tag tag, final TagDeserializationContext context) throws ParserException {
+        final var root = tag.getAsCompound();
 
-        var name = root.get("name").getAsString();
-        var boundingBox = context.deserialize(root.get("boundingBox"), BoundingBox.class);
+        final var name = root.get("name").getAsString();
+        final var boundingBox = context.deserialize(root.get("boundingBox"), BoundingBox.class);
 
-        var portal = new PaperPortal(plugin, name, boundingBox);
+        final var portal = new PaperPortal(plugin, name, boundingBox);
 
         root.optional("cooldown").map(tag1 -> context.deserialize(tag1, Duration.class)).ifPresent(portal::setCooldown);
-        root.optional("warmup").map(tag1 -> context.deserialize(tag1, Duration.class)).ifPresent(portal::setWarmup);
         root.optional("entryAction").map(tag1 -> context.deserialize(tag1, EntryAction.class)).ifPresent(portal::setEntryAction);
         root.optional("entryCost").map(tag1 -> context.deserialize(tag1, Double.class)).ifPresent(portal::setEntryCost);
         root.optional("entryPermission").map(tag1 -> context.deserialize(tag1, String.class)).ifPresent(portal::setEntryPermission);
+        root.optional("warmup").map(tag1 -> context.deserialize(tag1, Duration.class)).ifPresent(portal::setWarmup);
 
         return portal;
     }
 
     @Override
-    public Tag serialize(Portal portal, TagSerializationContext context) throws ParserException {
-        var tag = CompoundTag.builder();
+    public Tag serialize(final Portal portal, final TagSerializationContext context) throws ParserException {
+        final var tag = CompoundTag.builder();
 
         tag.put("name", portal.getName());
         tag.put("boundingBox", context.serialize(portal.getBoundingBox(), BoundingBox.class));
@@ -52,8 +52,8 @@ public final class PortalAdapter implements TagAdapter<Portal> {
         portal.getEntryPermission().ifPresent(permission -> tag.put("entryPermission", permission));
 
         tag.put("cooldown", context.serialize(portal.getCooldown()));
-        tag.put("warmup", context.serialize(portal.getWarmup()));
         tag.put("entryCost", portal.getEntryCost());
+        tag.put("warmup", context.serialize(portal.getWarmup()));
 
         return tag.build();
     }
