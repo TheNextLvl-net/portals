@@ -1,7 +1,9 @@
 package net.thenextlvl.portals.plugin.utils;
 
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.thenextlvl.nbt.serialization.NBT;
 import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.nbt.tag.ListTag;
@@ -19,6 +21,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Deque;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -35,7 +38,7 @@ public final class Debugger {
     private final Deque<String> logs = new LinkedBlockingDeque<>(maxLogs);
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    private final AtomicBoolean broadcast = new AtomicBoolean(true);
+    private final AtomicBoolean broadcast = new AtomicBoolean();
     private final AtomicInteger omittedLogs = new AtomicInteger();
     private final AtomicInteger transaction = new AtomicInteger();
 
@@ -83,12 +86,13 @@ public final class Debugger {
         }
 
         private void broadcast(final String message) {
-            final var placeholder1 = Placeholder.parsed("message", message);
-            final var placeholder2 = Formatter.number("id", id);
-            plugin.getServer().getOnlinePlayers().forEach(player -> {
-                if (!player.hasPermission("portals.debug")) return;
-                plugin.bundle().sendMessage(player, "portal.debug", placeholder1, placeholder2);
-            });
+            final var prefix = plugin.bundle().component("prefix", Locale.US);
+            final var component = prefix
+                    .append(Component.text(" (", NamedTextColor.DARK_GRAY))
+                    .append(Component.text("#" + id, NamedTextColor.GRAY))
+                    .append(Component.text(") ", NamedTextColor.DARK_GRAY))
+                    .append(Component.text(message, Style.style(TextDecoration.ITALIC)));
+            plugin.getServer().broadcast(component, "portals.debug");
         }
     }
 
