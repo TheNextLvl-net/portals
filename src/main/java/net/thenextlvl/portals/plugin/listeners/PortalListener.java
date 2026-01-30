@@ -7,6 +7,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.event.EntityPortalEnterEvent;
 import net.thenextlvl.portals.event.EntityPortalExitEvent;
+import net.thenextlvl.portals.event.EntityPortalWarmupCancelEvent;
+import net.thenextlvl.portals.event.EntityPortalWarmupEvent;
 import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import org.bukkit.Location;
@@ -135,12 +137,14 @@ public final class PortalListener implements Listener {
         if (scheduledTask == null) return;
 
         var finished = Instant.now().plus(portal.getWarmup());
-        warmups.put(entity.getUniqueId(), new Warmup(finished, scheduledTask));
+        warmups.put(entity.getUniqueId(), new Warmup(portal, finished, scheduledTask));
 
         var seconds = portal.getWarmup().toMillis() / 1000d;
         plugin.bundle().sendMessage(entity, "portal.warmup.start",
                 Formatter.number("warmup", seconds),
                 Formatter.booleanChoice("plural", seconds != 1));
+
+        new EntityPortalWarmupEvent(portal, entity).callEvent();
     }
 
     private @Nullable ScheduledTask scheduleWarmupCheck(Entity entity, Portal portal, Duration delay) {
@@ -169,8 +173,14 @@ public final class PortalListener implements Listener {
     private void resetWarmupIfPresent(Entity entity) {
         var warmup = warmups.remove(entity.getUniqueId());
         if (warmup == null) return;
-        plugin.debugger.log("Cancelled warmup for '%s'", entity.getName());
+
         warmup.task().cancel();
+
+        var remaining = Duration.between(Instant.now(), warmup.finished());
+        new EntityPortalWarmupCancelEvent(warmup.portal(), entity, remaining).callEvent();
+
+        var debugger = plugin.debugger;
+        debugger.log("Cancelled warmup for '%s' in '%s' (%s left)", entity.getName(), warmup.portal().getName(), debugger.durationToString(remaining));
     }
 
     private void pushAway(Entity entity, Location to) {
@@ -218,6 +228,6 @@ public final class PortalListener implements Listener {
                 .put(entity.getUniqueId(), Instant.now());
     }
 
-    private record Warmup(Instant finished, ScheduledTask task) {
+    private record Warmup(Portal portal, Instant finished, ScheduledTask task) {
     }
 }
