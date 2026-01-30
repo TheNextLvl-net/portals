@@ -85,6 +85,9 @@ paper {
         register("portals.command.cooldown") { children = listOf("portals.command.portal") }
         register("portals.command.cost") { children = listOf("portals.command.portal") }
         register("portals.command.create") { children = listOf("portals.command.portal") }
+        register("portals.command.debug") { children = listOf("portals.command.portal", "portals.debug") }
+        register("portals.command.debug.paste") { children = listOf("portals.command.debug") }
+        register("portals.command.debug.verbose") { children = listOf("portals.command.debug") }
         register("portals.command.delete") { children = listOf("portals.command.portal") }
         register("portals.command.list") { children = listOf("portals.command.portal") }
         register("portals.command.permission") { children = listOf("portals.command.portal") }
