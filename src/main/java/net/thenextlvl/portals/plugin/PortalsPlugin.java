@@ -94,6 +94,8 @@ public final class PortalsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        fastStats.ready();
+
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
