@@ -21,7 +21,6 @@ tasks.compileJava {
 group = "net.thenextlvl.portals"
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven("https://maven.enginehub.org/repo/")
     maven("https://repo.papermc.io/repository/maven-public/")
