@@ -21,6 +21,7 @@ tasks.compileJava {
 group = "net.thenextlvl.portals"
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven("https://maven.enginehub.org/repo/")
     maven("https://repo.papermc.io/repository/maven-public/")
@@ -40,10 +41,11 @@ dependencies {
     compileOnly("net.thenextlvl:service-io:2.5.1")
 
     implementation("net.thenextlvl.core:files:4.0.0-pre1")
+    implementation("net.thenextlvl.version-checker:modrinth-paper:1.0.1")
     implementation("net.thenextlvl:i18n:1.2.0")
     implementation("net.thenextlvl:nbt:4.3.4")
 
-    implementation("dev.faststats.metrics:bukkit:0.13.1")
+    implementation("dev.faststats.metrics:bukkit:0.14.0")
     implementation("org.bstats:bstats-bukkit:3.1.0")
 }
 

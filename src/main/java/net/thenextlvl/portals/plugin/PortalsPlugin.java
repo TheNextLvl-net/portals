@@ -36,6 +36,7 @@ import net.thenextlvl.portals.plugin.model.SimplePortalConfig;
 import net.thenextlvl.portals.plugin.portal.PaperPortalProvider;
 import net.thenextlvl.portals.plugin.selections.WorldEditSelectionProvider;
 import net.thenextlvl.portals.plugin.utils.Debugger;
+import net.thenextlvl.portals.plugin.version.PluginVersionChecker;
 import net.thenextlvl.portals.selection.SelectionProvider;
 import net.thenextlvl.portals.shape.BoundingBox;
 import net.thenextlvl.portals.view.PortalConfig;
@@ -53,6 +54,8 @@ import java.util.Locale;
 public final class PortalsPlugin extends JavaPlugin {
     public static final ErrorTracker ERROR_TRACKER = ErrorTracker.contextAware();
     public static final String ISSUES = "https://github.com/TheNextLvl-net/portals/issues/new?template=bug_report.yml";
+
+    private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
 
     private final PaperPortalProvider portalProvider = new PaperPortalProvider(this);
     private EconomyProvider economyProvider = new EmptyEconomyProvider();
