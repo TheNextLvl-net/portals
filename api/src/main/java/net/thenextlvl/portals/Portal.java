@@ -5,6 +5,7 @@ import net.thenextlvl.portals.notification.Notification;
 import net.thenextlvl.portals.notification.NotificationTrigger;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
@@ -208,6 +209,15 @@ public interface Portal extends PortalLike {
      */
     @Contract(mutates = "this")
     boolean clearNotifications(NotificationTrigger trigger);
+
+    /**
+     * Triggers all notifications for the given trigger.
+     *
+     * @param trigger the trigger to trigger notifications for
+     * @param entity  the entity to send the notifications to
+     * @since 1.4.0
+     */
+    void triggerNotification(NotificationTrigger trigger, Entity entity);
 
     /**
      * Gets the data file of the portal.
