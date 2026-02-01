@@ -13,6 +13,7 @@ import net.thenextlvl.portals.plugin.commands.arguments.NotificationTriggerArgum
 import net.thenextlvl.portals.plugin.commands.brigadier.SimpleCommand;
 import net.thenextlvl.portals.plugin.commands.suggestions.PortalNotificationTriggerSuggestionProvider;
 import net.thenextlvl.portals.plugin.commands.suggestions.PortalWithNotificationSuggestionProvider;
+import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NullMarked;
 
 import static net.thenextlvl.portals.plugin.commands.PortalCommand.portalArgument;
@@ -37,22 +38,10 @@ final class NotificationListCommand extends SimpleCommand {
     public int run(final CommandContext<CommandSourceStack> context) {
         final var sender = context.getSource().getSender();
         final var portal = context.getArgument("portal", Portal.class);
-        final var trigger = tryGetArgument(context, "trigger", NotificationTrigger.class);
+        final var trigger = tryGetArgument(context, "trigger", NotificationTrigger.class).orElse(null);
 
-        if (trigger.isPresent()) {
-            final var notifications = portal.getNotifications(trigger.get()).entrySet().stream()
-                    .map(entry -> plugin.bundle().component("portal.notification.list.entry", sender,
-                            Placeholder.parsed("type", entry.getKey().getName()),
-                            Placeholder.parsed("input", String.valueOf(entry.getValue()))))
-                    .toList();
-            final var message = notifications.isEmpty()
-                    ? "portal.notification.list.empty.trigger"
-                    : "portal.notification.list.trigger";
-            plugin.bundle().sendMessage(sender, message,
-                    Placeholder.parsed("portal", portal.getName()),
-                    Placeholder.parsed("trigger", trigger.get().getName()),
-                    Formatter.number("count", notifications.size()),
-                    Formatter.joining("notifications", notifications));
+        if (trigger != null) {
+            list(portal, trigger, sender);
             return SINGLE_SUCCESS;
         }
 
@@ -60,22 +49,28 @@ final class NotificationListCommand extends SimpleCommand {
         if (triggers.isEmpty()) {
             plugin.bundle().sendMessage(sender, "portal.notification.list.empty",
                     Placeholder.parsed("portal", portal.getName()));
-            return SINGLE_SUCCESS;
+            return 0;
         }
 
-        for (final var notificationTrigger : triggers) {
-            final var notifications = portal.getNotifications(notificationTrigger).entrySet().stream()
-                    .map(entry -> plugin.bundle().component("portal.notification.list.entry", sender,
-                            Placeholder.parsed("type", entry.getKey().getName()),
-                            Placeholder.parsed("input", String.valueOf(entry.getValue()))))
-                    .toList();
-            plugin.bundle().sendMessage(sender, "portal.notification.list.trigger",
-                    Placeholder.parsed("portal", portal.getName()),
-                    Placeholder.parsed("trigger", notificationTrigger.getName()),
-                    Formatter.number("count", notifications.size()),
-                    Formatter.joining("notifications", notifications));
-        }
-
+        triggers.forEach(notificationTrigger -> list(portal, notificationTrigger, sender));
         return SINGLE_SUCCESS;
+    }
+
+    private void list(final Portal portal, final NotificationTrigger trigger, final CommandSender sender) {
+        final var notifications = portal.getNotifications(trigger).entrySet().stream()
+                .map(entry -> plugin.bundle().component("portal.notification.list.entry", sender,
+                        Placeholder.parsed("type", entry.getKey().getName()),
+                        Placeholder.parsed("input", String.valueOf(entry.getValue()))))
+                .toList();
+
+        final var message = notifications.isEmpty()
+                ? "portal.notification.list.empty.trigger"
+                : "portal.notification.list.trigger";
+
+        plugin.bundle().sendMessage(sender, message,
+                Placeholder.parsed("portal", portal.getName()),
+                Placeholder.parsed("trigger", trigger.getName()),
+                Formatter.number("count", notifications.size()),
+                Formatter.joining("notifications", notifications));
     }
 }
