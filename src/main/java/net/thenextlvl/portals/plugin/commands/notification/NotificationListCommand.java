@@ -7,6 +7,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
+import net.thenextlvl.portals.notification.Notification;
 import net.thenextlvl.portals.notification.NotificationTrigger;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.commands.arguments.NotificationTriggerArgumentType;
@@ -45,22 +46,23 @@ final class NotificationListCommand extends SimpleCommand {
             return SINGLE_SUCCESS;
         }
 
-        final var triggers = portal.getNotificationTriggers();
-        if (triggers.isEmpty()) {
+        final var notifications = portal.getNotifications();
+        if (notifications.isEmpty()) {
             plugin.bundle().sendMessage(sender, "portal.notification.list.empty",
                     Placeholder.parsed("portal", portal.getName()));
             return 0;
         }
 
-        triggers.forEach(notificationTrigger -> list(portal, notificationTrigger, sender));
+        notifications.stream().map(Notification::trigger).distinct()
+                .forEach(notification -> list(portal, notification, sender));
         return SINGLE_SUCCESS;
     }
 
     private void list(final Portal portal, final NotificationTrigger trigger, final CommandSender sender) {
-        final var notifications = portal.getNotifications(trigger).entrySet().stream()
-                .map(entry -> plugin.bundle().component("portal.notification.list.entry", sender,
-                        Placeholder.parsed("type", entry.getKey().getName()),
-                        Placeholder.parsed("input", String.valueOf(entry.getValue()))))
+        final var notifications = portal.getNotifications().findByTrigger(trigger)
+                .map(notification -> plugin.bundle().component("portal.notification.list.entry", sender,
+                        Placeholder.parsed("type", notification.type().getName()),
+                        Placeholder.parsed("input", String.valueOf(notification.input()))))
                 .toList();
 
         final var message = notifications.isEmpty()

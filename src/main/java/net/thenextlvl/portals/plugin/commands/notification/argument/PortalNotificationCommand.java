@@ -25,7 +25,7 @@ abstract class PortalNotificationCommand<T> extends SimpleCommand {
         final var portal = context.getArgument("portal", Portal.class);
         final var trigger = context.getArgument("trigger", NotificationTrigger.class);
 
-        final var success = portal.setNotification(trigger, notificationType, input);
+        final var success = portal.getNotifications().set(trigger, notificationType, input);
 
         final var message = success ? "portal.notification.added" : "nothing.changed";
         plugin.bundle().sendMessage(sender, message,

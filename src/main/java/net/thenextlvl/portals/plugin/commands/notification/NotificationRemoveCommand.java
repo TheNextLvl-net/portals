@@ -8,6 +8,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.thenextlvl.portals.Portal;
+import net.thenextlvl.portals.notification.Notification;
 import net.thenextlvl.portals.notification.NotificationTrigger;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.commands.arguments.NotificationTriggerArgumentType;
@@ -45,10 +46,11 @@ final class NotificationRemoveCommand extends SimpleCommand {
         final var trigger = context.getArgument("trigger", NotificationTrigger.class);
         final var notification = context.getArgument("notification", String.class);
 
-        final var success = portal.getNotificationTypes(trigger).stream()
-                .filter(notificationType -> notificationType.getName().equals(notification))
+        final var success = portal.getNotifications().findByTrigger(trigger)
+                .map(Notification::type)
+                .filter(type -> type.getName().equals(notification))
                 .findAny()
-                .map(n -> portal.removeNotification(trigger, n))
+                .map(n -> portal.getNotifications().remove(trigger, n))
                 .orElse(false);
         final var message = success ? "portal.notification.removed" : "nothing.changed";
 

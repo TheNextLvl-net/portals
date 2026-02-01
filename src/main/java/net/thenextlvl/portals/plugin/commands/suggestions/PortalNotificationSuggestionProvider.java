@@ -6,6 +6,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.thenextlvl.portals.Portal;
+import net.thenextlvl.portals.notification.Notification;
 import net.thenextlvl.portals.notification.NotificationTrigger;
 import net.thenextlvl.portals.notification.NotificationType;
 import org.jspecify.annotations.NullMarked;
@@ -18,7 +19,8 @@ public final class PortalNotificationSuggestionProvider implements SuggestionPro
     public CompletableFuture<Suggestions> getSuggestions(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
         final var portal = context.getLastChild().getArgument("portal", Portal.class);
         final var trigger = context.getLastChild().getArgument("trigger", NotificationTrigger.class);
-        portal.getNotificationTypes(trigger).stream()
+        portal.getNotifications().findByTrigger(trigger)
+                .map(Notification::type)
                 .map(NotificationType::getName)
                 .filter(string -> string.contains(builder.getRemaining()))
                 .forEach(builder::suggest);

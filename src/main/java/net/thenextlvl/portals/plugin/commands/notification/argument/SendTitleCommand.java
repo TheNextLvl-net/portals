@@ -8,16 +8,15 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.Ticks;
 import net.thenextlvl.portals.notification.NotificationTypes;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
+import net.thenextlvl.portals.view.UnparsedTitle;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class SendTitleCommand extends PortalNotificationCommand<Title> {
+public final class SendTitleCommand extends PortalNotificationCommand<UnparsedTitle> {
     private SendTitleCommand(final PortalsPlugin plugin) {
         super(plugin, NotificationTypes.types().title(), "title");
     }
@@ -39,14 +38,12 @@ public final class SendTitleCommand extends PortalNotificationCommand<Title> {
 
     @Override
     public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        final var title = MiniMessage.miniMessage().deserialize(context.getArgument("title", String.class));
-        final var subtitle = tryGetArgument(context, "subtitle", String.class)
-                .map(MiniMessage.miniMessage()::deserialize)
-                .orElse(Component.empty());
+        final var title = context.getArgument("title", String.class);
+        final var subtitle = tryGetArgument(context, "subtitle", String.class).orElse("");
         final var fadeIn = tryGetArgument(context, "fade-in", int.class).map(Ticks::duration).orElse(null);
         final var stay = tryGetArgument(context, "stay", int.class).map(Ticks::duration).orElse(null);
         final var fadeOut = tryGetArgument(context, "fade-out", int.class).map(Ticks::duration).orElse(null);
         final var times = fadeIn != null && stay != null && fadeOut != null ? Title.Times.times(fadeIn, stay, fadeOut) : null;
-        return addAction(context, Title.title(title, subtitle, times));
+        return addAction(context, new UnparsedTitle(title, subtitle, times));
     }
 }
