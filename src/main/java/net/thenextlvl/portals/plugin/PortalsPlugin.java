@@ -8,22 +8,32 @@ import dev.faststats.core.ErrorTracker;
 import io.papermc.paper.math.Position;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.title.Title;
 import net.thenextlvl.binder.StaticBinder;
 import net.thenextlvl.i18n.ComponentBundle;
 import net.thenextlvl.nbt.serialization.NBT;
+import net.thenextlvl.nbt.serialization.adapters.EnumAdapter;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalProvider;
 import net.thenextlvl.portals.action.ActionTypeRegistry;
 import net.thenextlvl.portals.action.ActionTypes;
 import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.bounds.BoundsFactory;
+import net.thenextlvl.portals.notification.NotificationTrigger;
+import net.thenextlvl.portals.notification.NotificationType;
 import net.thenextlvl.portals.plugin.action.SimpleActionTypeRegistry;
 import net.thenextlvl.portals.plugin.action.SimpleActionTypes;
 import net.thenextlvl.portals.plugin.adapters.BoundingBoxAdapter;
 import net.thenextlvl.portals.plugin.adapters.EntryActionAdapter;
 import net.thenextlvl.portals.plugin.adapters.FinePositionAdapter;
 import net.thenextlvl.portals.plugin.adapters.KeyAdapter;
+import net.thenextlvl.portals.plugin.adapters.NotificationTriggerAdapter;
+import net.thenextlvl.portals.plugin.adapters.NotificationTypeAdapter;
 import net.thenextlvl.portals.plugin.adapters.PortalAdapter;
+import net.thenextlvl.portals.plugin.adapters.SoundAdapter;
+import net.thenextlvl.portals.plugin.adapters.TitleTimesAdapter;
+import net.thenextlvl.portals.plugin.adapters.UnparsedTitleAdapter;
 import net.thenextlvl.portals.plugin.bounds.SimpleBoundsFactory;
 import net.thenextlvl.portals.plugin.commands.PortalCommand;
 import net.thenextlvl.portals.plugin.economy.EconomyProvider;
@@ -33,6 +43,7 @@ import net.thenextlvl.portals.plugin.economy.VaultEconomyProvider;
 import net.thenextlvl.portals.plugin.listeners.PortalListener;
 import net.thenextlvl.portals.plugin.listeners.WorldListener;
 import net.thenextlvl.portals.plugin.model.SimplePortalConfig;
+import net.thenextlvl.portals.plugin.portal.PaperPortal;
 import net.thenextlvl.portals.plugin.portal.PaperPortalProvider;
 import net.thenextlvl.portals.plugin.selections.WorldEditSelectionProvider;
 import net.thenextlvl.portals.plugin.utils.Debugger;
@@ -40,6 +51,7 @@ import net.thenextlvl.portals.plugin.version.PluginVersionChecker;
 import net.thenextlvl.portals.selection.SelectionProvider;
 import net.thenextlvl.portals.shape.BoundingBox;
 import net.thenextlvl.portals.view.PortalConfig;
+import net.thenextlvl.portals.view.UnparsedTitle;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -150,7 +162,13 @@ public final class PortalsPlugin extends JavaPlugin {
                 .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter(this))
                 .registerTypeHierarchyAdapter(Position.class, new FinePositionAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
-                .registerTypeHierarchyAdapter(Portal.class, new PortalAdapter(this))
+                .registerTypeHierarchyAdapter(PaperPortal.class, new PortalAdapter(this))
+                .registerTypeHierarchyAdapter(NotificationTrigger.class, new NotificationTriggerAdapter())
+                .registerTypeHierarchyAdapter(NotificationType.class, new NotificationTypeAdapter())
+                .registerTypeHierarchyAdapter(Sound.class, new SoundAdapter())
+                .registerTypeHierarchyAdapter(Sound.Source.class, new EnumAdapter<>(Sound.Source.class))
+                .registerTypeHierarchyAdapter(UnparsedTitle.class, new UnparsedTitleAdapter())
+                .registerTypeHierarchyAdapter(Title.Times.class, new TitleTimesAdapter())
                 .build();
     }
 
