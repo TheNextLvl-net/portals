@@ -7,6 +7,11 @@ import org.jetbrains.annotations.Contract;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * Represents a collection of notifications.
+ *
+ * @since 1.4.0
+ */
 @ApiStatus.NonExtendable
 public interface Notifications extends Iterable<Notification<?>> {
     /**
