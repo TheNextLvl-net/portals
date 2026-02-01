@@ -10,10 +10,11 @@ final class SimpleNotificationTriggerRegistry implements NotificationTriggerRegi
     public static final SimpleNotificationTriggerRegistry INSTANCE = new SimpleNotificationTriggerRegistry();
 
     private final Set<NotificationTrigger> triggers = new HashSet<>(Set.of(
-            NotificationTriggers.triggers().teleportSuccess(),
-            NotificationTriggers.triggers().teleportFailure(),
-            NotificationTriggers.triggers().exitSuccess(),
-            NotificationTriggers.triggers().exitFailure()
+            NotificationTrigger.teleportSuccess(),
+            NotificationTrigger.teleportFailure(),
+            NotificationTrigger.entrySuccess(),
+            NotificationTrigger.entryFailure(),
+            NotificationTrigger.exit()
     ));
 
     @Override

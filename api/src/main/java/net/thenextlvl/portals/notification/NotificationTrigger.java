@@ -10,6 +10,83 @@ import org.jetbrains.annotations.Contract;
  */
 public sealed interface NotificationTrigger permits SimpleNotificationTrigger {
     /**
+     * Gets the trigger for successful teleportation.
+     *
+     * @return the teleport success trigger
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationTrigger teleportSuccess() {
+        return SimpleNotificationTrigger.TELEPORT_SUCCESS;
+    }
+
+    /**
+     * Gets the trigger for failed teleportation.
+     *
+     * @return the teleport failure trigger
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationTrigger teleportFailure() {
+        return SimpleNotificationTrigger.TELEPORT_FAILURE;
+    }
+
+    /**
+     * Gets the trigger for successful warmup.
+     *
+     * @return the warmup success trigger
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationTrigger warmupSuccess() {
+        return SimpleNotificationTrigger.WARMUP_SUCCESS;
+    }
+
+    /**
+     * Gets the trigger for failed warmup.
+     *
+     * @return the warmup failure trigger
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationTrigger warmupFailure() {
+        return SimpleNotificationTrigger.WARMUP_FAILURE;
+    }
+
+    /**
+     * Gets the trigger for successful portal entry.
+     *
+     * @return the entry success trigger
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationTrigger entrySuccess() {
+        return SimpleNotificationTrigger.ENTRY_SUCCESS;
+    }
+
+    /**
+     * Gets the trigger for failed portal entry.
+     *
+     * @return the entry failure trigger
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationTrigger entryFailure() {
+        return SimpleNotificationTrigger.ENTRY_FAILURE;
+    }
+
+    /**
+     * Gets the trigger for portal exit.
+     *
+     * @return the exit trigger
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationTrigger exit() {
+        return SimpleNotificationTrigger.EXIT;
+    }
+
+    /**
      * Gets the name of this trigger.
      *
      * @return the name of this trigger
