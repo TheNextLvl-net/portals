@@ -10,6 +10,7 @@ import net.thenextlvl.portals.event.EntityPortalExitEvent;
 import net.thenextlvl.portals.event.EntityPortalWarmupCancelEvent;
 import net.thenextlvl.portals.event.EntityPortalWarmupEvent;
 import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
+import net.thenextlvl.portals.notification.NotificationTrigger;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.utils.Debugger;
 import net.thenextlvl.portals.plugin.utils.Debugger.Transaction;
@@ -83,30 +84,37 @@ public final class PortalListener implements Listener {
                     transaction.log("'%s' entered the portal '%s'", entity.getName(), portal.getName());
 
                     if (!new PreEntityPortalEnterEvent(portal, entity).callEvent()) {
+                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
                         transaction.log("PreEntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
                         return false;
                     }
 
                     if (!portal.getEntryPermission().map(entity::hasPermission).orElse(true)) {
+                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
                         transaction.log("EntryPermission was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryPermission().orElse(null));
                         return false;
                     }
                     if (portal.getCooldown().isPositive() && hasCooldown(portal, entity)) {
+                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
                         transaction.log("Cooldown was not met for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), Debugger.durationToString(getRemainingCooldown(portal, entity)));
                         return false;
                     }
                     if (portal.getEntryCost() > 0 && !withdrawEntryCost(portal, entity)) {
+                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
                         transaction.log("EntryCost was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryCost());
                         return false;
                     }
 
                     if (!new EntityPortalEnterEvent(portal, entity).callEvent()) {
+                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
                         transaction.log("EntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
                         return false;
                     }
 
                     if (portal.getCooldown().isPositive()) setLastEntry(portal, entity);
                     setLastPortal(entity, portal);
+
+                    portal.triggerNotification(NotificationTrigger.entrySuccess(), entity);
 
                     resetWarmupIfPresent(entity);
                     if (portal.getWarmup().isPositive()) {
@@ -117,9 +125,11 @@ public final class PortalListener implements Listener {
                     return portal.getEntryAction().map(action -> {
                         if (action.onEntry(entity, portal)) {
                             transaction.log("EntryAction was successful for '%s' in '%s'", entity.getName(), portal.getName());
+                            portal.triggerNotification(NotificationTrigger.teleportSuccess(), entity);
                             return true;
                         }
                         transaction.log("EntryAction was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
+                        portal.triggerNotification(NotificationTrigger.teleportFailure(), entity);
                         return false;
                     }).orElseGet(() -> {
                         transaction.log("No EntryAction for '%s' in '%s'", entity.getName(), portal.getName());
@@ -127,8 +137,11 @@ public final class PortalListener implements Listener {
                     });
                 }).orElseGet(() -> {
                     resetWarmupIfPresent(entity);
-                    final var removed = lastPortal.remove(entity.getUniqueId());
-                    if (removed != null) new EntityPortalExitEvent(removed, entity).callEvent();
+                    final var portal = lastPortal.remove(entity.getUniqueId());
+                    if (portal != null) {
+                        portal.triggerNotification(NotificationTrigger.exit(), entity);
+                        new EntityPortalExitEvent(portal, entity).callEvent();
+                    }
                     return true;
                 });
     }
@@ -153,12 +166,15 @@ public final class PortalListener implements Listener {
 
         return entity.getScheduler().runDelayed(plugin, task -> {
             warmups.remove(entity.getUniqueId());
+            portal.triggerNotification(NotificationTrigger.warmupSuccess(), entity);
 
             portal.getEntryAction().ifPresentOrElse(action -> {
                 if (action.onEntry(entity, portal)) {
                     transaction.log("EntryAction was successful for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                    portal.triggerNotification(NotificationTrigger.teleportSuccess(), entity);
                 } else {
                     transaction.log("EntryAction was cancelled for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
+                    portal.triggerNotification(NotificationTrigger.teleportFailure(), entity);
                 }
             }, () -> {
                 transaction.log("No EntryAction for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
@@ -180,6 +196,7 @@ public final class PortalListener implements Listener {
 
         warmup.transaction().log("Cancelled warmup for '%s' in '%s' (%s left)",
                 entity.getName(), warmup.portal().getName(), Debugger.durationToString(remaining));
+        warmup.portal().triggerNotification(NotificationTrigger.warmupFailure(), entity);
     }
 
     private void pushAway(final Entity entity, final Location to) {
