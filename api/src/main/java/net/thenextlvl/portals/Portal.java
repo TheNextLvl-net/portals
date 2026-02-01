@@ -1,8 +1,8 @@
 package net.thenextlvl.portals;
 
 import net.thenextlvl.portals.action.EntryAction;
-import net.thenextlvl.portals.notification.Notification;
 import net.thenextlvl.portals.notification.NotificationTrigger;
+import net.thenextlvl.portals.notification.NotificationType;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -158,15 +158,15 @@ public interface Portal extends PortalLike {
     boolean setEntryAction(@Nullable EntryAction<?> action);
 
     /**
-     * Gets all notifications for a specific trigger.
+     * Gets the notification for a specific trigger and type.
      *
-     * @param trigger the trigger to get notifications for
-     * @return an unmodifiable list of notifications for the trigger
+     * @param trigger the trigger to get the notification for
+     * @param type    the notification type
+     * @return the notification or an empty optional if not found
      * @since 1.4.0
      */
-    @Unmodifiable
     @Contract(pure = true)
-    List<Notification<?>> getNotifications(NotificationTrigger trigger);
+    <T> Optional<T> getNotification(NotificationTrigger trigger, NotificationType<T> type);
 
     /**
      * Gets all notification triggers configured for this portal.
@@ -179,26 +179,42 @@ public interface Portal extends PortalLike {
     Set<NotificationTrigger> getNotificationTriggers();
 
     /**
-     * Adds a notification for a specific trigger.
+     * Gets all notification types configured for this portal with the given trigger.
      *
-     * @param trigger      the trigger to add the notification for
-     * @param notification the notification to add
-     * @return {@code true} if the notification was added, {@code false} otherwise
+     * @param trigger the trigger to get the notification types for
+     * @return an unmodifiable set of all configured notification types for the given trigger
+     * @since 1.4.0
+     */
+    @Unmodifiable
+    @Contract(pure = true)
+    Set<NotificationType<?>> getNotificationTypes(NotificationTrigger trigger);
+    
+    @Unmodifiable
+    @Contract(pure = true)
+    Map<NotificationType<?>, ?> getNotifications(NotificationTrigger trigger);
+
+    /**
+     * Sets a notification for a specific trigger and type.
+     *
+     * @param trigger the trigger to set the notification for
+     * @param type    the notification type
+     * @param input   the input for the notification
+     * @return {@code true} if anything was changed, {@code false} otherwise
      * @since 1.4.0
      */
     @Contract(mutates = "this")
-    boolean addNotification(NotificationTrigger trigger, Notification<?> notification);
+    <T> boolean setNotification(NotificationTrigger trigger, NotificationType<T> type, T input);
 
     /**
      * Removes a notification for a specific trigger.
      *
      * @param trigger      the trigger to remove the notification from
-     * @param notification the notification to remove
+     * @param notification the notification type to remove
      * @return {@code true} if the notification was removed, {@code false} otherwise
      * @since 1.4.0
      */
     @Contract(mutates = "this")
-    boolean removeNotification(NotificationTrigger trigger, Notification<?> notification);
+    boolean removeNotification(NotificationTrigger trigger, NotificationType<?> notification);
 
     /**
      * Clears all notifications for a specific trigger.

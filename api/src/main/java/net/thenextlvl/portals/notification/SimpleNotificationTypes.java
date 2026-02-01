@@ -1,35 +1,35 @@
 package net.thenextlvl.portals.notification;
 
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 
 final class SimpleNotificationTypes implements NotificationTypes {
     public static final SimpleNotificationTypes INSTANCE = new SimpleNotificationTypes();
 
-    private final NotificationType<Sound> sound = NotificationType.create("sound", Sound.class, (entity, portal, input) -> {
+    private final NotificationType<Sound> playSound = NotificationType.create("sound", Sound.class, (entity, portal, input) -> {
         entity.playSound(input);
     });
 
-    private final NotificationType<Component> message = NotificationType.create("message", Component.class, (entity, portal, input) -> {
-        entity.sendMessage(input);
+    private final NotificationType<String> message = NotificationType.create("message", String.class, (entity, portal, input) -> {
+        entity.sendRichMessage(input);
     });
 
     private final NotificationType<Title> title = NotificationType.create("title", Title.class, (entity, portal, input) -> {
         entity.showTitle(input);
     });
 
-    private final NotificationType<Component> actionBar = NotificationType.create("action_bar", Component.class, (entity, portal, input) -> {
-        entity.sendActionBar(input);
+    private final NotificationType<String> actionBar = NotificationType.create("actionbar", String.class, (entity, portal, input) -> {
+        entity.sendActionBar(MiniMessage.miniMessage().deserialize(input));
     });
 
     @Override
     public NotificationType<Sound> sound() {
-        return sound;
+        return playSound;
     }
 
     @Override
-    public NotificationType<Component> message() {
+    public NotificationType<String> message() {
         return message;
     }
 
@@ -39,7 +39,7 @@ final class SimpleNotificationTypes implements NotificationTypes {
     }
 
     @Override
-    public NotificationType<Component> actionBar() {
+    public NotificationType<String> actionbar() {
         return actionBar;
     }
 }

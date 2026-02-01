@@ -1,7 +1,6 @@
 package net.thenextlvl.portals.notification;
 
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.Contract;
 
@@ -38,7 +37,7 @@ public sealed interface NotificationTypes permits SimpleNotificationTypes {
      * @since 1.4.0
      */
     @Contract(pure = true)
-    NotificationType<Component> message();
+    NotificationType<String> message();
 
     /**
      * Gets the notification type for sending a title to an entity.
@@ -56,5 +55,5 @@ public sealed interface NotificationTypes permits SimpleNotificationTypes {
      * @since 1.4.0
      */
     @Contract(pure = true)
-    NotificationType<Component> actionBar();
+    NotificationType<String> actionbar();
 }

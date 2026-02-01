@@ -81,5 +81,5 @@ public sealed interface NotificationTriggerRegistry permits SimpleNotificationTr
      */
     @Unmodifiable
     @Contract(pure = true)
-    Set<NotificationTrigger> getNotificationTriggers();
+    Set<NotificationTrigger> getTriggers();
 }

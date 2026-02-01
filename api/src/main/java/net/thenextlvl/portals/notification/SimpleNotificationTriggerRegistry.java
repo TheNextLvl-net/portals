@@ -12,6 +12,8 @@ final class SimpleNotificationTriggerRegistry implements NotificationTriggerRegi
     private final Set<NotificationTrigger> triggers = new HashSet<>(Set.of(
             NotificationTrigger.teleportSuccess(),
             NotificationTrigger.teleportFailure(),
+            NotificationTrigger.warmupSuccess(),
+            NotificationTrigger.warmupFailure(),
             NotificationTrigger.entrySuccess(),
             NotificationTrigger.entryFailure(),
             NotificationTrigger.exit()
@@ -45,7 +47,7 @@ final class SimpleNotificationTriggerRegistry implements NotificationTriggerRegi
     }
 
     @Override
-    public @Unmodifiable Set<NotificationTrigger> getNotificationTriggers() {
+    public @Unmodifiable Set<NotificationTrigger> getTriggers() {
         return Set.copyOf(triggers);
     }
 }

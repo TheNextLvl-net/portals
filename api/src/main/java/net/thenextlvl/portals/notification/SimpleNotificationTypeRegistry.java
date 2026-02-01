@@ -13,7 +13,7 @@ final class SimpleNotificationTypeRegistry implements NotificationTypeRegistry {
             NotificationTypes.types().sound(),
             NotificationTypes.types().message(),
             NotificationTypes.types().title(),
-            NotificationTypes.types().actionBar()
+            NotificationTypes.types().actionbar()
     ));
     
     @Override
