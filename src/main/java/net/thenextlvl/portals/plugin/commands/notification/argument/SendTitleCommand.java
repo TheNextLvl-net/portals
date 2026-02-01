@@ -9,7 +9,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.Ticks;
-import net.thenextlvl.portals.notification.NotificationTypes;
+import net.thenextlvl.portals.notification.NotificationType;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.view.UnparsedTitle;
 import org.jspecify.annotations.NullMarked;
@@ -17,7 +17,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class SendTitleCommand extends PortalNotificationCommand<UnparsedTitle> {
     private SendTitleCommand(final PortalsPlugin plugin) {
-        super(plugin, NotificationTypes.types().title(), "title");
+        super(plugin, NotificationType.title(), "title");
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {

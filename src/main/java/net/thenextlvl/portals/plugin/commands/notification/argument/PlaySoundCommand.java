@@ -10,7 +10,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.RegistryArgumentExtractor;
 import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.sound.Sound;
-import net.thenextlvl.portals.notification.NotificationTypes;
+import net.thenextlvl.portals.notification.NotificationType;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.commands.arguments.EnumArgumentType;
 import org.jspecify.annotations.NullMarked;
@@ -18,7 +18,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class PlaySoundCommand extends PortalNotificationCommand<Sound> {
     private PlaySoundCommand(final PortalsPlugin plugin) {
-        super(plugin, NotificationTypes.types().sound(), "sound");
+        super(plugin, NotificationType.sound(), "sound");
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {

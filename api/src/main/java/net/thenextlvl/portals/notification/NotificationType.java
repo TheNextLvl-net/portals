@@ -1,7 +1,9 @@
 package net.thenextlvl.portals.notification;
 
 import net.kyori.adventure.key.KeyPattern;
+import net.kyori.adventure.sound.Sound;
 import net.thenextlvl.portals.Portal;
+import net.thenextlvl.portals.view.UnparsedTitle;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Contract;
 
@@ -12,6 +14,50 @@ import org.jetbrains.annotations.Contract;
  * @since 1.4.0
  */
 public sealed interface NotificationType<T> permits SimpleNotificationType {
+    /**
+     * Gets the notification type for sending a sound to an entity.
+     *
+     * @return the sound notification type
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationType<Sound> sound() {
+        return SimpleNotificationType.PLAY_SOUND;
+    }
+
+    /**
+     * Gets the notification type for sending a chat message to an entity.
+     *
+     * @return the message notification type
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationType<String> message() {
+        return SimpleNotificationType.MESSAGE;
+    }
+
+    /**
+     * Gets the notification type for sending a title to an entity.
+     *
+     * @return the title notification type
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationType<UnparsedTitle> title() {
+        return SimpleNotificationType.TITLE;
+    }
+
+    /**
+     * Gets the notification type for sending an action bar to an entity.
+     *
+     * @return the action bar notification type
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    static NotificationType<String> actionbar() {
+        return SimpleNotificationType.ACTIONBAR;
+    }
+    
     /**
      * Gets the type of the input for this notification.
      *

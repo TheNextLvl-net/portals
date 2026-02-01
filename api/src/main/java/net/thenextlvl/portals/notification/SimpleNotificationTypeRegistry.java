@@ -8,14 +8,14 @@ import java.util.Set;
 
 final class SimpleNotificationTypeRegistry implements NotificationTypeRegistry {
     public static final SimpleNotificationTypeRegistry INSTANCE = new SimpleNotificationTypeRegistry();
-    
+
     private final Set<NotificationType<?>> types = new HashSet<>(Set.of(
-            NotificationTypes.types().sound(),
-            NotificationTypes.types().message(),
-            NotificationTypes.types().title(),
-            NotificationTypes.types().actionbar()
+            NotificationType.sound(),
+            NotificationType.message(),
+            NotificationType.title(),
+            NotificationType.actionbar()
     ));
-    
+
     @Override
     public boolean register(final NotificationType<?> type) {
         return types.add(type);
