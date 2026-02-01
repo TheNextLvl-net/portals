@@ -158,89 +158,13 @@ public interface Portal extends PortalLike {
     boolean setEntryAction(@Nullable EntryAction<?> action);
 
     /**
-     * Gets the notification for a specific trigger and type.
+     * Gets the notifications of the portal.
      *
-     * @param trigger the trigger to get the notification for
-     * @param type    the notification type
-     * @return the notification or an empty optional if not found
+     * @return the notifications
      * @since 1.4.0
      */
     @Contract(pure = true)
-    <T> Optional<T> getNotification(NotificationTrigger trigger, NotificationType<T> type);
-
-    /**
-     * Gets all notification triggers configured for this portal.
-     *
-     * @return an unmodifiable set of all configured triggers
-     * @since 1.4.0
-     */
-    @Unmodifiable
-    @Contract(pure = true)
-    Set<NotificationTrigger> getNotificationTriggers();
-
-    /**
-     * Gets all notification types configured for this portal with the given trigger.
-     *
-     * @param trigger the trigger to get the notification types for
-     * @return an unmodifiable set of all configured notification types for the given trigger
-     * @since 1.4.0
-     */
-    @Unmodifiable
-    @Contract(pure = true)
-    Set<NotificationType<?>> getNotificationTypes(NotificationTrigger trigger);
-
-    /**
-     * Gets all notifications configured for a specific trigger.
-     *
-     * @param trigger the trigger to get the notifications for
-     * @return an unmodifiable map of all configured notifications for the given trigger
-     * @since 1.4.0
-     */
-    @Unmodifiable
-    @Contract(pure = true)
-    Map<NotificationType<?>, ?> getNotifications(NotificationTrigger trigger);
-
-    /**
-     * Sets a notification for a specific trigger and type.
-     *
-     * @param trigger the trigger to set the notification for
-     * @param type    the notification type
-     * @param input   the input for the notification
-     * @return {@code true} if anything was changed, {@code false} otherwise
-     * @since 1.4.0
-     */
-    @Contract(mutates = "this")
-    <T> boolean setNotification(NotificationTrigger trigger, NotificationType<T> type, T input);
-
-    /**
-     * Removes a notification for a specific trigger.
-     *
-     * @param trigger      the trigger to remove the notification from
-     * @param notification the notification type to remove
-     * @return {@code true} if the notification was removed, {@code false} otherwise
-     * @since 1.4.0
-     */
-    @Contract(mutates = "this")
-    boolean removeNotification(NotificationTrigger trigger, NotificationType<?> notification);
-
-    /**
-     * Clears all notifications for a specific trigger.
-     *
-     * @param trigger the trigger to clear notifications for
-     * @return {@code true} if any notifications were removed, {@code false} otherwise
-     * @since 1.4.0
-     */
-    @Contract(mutates = "this")
-    boolean clearNotifications(NotificationTrigger trigger);
-
-    /**
-     * Triggers all notifications for the given trigger.
-     *
-     * @param trigger the trigger to trigger notifications for
-     * @param entity  the entity to send the notifications to
-     * @since 1.4.0
-     */
-    void triggerNotification(NotificationTrigger trigger, Entity entity);
+    Notifications getNotifications();
 
     /**
      * Gets the data file of the portal.
