@@ -3,7 +3,6 @@ package net.thenextlvl.portals.plugin.listeners;
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import io.papermc.paper.util.Tick;
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.event.EntityPortalEnterEvent;
 import net.thenextlvl.portals.event.EntityPortalExitEvent;
@@ -12,6 +11,7 @@ import net.thenextlvl.portals.event.EntityPortalWarmupEvent;
 import net.thenextlvl.portals.event.PreEntityPortalEnterEvent;
 import net.thenextlvl.portals.notification.NotificationTrigger;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
+import net.thenextlvl.portals.plugin.portal.PaperPortal;
 import net.thenextlvl.portals.plugin.utils.Debugger;
 import net.thenextlvl.portals.plugin.utils.Debugger.Transaction;
 import org.bukkit.Location;
@@ -22,6 +22,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.util.BoundingBox;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -33,9 +34,7 @@ import java.util.UUID;
 
 @NullMarked
 public final class PortalListener implements Listener {
-    private static final Map<Portal, Map<UUID, Instant>> lastEntry = new HashMap<>();
     private static final Map<UUID, Portal> lastPortal = new HashMap<>();
-    private static final Map<UUID, Warmup> warmups = new HashMap<>();
 
     private final PortalsPlugin plugin;
 
@@ -78,58 +77,57 @@ public final class PortalListener implements Listener {
         final var boundingBox = translate(entity.getBoundingBox(), to);
         return plugin.portalProvider().getPortals(entity.getWorld())
                 .filter(portal -> portal.getBoundingBox().overlaps(boundingBox))
-                .findAny().map(portal -> {
+                .findAny().map(portal -> (PaperPortal) portal).map(portal -> {
                     if (portal.equals(lastPortal.get(entity.getUniqueId()))) return true;
                     final var transaction = plugin.debugger.newTransaction();
                     transaction.log("'%s' entered the portal '%s'", entity.getName(), portal.getName());
 
                     if (!new PreEntityPortalEnterEvent(portal, entity).callEvent()) {
-                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
+                        portal.getNotifications().trigger(NotificationTrigger.entryFailure(), entity);
                         transaction.log("PreEntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
                         return false;
                     }
 
                     if (!portal.getEntryPermission().map(entity::hasPermission).orElse(true)) {
-                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
+                        portal.getNotifications().trigger(NotificationTrigger.entryFailure(), entity);
                         transaction.log("EntryPermission was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryPermission().orElse(null));
                         return false;
                     }
-                    if (portal.getCooldown().isPositive() && hasCooldown(portal, entity)) {
-                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
-                        transaction.log("Cooldown was not met for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), Debugger.durationToString(getRemainingCooldown(portal, entity)));
+                    if (portal.getCooldown().isPositive() && portal.getRemainingCooldown(entity).isPositive()) {
+                        portal.getNotifications().trigger(NotificationTrigger.entryFailure(), entity);
+                        transaction.log("Cooldown was not met for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), Debugger.durationToString(portal.getRemainingCooldown(entity)));
                         return false;
                     }
                     if (portal.getEntryCost() > 0 && !withdrawEntryCost(portal, entity)) {
-                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
+                        portal.getNotifications().trigger(NotificationTrigger.entryFailure(), entity);
                         transaction.log("EntryCost was not met for '%s' in '%s' (%s)", entity.getName(), portal.getName(), portal.getEntryCost());
                         return false;
                     }
 
                     if (!new EntityPortalEnterEvent(portal, entity).callEvent()) {
-                        portal.triggerNotification(NotificationTrigger.entryFailure(), entity);
+                        portal.getNotifications().trigger(NotificationTrigger.entryFailure(), entity);
                         transaction.log("EntityPortalEnterEvent was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
                         return false;
                     }
 
-                    if (portal.getCooldown().isPositive()) setLastEntry(portal, entity);
+                    if (portal.getCooldown().isPositive()) portal.startCooldown(entity);
                     setLastPortal(entity, portal);
 
-                    portal.triggerNotification(NotificationTrigger.entrySuccess(), entity);
-
                     resetWarmupIfPresent(entity);
-                    if (portal.getWarmup().isPositive()) {
-                        startWarmup(entity, portal, transaction);
-                        return true;
-                    }
+                    final var warmingUp = startWarmup(entity, portal, transaction);
+
+                    portal.getNotifications().trigger(NotificationTrigger.entrySuccess(), entity);
+
+                    if (warmingUp) return true;
 
                     return portal.getEntryAction().map(action -> {
                         if (action.onEntry(entity, portal)) {
                             transaction.log("EntryAction was successful for '%s' in '%s'", entity.getName(), portal.getName());
-                            portal.triggerNotification(NotificationTrigger.teleportSuccess(), entity);
+                            portal.getNotifications().trigger(NotificationTrigger.teleportSuccess(), entity);
                             return true;
                         }
                         transaction.log("EntryAction was cancelled for '%s' in '%s'", entity.getName(), portal.getName());
-                        portal.triggerNotification(NotificationTrigger.teleportFailure(), entity);
+                        portal.getNotifications().trigger(NotificationTrigger.teleportFailure(), entity);
                         return false;
                     }).orElseGet(() -> {
                         transaction.log("No EntryAction for '%s' in '%s'", entity.getName(), portal.getName());
@@ -139,54 +137,52 @@ public final class PortalListener implements Listener {
                     resetWarmupIfPresent(entity);
                     final var portal = lastPortal.remove(entity.getUniqueId());
                     if (portal != null) {
-                        portal.triggerNotification(NotificationTrigger.exit(), entity);
+                        portal.getNotifications().trigger(NotificationTrigger.exit(), entity);
                         new EntityPortalExitEvent(portal, entity).callEvent();
                     }
                     return true;
                 });
     }
 
-    private void startWarmup(final Entity entity, final Portal portal, final Transaction transaction) {
+    private boolean startWarmup(final Entity entity, final PaperPortal portal, final Transaction transaction) {
+        if (!portal.getWarmup().isPositive()) return false;
+
         final var scheduledTask = scheduleWarmupCheck(entity, portal, portal.getWarmup(), transaction);
-        if (scheduledTask == null) return;
+        if (scheduledTask == null) return false;
 
         final var finished = Instant.now().plus(portal.getWarmup());
-        warmups.put(entity.getUniqueId(), new Warmup(portal, finished, scheduledTask, transaction));
-
-        final var seconds = portal.getWarmup().toMillis() / 1000d;
-        plugin.bundle().sendMessage(entity, "portal.warmup.start",
-                Formatter.number("warmup", seconds),
-                Formatter.booleanChoice("plural", seconds != 1));
+        PaperPortal.WARMUPS.put(entity.getUniqueId(), new PaperPortal.Warmup(portal, finished, scheduledTask, transaction));
 
         new EntityPortalWarmupEvent(portal, entity).callEvent();
+        return true;
     }
 
-    private @Nullable ScheduledTask scheduleWarmupCheck(final Entity entity, final Portal portal, final Duration delay, final Transaction transaction) {
+    private @Nullable ScheduledTask scheduleWarmupCheck(final Entity entity, final PaperPortal portal, final Duration delay, final Transaction transaction) {
         transaction.log("Starting warmup for '%s' in '%s' (%s left)", entity.getName(), portal.getName(), Debugger.durationToString(delay));
 
         return entity.getScheduler().runDelayed(plugin, task -> {
-            warmups.remove(entity.getUniqueId());
-            portal.triggerNotification(NotificationTrigger.warmupSuccess(), entity);
+            portal.getNotifications().trigger(NotificationTrigger.warmupSuccess(), entity);
+            PaperPortal.WARMUPS.remove(entity.getUniqueId());
 
             portal.getEntryAction().ifPresentOrElse(action -> {
                 if (action.onEntry(entity, portal)) {
                     transaction.log("EntryAction was successful for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
-                    portal.triggerNotification(NotificationTrigger.teleportSuccess(), entity);
+                    portal.getNotifications().trigger(NotificationTrigger.teleportSuccess(), entity);
                 } else {
                     transaction.log("EntryAction was cancelled for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
-                    portal.triggerNotification(NotificationTrigger.teleportFailure(), entity);
+                    portal.getNotifications().trigger(NotificationTrigger.teleportFailure(), entity);
                 }
             }, () -> {
                 transaction.log("No EntryAction for '%s' in '%s' (after warmup)", entity.getName(), portal.getName());
             });
         }, () -> {
             transaction.log("Cancelled warmup for '%s' in '%s' (retired)", entity.getName(), portal.getName());
-            warmups.remove(entity.getUniqueId());
+            PaperPortal.WARMUPS.remove(entity.getUniqueId());
         }, Math.max(1, Tick.tick().fromDuration(delay)));
     }
 
     private void resetWarmupIfPresent(final Entity entity) {
-        final var warmup = warmups.remove(entity.getUniqueId());
+        final var warmup = PaperPortal.WARMUPS.get(entity.getUniqueId());
         if (warmup == null) return;
 
         warmup.task().cancel();
@@ -196,7 +192,9 @@ public final class PortalListener implements Listener {
 
         warmup.transaction().log("Cancelled warmup for '%s' in '%s' (%s left)",
                 entity.getName(), warmup.portal().getName(), Debugger.durationToString(remaining));
-        warmup.portal().triggerNotification(NotificationTrigger.warmupFailure(), entity);
+        warmup.portal().getNotifications().trigger(NotificationTrigger.warmupFailure(), entity);
+
+        PaperPortal.WARMUPS.remove(entity.getUniqueId());
     }
 
     private void pushAway(final Entity entity, final Location to) {
@@ -217,33 +215,13 @@ public final class PortalListener implements Listener {
         lastPortal.put(entity.getUniqueId(), portal);
     }
 
-    private static org.bukkit.util.BoundingBox translate(final org.bukkit.util.BoundingBox boundingBox, final Location location) {
+    private static BoundingBox translate(final BoundingBox boundingBox, final Location location) {
         final var widthX = boundingBox.getWidthX() / 2;
         final var widthZ = boundingBox.getWidthZ() / 2;
 
-        return new org.bukkit.util.BoundingBox(
+        return new BoundingBox(
                 location.getX() - widthX, location.getY(), location.getZ() - widthZ,
                 location.getX() + widthX, location.getY() + boundingBox.getHeight(), location.getZ() + widthZ
         );
-    }
-
-    private static boolean hasCooldown(final Portal portal, final Entity entity) {
-        return getRemainingCooldown(portal, entity).isPositive();
-    }
-
-    private static Duration getRemainingCooldown(final Portal portal, final Entity entity) {
-        final var entries = lastEntry.get(portal);
-        if (entries == null) return Duration.ZERO;
-        final var lastEntry = entries.get(entity.getUniqueId());
-        if (lastEntry == null) return Duration.ZERO;
-        return Duration.between(Instant.now(), lastEntry.plus(portal.getCooldown()));
-    }
-
-    private static void setLastEntry(final Portal portal, final Entity entity) {
-        lastEntry.computeIfAbsent(portal, ignored -> new HashMap<>())
-                .put(entity.getUniqueId(), Instant.now());
-    }
-
-    private record Warmup(Portal portal, Instant finished, ScheduledTask task, Transaction transaction) {
     }
 }

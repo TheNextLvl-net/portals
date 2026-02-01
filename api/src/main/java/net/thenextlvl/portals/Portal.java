@@ -1,21 +1,19 @@
 package net.thenextlvl.portals;
 
+import net.kyori.adventure.audience.Audience;
 import net.thenextlvl.portals.action.EntryAction;
-import net.thenextlvl.portals.notification.NotificationTrigger;
-import net.thenextlvl.portals.notification.NotificationType;
+import net.thenextlvl.portals.notification.Notifications;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Represents a portal.
@@ -96,6 +94,16 @@ public interface Portal extends PortalLike {
     boolean setCooldown(Duration cooldown) throws IllegalArgumentException;
 
     /**
+     * Gets the remaining cooldown of the portal for the given entity.
+     *
+     * @param entity the entity to check the cooldown for
+     * @return the remaining cooldown
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    Duration getRemainingCooldown(Entity entity);
+
+    /**
      * Gets the warmup time of the portal.
      *
      * @return the warmup time
@@ -119,6 +127,16 @@ public interface Portal extends PortalLike {
     boolean setWarmup(Duration warmup) throws IllegalArgumentException;
 
     /**
+     * Gets the remaining warmup time of the portal for the given entity.
+     *
+     * @param entity the entity to check the warmup for
+     * @return the remaining warmup time
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    Duration getRemainingWarmup(Entity entity);
+
+    /**
      * Gets the entry cost of the portal.
      *
      * @return the entry cost
@@ -137,6 +155,26 @@ public interface Portal extends PortalLike {
      */
     @Contract(mutates = "this")
     boolean setEntryCost(double cost) throws IllegalArgumentException;
+
+    /**
+     * Gets the formatted entry cost of the portal for the given audience.
+     *
+     * @param audience the audience to format the entry cost for
+     * @return the formatted entry cost
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    String getFormattedEntryCost(Audience audience);
+
+    /**
+     * Gets the formatted entry cost of the portal for the given locale.
+     *
+     * @param locale the locale to format the entry cost for
+     * @return the formatted entry cost
+     * @since 1.4.0
+     */
+    @Contract(pure = true)
+    String getFormattedEntryCost(Locale locale);
 
     /**
      * Gets the entry action of the portal.
