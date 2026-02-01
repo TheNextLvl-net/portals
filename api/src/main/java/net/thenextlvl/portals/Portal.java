@@ -1,15 +1,20 @@
 package net.thenextlvl.portals;
 
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.notification.Notification;
+import net.thenextlvl.portals.notification.NotificationTrigger;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Represents a portal.
@@ -150,6 +155,59 @@ public interface Portal extends PortalLike {
      */
     @Contract(mutates = "this")
     boolean setEntryAction(@Nullable EntryAction<?> action);
+
+    /**
+     * Gets all notifications for a specific trigger.
+     *
+     * @param trigger the trigger to get notifications for
+     * @return an unmodifiable list of notifications for the trigger
+     * @since 1.4.0
+     */
+    @Unmodifiable
+    @Contract(pure = true)
+    List<Notification<?>> getNotifications(NotificationTrigger trigger);
+
+    /**
+     * Gets all notification triggers configured for this portal.
+     *
+     * @return an unmodifiable set of all configured triggers
+     * @since 1.4.0
+     */
+    @Unmodifiable
+    @Contract(pure = true)
+    Set<NotificationTrigger> getNotificationTriggers();
+
+    /**
+     * Adds a notification for a specific trigger.
+     *
+     * @param trigger      the trigger to add the notification for
+     * @param notification the notification to add
+     * @return {@code true} if the notification was added, {@code false} otherwise
+     * @since 1.4.0
+     */
+    @Contract(mutates = "this")
+    boolean addNotification(NotificationTrigger trigger, Notification<?> notification);
+
+    /**
+     * Removes a notification for a specific trigger.
+     *
+     * @param trigger      the trigger to remove the notification from
+     * @param notification the notification to remove
+     * @return {@code true} if the notification was removed, {@code false} otherwise
+     * @since 1.4.0
+     */
+    @Contract(mutates = "this")
+    boolean removeNotification(NotificationTrigger trigger, Notification<?> notification);
+
+    /**
+     * Clears all notifications for a specific trigger.
+     *
+     * @param trigger the trigger to clear notifications for
+     * @return {@code true} if any notifications were removed, {@code false} otherwise
+     * @since 1.4.0
+     */
+    @Contract(mutates = "this")
+    boolean clearNotifications(NotificationTrigger trigger);
 
     /**
      * Gets the data file of the portal.
