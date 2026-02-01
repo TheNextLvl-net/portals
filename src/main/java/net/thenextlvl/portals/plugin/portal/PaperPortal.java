@@ -339,9 +339,8 @@ public final class PaperPortal implements Portal {
 
         @Override
         public <T> boolean set(final NotificationTrigger trigger, final NotificationType<T> type, final T input) {
-            // todo: return false if already set
-            //  allow overriding if different input
-            notifications.removeIf(notification -> notification.trigger().equals(trigger) && notification.type().equals(type));
+            if (get(trigger, type).filter(t -> t.equals(input)).isPresent()) return false;
+            remove(trigger, type);
             notifications.add(new SimpleNotification<>(trigger, type, input));
             return true;
         }
