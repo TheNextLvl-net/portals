@@ -4,9 +4,12 @@ import com.google.common.base.Preconditions;
 import net.thenextlvl.nbt.NBTOutputStream;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.notification.Notification;
+import net.thenextlvl.portals.notification.NotificationTrigger;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -14,8 +17,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
@@ -24,6 +32,8 @@ import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
 public final class PaperPortal implements Portal {
     private final PortalsPlugin plugin;
     private final String name;
+
+    private final Map<NotificationTrigger, List<Notification<?>>> notifications = new ConcurrentHashMap<>();
 
     private BoundingBox boundingBox;
     private Duration cooldown = Duration.ZERO;
@@ -159,6 +169,42 @@ public final class PaperPortal implements Portal {
         if (Objects.equals(this.entryAction, action)) return false;
         this.entryAction = action;
         return true;
+    }
+
+    @Override
+    public List<Notification<?>> getNotifications(final NotificationTrigger trigger) {
+        final var notifications = this.notifications.get(trigger);
+        return notifications != null ? List.copyOf(notifications) : List.of();
+    }
+
+    @Override
+    public Set<NotificationTrigger> getNotificationTriggers() {
+        return Set.copyOf(notifications.keySet());
+    }
+
+    @Override
+    public boolean addNotification(final NotificationTrigger trigger, final Notification<?> notification) {
+        return notifications.computeIfAbsent(trigger, k -> new CopyOnWriteArrayList<>()).add(notification);
+    }
+
+    @Override
+    public boolean removeNotification(final NotificationTrigger trigger, final Notification<?> notification) {
+        return notifications.computeIfPresent(trigger, (ignored, notifications) -> {
+            notifications.remove(notification);
+            return notifications.isEmpty() ? null : notifications;
+        }) != null;
+    }
+
+    @Override
+    public boolean clearNotifications(final NotificationTrigger trigger) {
+        return notifications.remove(trigger) != null;
+    }
+
+    @Override
+    public void triggerNotification(final NotificationTrigger trigger, final Entity entity) {
+        final var notifications = this.notifications.get(trigger);
+        if (notifications == null) return;
+        notifications.forEach(notification -> notification.send(entity, this));
     }
 
     @Override
