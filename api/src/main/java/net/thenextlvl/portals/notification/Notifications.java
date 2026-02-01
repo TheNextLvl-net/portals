@@ -43,9 +43,9 @@ public interface Notifications extends Iterable<Notification<?>> {
     int size();
 
     /**
-     * Triggers all notifications for the given trigger.
+     * Sends all notifications for the given trigger to the specified entity.
      *
-     * @param trigger the trigger to trigger notifications for
+     * @param trigger the notification trigger
      * @param entity  the entity to send the notifications to
      * @since 1.4.0
      */
