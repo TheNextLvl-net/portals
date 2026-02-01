@@ -4,7 +4,6 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -40,7 +39,7 @@ public final class PlaySoundCommand extends PortalNotificationCommand<Sound> {
     }
 
     @Override
-    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public int run(final CommandContext<CommandSourceStack> context) {
         final var source = tryGetArgument(context, "source", Sound.Source.class).orElse(Sound.Source.MASTER);
         final var volume = tryGetArgument(context, "volume", float.class).orElse(1f);
         final var pitch = tryGetArgument(context, "pitch", float.class).orElse(1f);

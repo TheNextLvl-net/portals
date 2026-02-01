@@ -4,7 +4,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -37,7 +36,7 @@ public final class SendTitleCommand extends PortalNotificationCommand<UnparsedTi
     }
 
     @Override
-    public int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public int run(final CommandContext<CommandSourceStack> context) {
         final var title = context.getArgument("title", String.class);
         final var subtitle = tryGetArgument(context, "subtitle", String.class).orElse("");
         final var fadeIn = tryGetArgument(context, "fade-in", int.class).map(Ticks::duration).orElse(null);
