@@ -1,12 +1,27 @@
 package net.thenextlvl.portals.plugin.portal;
 
 import com.google.common.base.Preconditions;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import net.kyori.adventure.audience.Audience;
 import net.thenextlvl.nbt.NBTOutputStream;
+import net.thenextlvl.nbt.serialization.ParserException;
+import net.thenextlvl.nbt.serialization.TagDeserializationContext;
+import net.thenextlvl.nbt.serialization.TagSerializationContext;
+import net.thenextlvl.nbt.tag.CompoundTag;
+import net.thenextlvl.nbt.tag.ListTag;
+import net.thenextlvl.nbt.tag.Tag;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.notification.Notification;
+import net.thenextlvl.portals.notification.NotificationTrigger;
+import net.thenextlvl.portals.notification.NotificationType;
+import net.thenextlvl.portals.notification.Notifications;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
+import net.thenextlvl.portals.plugin.model.SimpleNotification;
+import net.thenextlvl.portals.plugin.utils.Debugger;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -14,14 +29,28 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
 
 @NullMarked
 public final class PaperPortal implements Portal {
+    public static final Map<UUID, Warmup> WARMUPS = new HashMap<>();
+
+    private final SimpleNotifications notifications = new SimpleNotifications();
+    private final Map<UUID, Instant> cooldowns = new HashMap<>();
+
     private final PortalsPlugin plugin;
     private final String name;
 
@@ -124,6 +153,17 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
+    public Duration getRemainingCooldown(final Entity entity) {
+        final var finished = this.cooldowns.get(entity.getUniqueId());
+        if (finished == null) return Duration.ZERO;
+        return Duration.between(Instant.now(), finished);
+    }
+
+    public void startCooldown(final Entity entity) {
+        cooldowns.put(entity.getUniqueId(), Instant.now().plus(cooldown));
+    }
+
+    @Override
     public Duration getWarmup() {
         return warmup;
     }
@@ -134,6 +174,14 @@ public final class PaperPortal implements Portal {
         if (this.warmup.equals(warmup)) return false;
         this.warmup = warmup;
         return true;
+    }
+
+    @Override
+    public Duration getRemainingWarmup(final Entity entity) {
+        final var warmup = WARMUPS.get(entity.getUniqueId());
+        if (warmup == null) return Duration.ZERO;
+        if (!warmup.portal.equals(this)) return Duration.ZERO;
+        return Duration.between(Instant.now(), warmup.finished());
     }
 
     @Override
@@ -150,6 +198,16 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
+    public String getFormattedEntryCost(final Audience audience) {
+        return plugin.economyProvider().format(audience, entryCost);
+    }
+
+    @Override
+    public String getFormattedEntryCost(final Locale locale) {
+        return plugin.economyProvider().format(locale, entryCost);
+    }
+
+    @Override
     public Optional<EntryAction<?>> getEntryAction() {
         return Optional.ofNullable(entryAction);
     }
@@ -159,6 +217,11 @@ public final class PaperPortal implements Portal {
         if (Objects.equals(this.entryAction, action)) return false;
         this.entryAction = action;
         return true;
+    }
+
+    @Override
+    public SimpleNotifications getNotifications() {
+        return notifications;
     }
 
     @Override
@@ -232,5 +295,84 @@ public final class PaperPortal implements Portal {
     @Override
     public int hashCode() {
         return Objects.hashCode(name);
+    }
+
+    public record Warmup(Portal portal, Instant finished, ScheduledTask task, Debugger.Transaction transaction) {
+    }
+
+    public class SimpleNotifications implements Notifications {
+        private final List<Notification<?>> notifications = new CopyOnWriteArrayList<>();
+
+        @Override
+        public Stream<Notification<?>> stream() {
+            return notifications.stream();
+        }
+
+        @Override
+        public Stream<Notification<?>> findByTrigger(final NotificationTrigger trigger) {
+            return stream().filter(notification -> notification.trigger().equals(trigger));
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return notifications.isEmpty();
+        }
+
+        @Override
+        public int size() {
+            return notifications.size();
+        }
+
+        @Override
+        public void trigger(final NotificationTrigger trigger, final Entity entity) {
+            findByTrigger(trigger).forEach(notification -> notification.send(entity, PaperPortal.this));
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> Optional<T> get(final NotificationTrigger trigger, final NotificationType<T> type) {
+            return (Optional<T>) findByTrigger(trigger)
+                    .filter(notification -> notification.type().equals(type))
+                    .map(Notification::input)
+                    .findAny();
+        }
+
+        @Override
+        public <T> boolean set(final NotificationTrigger trigger, final NotificationType<T> type, final T input) {
+            if (get(trigger, type).filter(t -> t.equals(input)).isPresent()) return false;
+            remove(trigger, type);
+            notifications.add(new SimpleNotification<>(trigger, type, input));
+            return true;
+        }
+
+        @Override
+        public boolean remove(final NotificationTrigger trigger, final NotificationType<?> type) {
+            return notifications.removeIf(n -> n.trigger().equals(trigger) && n.type().equals(type));
+        }
+
+        @Override
+        public Iterator<Notification<?>> iterator() {
+            return notifications.iterator();
+        }
+
+        public Tag serialize(final TagSerializationContext context) throws ParserException {
+            return ListTag.of(CompoundTag.ID, stream().map(notification -> {
+                return CompoundTag.builder()
+                        .put("trigger", context.serialize(notification.trigger()))
+                        .put("type", context.serialize(notification.type()))
+                        .put("input", context.serialize(notification.input()))
+                        .build();
+            }).toList());
+        }
+
+        @SuppressWarnings("unchecked")
+        public void deserialize(final ListTag<CompoundTag> list, final TagDeserializationContext context) throws ParserException {
+            list.forEach(compound -> {
+                final var trigger = context.deserialize(compound.get("trigger"), NotificationTrigger.class);
+                final var type = (NotificationType<Object>) context.deserialize(compound.get("type"), NotificationType.class);
+                final var input = context.deserialize(compound.get("input"), type.getType());
+                set(trigger, type, input);
+            });
+        }
     }
 }

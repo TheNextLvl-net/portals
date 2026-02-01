@@ -10,6 +10,7 @@ import net.thenextlvl.portals.plugin.commands.action.PortalActionCommand;
 import net.thenextlvl.portals.plugin.commands.arguments.PortalArgumentType;
 import net.thenextlvl.portals.plugin.commands.brigadier.BrigadierCommand;
 import net.thenextlvl.portals.plugin.commands.debug.PortalDebugCommand;
+import net.thenextlvl.portals.plugin.commands.notification.PortalNotificationCommand;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -28,6 +29,7 @@ public final class PortalCommand extends BrigadierCommand {
                 .then(PortalDebugCommand.create(plugin))
                 .then(PortalDeleteCommand.create(plugin))
                 .then(PortalListCommand.create(plugin))
+                .then(PortalNotificationCommand.create(plugin))
                 .then(PortalPermissionCommand.create(plugin))
                 .then(PortalRedefineCommand.create(plugin))
                 .then(PortalTeleportCommand.create(plugin))
