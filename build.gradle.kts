@@ -91,8 +91,14 @@ paper {
         register("portals.command.debug.verbose") { children = listOf("portals.command.debug") }
         register("portals.command.delete") { children = listOf("portals.command.portal") }
         register("portals.command.list") { children = listOf("portals.command.portal") }
+        register("portals.command.notification") { children = listOf("portals.command.portal") }
+        register("portals.command.notification.list") { children = listOf("portals.command.notification") }
+        register("portals.command.notification.remove") { children = listOf("portals.command.notification") }
+        register("portals.command.notification.set") { children = listOf("portals.command.notification") }
         register("portals.command.permission") { children = listOf("portals.command.portal") }
+        register("portals.command.redefine") { children = listOf("portals.command.portal") }
         register("portals.command.teleport") { children = listOf("portals.command.portal") }
+        register("portals.command.warmup") { children = listOf("portals.command.portal") }
 
         register("portals.debug") {
             description = "Grants the permission to view debugs"
