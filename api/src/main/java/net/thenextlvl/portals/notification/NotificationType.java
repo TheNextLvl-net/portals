@@ -57,7 +57,7 @@ public sealed interface NotificationType<T> permits SimpleNotificationType {
     static NotificationType<String> actionbar() {
         return SimpleNotificationType.ACTIONBAR;
     }
-    
+
     /**
      * Gets the type of the input for this notification.
      *
