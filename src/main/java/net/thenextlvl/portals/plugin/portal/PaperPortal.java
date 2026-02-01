@@ -4,12 +4,13 @@ import com.google.common.base.Preconditions;
 import net.thenextlvl.nbt.NBTOutputStream;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.action.EntryAction;
-import net.thenextlvl.portals.notification.Notification;
 import net.thenextlvl.portals.notification.NotificationTrigger;
+import net.thenextlvl.portals.notification.NotificationType;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.shape.BoundingBox;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Unmodifiable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -17,13 +18,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
@@ -33,7 +32,7 @@ public final class PaperPortal implements Portal {
     private final PortalsPlugin plugin;
     private final String name;
 
-    private final Map<NotificationTrigger, List<Notification<?>>> notifications = new ConcurrentHashMap<>();
+    private final Map<NotificationTrigger, Map<NotificationType<Object>, Object>> notifications = new ConcurrentHashMap<>();
 
     private BoundingBox boundingBox;
     private Duration cooldown = Duration.ZERO;
@@ -172,27 +171,47 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public List<Notification<?>> getNotifications(final NotificationTrigger trigger) {
+    @SuppressWarnings("unchecked")
+    public <T> Optional<T> getNotification(final NotificationTrigger trigger, final NotificationType<T> type) {
         final var notifications = this.notifications.get(trigger);
-        return notifications != null ? List.copyOf(notifications) : List.of();
+        return notifications != null ? Optional.ofNullable((T) notifications.get(type)) : Optional.empty();
     }
 
     @Override
-    public Set<NotificationTrigger> getNotificationTriggers() {
+    public @Unmodifiable Set<NotificationTrigger> getNotificationTriggers() {
         return Set.copyOf(notifications.keySet());
     }
 
     @Override
-    public boolean addNotification(final NotificationTrigger trigger, final Notification<?> notification) {
-        return notifications.computeIfAbsent(trigger, k -> new CopyOnWriteArrayList<>()).add(notification);
+    public @Unmodifiable Set<NotificationType<?>> getNotificationTypes(final NotificationTrigger trigger) {
+        final var notifications = this.notifications.get(trigger);
+        if (notifications == null) return Set.of();
+        return Set.copyOf(notifications.keySet());
     }
 
     @Override
-    public boolean removeNotification(final NotificationTrigger trigger, final Notification<?> notification) {
-        return notifications.computeIfPresent(trigger, (ignored, notifications) -> {
-            notifications.remove(notification);
-            return notifications.isEmpty() ? null : notifications;
-        }) != null;
+    public @Unmodifiable Map<NotificationType<?>, ?> getNotifications(final NotificationTrigger trigger) {
+        final var notifications = this.notifications.get(trigger);
+        return notifications != null ? Map.copyOf(notifications) : Map.of();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> boolean setNotification(final NotificationTrigger trigger, final NotificationType<T> type, final T input) {
+        final var put = notifications.computeIfAbsent(trigger, k -> new ConcurrentHashMap<>())
+                .put((NotificationType<Object>) type, input);
+        return put == null || !put.equals(input);
+    }
+
+    @Override
+    public boolean removeNotification(final NotificationTrigger trigger, final NotificationType<?> notification) {
+        final var notifications = this.notifications.get(trigger);
+        if (notifications == null) return false;
+
+        final var removed = notifications.remove(notification) != null;
+        if (notifications.isEmpty()) this.notifications.remove(trigger);
+
+        return removed;
     }
 
     @Override
@@ -204,7 +223,7 @@ public final class PaperPortal implements Portal {
     public void triggerNotification(final NotificationTrigger trigger, final Entity entity) {
         final var notifications = this.notifications.get(trigger);
         if (notifications == null) return;
-        notifications.forEach(notification -> notification.send(entity, this));
+        notifications.forEach((type, input) -> type.getSender().send(entity, this, input));
     }
 
     @Override

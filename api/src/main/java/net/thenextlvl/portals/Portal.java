@@ -188,7 +188,14 @@ public interface Portal extends PortalLike {
     @Unmodifiable
     @Contract(pure = true)
     Set<NotificationType<?>> getNotificationTypes(NotificationTrigger trigger);
-    
+
+    /**
+     * Gets all notifications configured for a specific trigger.
+     *
+     * @param trigger the trigger to get the notifications for
+     * @return an unmodifiable map of all configured notifications for the given trigger
+     * @since 1.4.0
+     */
     @Unmodifiable
     @Contract(pure = true)
     Map<NotificationType<?>, ?> getNotifications(NotificationTrigger trigger);
