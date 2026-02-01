@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class SendActionbarCommand extends PortalStringNotificationCommand {
     private SendActionbarCommand(final PortalsPlugin plugin) {
-        super(plugin, NotificationType.actionbar(), "actionbar", "message");
+        super(plugin, NotificationType.actionbar(), "message");
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {

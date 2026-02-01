@@ -15,8 +15,8 @@ import org.jspecify.annotations.NullMarked;
 abstract class PortalNotificationCommand<T> extends SimpleCommand {
     private final NotificationType<T> notificationType;
 
-    protected PortalNotificationCommand(final PortalsPlugin plugin, final NotificationType<T> notificationType, final String name) {
-        super(plugin, name, null);
+    protected PortalNotificationCommand(final PortalsPlugin plugin, final NotificationType<T> notificationType) {
+        super(plugin, notificationType.getName(), null);
         this.notificationType = notificationType;
     }
 

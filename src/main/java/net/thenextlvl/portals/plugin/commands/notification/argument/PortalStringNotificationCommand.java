@@ -13,8 +13,8 @@ import org.jspecify.annotations.NullMarked;
 abstract class PortalStringNotificationCommand extends PortalNotificationCommand<String> {
     private final String argument;
 
-    protected PortalStringNotificationCommand(final PortalsPlugin plugin, final NotificationType<String> actionType, final String name, final String argument) {
-        super(plugin, actionType, name);
+    protected PortalStringNotificationCommand(final PortalsPlugin plugin, final NotificationType<String> actionType, final String argument) {
+        super(plugin, actionType);
         this.argument = argument;
     }
 

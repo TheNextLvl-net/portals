@@ -18,7 +18,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class PlaySoundCommand extends PortalNotificationCommand<Sound> {
     private PlaySoundCommand(final PortalsPlugin plugin) {
-        super(plugin, NotificationType.sound(), "sound");
+        super(plugin, NotificationType.sound());
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {

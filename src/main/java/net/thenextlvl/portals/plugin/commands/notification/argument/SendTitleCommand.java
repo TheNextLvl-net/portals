@@ -17,7 +17,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class SendTitleCommand extends PortalNotificationCommand<UnparsedTitle> {
     private SendTitleCommand(final PortalsPlugin plugin) {
-        super(plugin, NotificationType.title(), "title");
+        super(plugin, NotificationType.title());
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(final PortalsPlugin plugin) {
