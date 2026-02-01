@@ -371,7 +371,7 @@ public final class PaperPortal implements Portal {
                 final var trigger = context.deserialize(compound.get("trigger"), NotificationTrigger.class);
                 final var type = (NotificationType<Object>) context.deserialize(compound.get("type"), NotificationType.class);
                 final var input = context.deserialize(compound.get("input"), type.getType());
-                notifications.add(new SimpleNotification<>(trigger, type, input));
+                set(trigger, type, input);
             });
         }
     }
