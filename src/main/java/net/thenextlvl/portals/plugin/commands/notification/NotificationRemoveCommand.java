@@ -1,7 +1,6 @@
 package net.thenextlvl.portals.plugin.commands.notification;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -30,14 +29,11 @@ final class NotificationRemoveCommand extends SimpleCommand {
         final var command = new NotificationRemoveCommand(plugin);
         final var trigger = Commands.argument("trigger", new NotificationTriggerArgumentType())
                 .suggests(new PortalNotificationTriggerSuggestionProvider());
+        final var notification = Commands.argument("notification", StringArgumentType.word())
+                .suggests(new PortalNotificationSuggestionProvider());
         return command.create().then(portalArgument(plugin)
                 .suggests(new PortalWithNotificationSuggestionProvider<>())
-                .then(trigger.then(notificationArgument(plugin).executes(command))));
-    }
-
-    static ArgumentBuilder<CommandSourceStack, ?> notificationArgument(final PortalsPlugin plugin) {
-        return Commands.argument("notification", StringArgumentType.word())
-                .suggests(new PortalNotificationSuggestionProvider());
+                .then(trigger.then(notification.executes(command))));
     }
 
     @Override
