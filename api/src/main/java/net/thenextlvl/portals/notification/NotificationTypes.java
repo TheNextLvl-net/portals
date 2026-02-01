@@ -1,7 +1,7 @@
 package net.thenextlvl.portals.notification;
 
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.title.Title;
+import net.thenextlvl.portals.view.UnparsedTitle;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -46,7 +46,7 @@ public sealed interface NotificationTypes permits SimpleNotificationTypes {
      * @since 1.4.0
      */
     @Contract(pure = true)
-    NotificationType<Title> title();
+    NotificationType<UnparsedTitle> title();
 
     /**
      * Gets the notification type for sending an action bar to an entity.
