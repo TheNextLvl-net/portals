@@ -9,12 +9,13 @@ import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.listeners.PortalListener;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN;
 
 @NullMarked
 public final class SimpleActionTypes implements ActionTypes {
@@ -43,7 +44,7 @@ public final class SimpleActionTypes implements ActionTypes {
     });
 
     private final ActionType<Location> teleport = ActionType.create("teleport", Location.class, (entity, portal, location) -> {
-        entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+        entity.teleportAsync(location, PLUGIN);
         return true;
     });
 
@@ -109,9 +110,12 @@ public final class SimpleActionTypes implements ActionTypes {
             dest[tW] = tMin[tW] + fw * tSize[tW];
 
             var destination = new Location(targetPortal.getWorld(), dest[0], dest[1], dest[2]).setRotation(from.getRotation());
-            entity.teleportAsync(destination, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.Relative.values()).thenAccept(success -> {
+            Runnable teleport = () -> entity.teleportAsync(destination, PLUGIN, TeleportFlag.Relative.values()).thenAccept(success -> {
                 if (success) PortalListener.setLastPortal(entity, targetPortal);
             });
+
+            if (plugin.getServer().isOwnedByCurrentRegion(destination)) teleport.run();
+            else plugin.getServer().getRegionScheduler().run(plugin, destination, ignored -> teleport.run());
             return true;
 
         }).orElse(false);
@@ -125,7 +129,7 @@ public final class SimpleActionTypes implements ActionTypes {
                 return;
             }
             location.setRotation(entity.getLocation().getRotation());
-            entity.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN).thenAccept(success -> {
+            entity.teleportAsync(location, PLUGIN).thenAccept(success -> {
                 var message = success ? "portal.random-teleport.success" : "portal.random-teleport.cancelled";
                 plugin.bundle().sendMessage(entity, message);
             });
