@@ -44,7 +44,9 @@ public final class SimpleActionTypes implements ActionTypes {
     });
 
     private final ActionType<Location> teleport = ActionType.create("teleport", Location.class, (entity, portal, location) -> {
-        entity.teleportAsync(location, PLUGIN);
+        Runnable teleport = () -> entity.teleportAsync(location, PLUGIN);
+        if (plugin.getServer().isOwnedByCurrentRegion(location)) teleport.run();
+        else plugin.getServer().getRegionScheduler().run(plugin, location, ignored -> teleport.run());
         return true;
     });
 
