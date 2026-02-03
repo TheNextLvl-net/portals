@@ -109,8 +109,10 @@ public final class SimpleActionTypes implements ActionTypes {
             dest[tW] = tMin[tW] + fw * tSize[tW];
 
             var destination = new Location(targetPortal.getWorld(), dest[0], dest[1], dest[2]).setRotation(from.getRotation());
-            entity.teleportAsync(destination, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.Relative.values()).thenAccept(success -> {
-                if (success) PortalListener.setLastPortal(entity, targetPortal);
+            plugin.getServer().getRegionScheduler().run(plugin, destination, ignored -> {
+                entity.teleportAsync(destination, PlayerTeleportEvent.TeleportCause.PLUGIN, TeleportFlag.Relative.values()).thenAccept(success -> {
+                    if (success) PortalListener.setLastPortal(entity, targetPortal);
+                });
             });
             return true;
 
