@@ -40,6 +40,7 @@ import net.thenextlvl.portals.plugin.economy.EconomyProvider;
 import net.thenextlvl.portals.plugin.economy.EmptyEconomyProvider;
 import net.thenextlvl.portals.plugin.economy.ServiceEconomyProvider;
 import net.thenextlvl.portals.plugin.economy.VaultEconomyProvider;
+import net.thenextlvl.portals.plugin.listeners.EntityListener;
 import net.thenextlvl.portals.plugin.listeners.PortalListener;
 import net.thenextlvl.portals.plugin.listeners.WorldListener;
 import net.thenextlvl.portals.plugin.model.SimplePortalConfig;
@@ -110,6 +111,7 @@ public final class PortalsPlugin extends JavaPlugin {
 
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
+        getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
 
