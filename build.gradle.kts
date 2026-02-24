@@ -45,7 +45,7 @@ dependencies {
     implementation("net.thenextlvl:nbt:4.3.4")
 
     implementation("dev.faststats.metrics:bukkit:0.16.0")
-    implementation("org.bstats:bstats-bukkit:3.2.1-SNAPSHOT")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
 }
 
 tasks.shadowJar {
