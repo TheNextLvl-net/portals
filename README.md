@@ -32,6 +32,8 @@ For more information and documentation, visit the [Wiki](https://thenextlvl.net/
 
 **Multiverse-Portals Migration** – Easy import tool to migrate from Multiverse-Portals
 
+---
+
 [Download now on Modrinth](https://modrinth.com/project/R2dgUCYq)
 
-[![Usage](https://faststats.dev/embed/5e6137be-dd8d-4856-94f7-b19ceefae84f?w=1012)](https://faststats.dev/project/portals)
+[![Usage](https://faststats.dev/embed/default:c1267093-5c16-449d-bafa-10bd66a5c95e:servers-and-players?w=1012)](https://faststats.dev/project/portals)
