@@ -30,7 +30,8 @@ public final class PaperPortalProvider implements PortalProvider {
 
     @Override
     public Path getDataFolder(final World world) {
-        return world.getWorldPath().resolve("portals");
+        // return world.getWorldPath().resolve("portals"); // 1.21.4 compat
+        return world.getWorldFolder().toPath().resolve("portals");
     }
 
     @Override
