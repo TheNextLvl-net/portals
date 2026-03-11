@@ -2,9 +2,6 @@ package net.thenextlvl.portals.plugin.bounds;
 
 import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.math.Position;
-import io.papermc.paper.registry.RegistryAccess;
-import io.papermc.paper.registry.RegistryKey;
-import io.papermc.paper.registry.tag.TagKey;
 import net.kyori.adventure.key.Key;
 import net.thenextlvl.portals.bounds.Bounds;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
@@ -12,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -145,10 +141,5 @@ record SimpleBounds(
     private boolean isInvalidSpawnInside(final Block block) {
         if (block.getLightFromSky() == 0 && !plugin.config().allowCaveSpawns()) return true;
         return !block.isPassable() || block.isLiquid() || block.getType().equals(Material.KELP);
-    }
-
-    private boolean isTagged(final Block block, final TagKey<BlockType> tag) {
-        return RegistryAccess.registryAccess().getRegistry(RegistryKey.BLOCK)
-                .getTagValues(tag).contains(block.getType().asBlockType());
     }
 }
