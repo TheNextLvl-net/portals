@@ -1,6 +1,7 @@
 package net.thenextlvl.portals.plugin.action;
 
 import io.papermc.paper.entity.TeleportFlag;
+import io.papermc.paper.math.Rotation;
 import net.thenextlvl.portals.PortalLike;
 import net.thenextlvl.portals.action.ActionType;
 import net.thenextlvl.portals.action.ActionTypes;
@@ -111,7 +112,8 @@ public final class SimpleActionTypes implements ActionTypes {
             dest[tV] = tMin[tV] + fv * tSize[tV];
             dest[tW] = tMin[tW] + fw * tSize[tW];
 
-            var destination = new Location(targetPortal.getWorld(), dest[0], dest[1], dest[2]).setRotation(from.getRotation());
+            var rotation = Rotation.rotation(from.getYaw(), from.getPitch()); // 1.21.4 compat, instead of from.getRotation()
+            var destination = new Location(targetPortal.getWorld(), dest[0], dest[1], dest[2]).setRotation(rotation);
             Runnable teleport = () -> entity.teleportAsync(destination, PLUGIN, TeleportFlag.Relative.values()).thenAccept(success -> {
                 if (success) PortalListener.setLastPortal(entity, targetPortal);
             });
@@ -130,7 +132,7 @@ public final class SimpleActionTypes implements ActionTypes {
                 plugin.bundle().sendMessage(entity, "portal.random-teleport.failed");
                 return;
             }
-            location.setRotation(entity.getLocation().getRotation());
+            location.setRotation(Rotation.rotation(entity.getYaw(), entity.getPitch()));
             entity.teleportAsync(location, PLUGIN).thenAccept(success -> {
                 var message = success ? "portal.random-teleport.success" : "portal.random-teleport.cancelled";
                 plugin.bundle().sendMessage(entity, message);
