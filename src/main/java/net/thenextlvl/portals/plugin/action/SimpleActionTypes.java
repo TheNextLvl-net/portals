@@ -1,5 +1,6 @@
 package net.thenextlvl.portals.plugin.action;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.papermc.paper.entity.TeleportFlag;
 import io.papermc.paper.math.Rotation;
 import net.thenextlvl.portals.PortalLike;
@@ -32,14 +33,30 @@ public final class SimpleActionTypes implements ActionTypes {
 
     private final ActionType<String> runCommand = ActionType.create("run_command", String.class, (entity, portal, input) -> {
         if (!(entity instanceof Player player)) return false;
-        player.performCommand(input.replace("<player>", player.getName()));
+        try {
+            player.performCommand(input.replace("<player>", player.getName()));
+        } catch (Exception e) {
+            if (e.getCause() instanceof CommandSyntaxException cause) {
+                plugin.getComponentLogger().error("Failed to run command for player {}: {}", player.getName(), cause.getMessage());
+            } else {
+                plugin.getComponentLogger().error("Failed to run command for player {}", player.getName(), e);
+            }
+        }
         return true;
     });
 
     private final ActionType<String> runConsoleCommand = ActionType.create("run_console_command", String.class, (entity, portal, input) -> {
         var command = entity instanceof Player player ? input.replace("<player>", player.getName()) : input;
         plugin.getServer().getGlobalRegionScheduler().run(plugin, ignored -> {
-            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+            try {
+                plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+            } catch (Exception e) {
+                if (e.getCause() instanceof CommandSyntaxException cause) {
+                    plugin.getComponentLogger().error("Failed to run console command: {}", cause.getMessage());
+                } else {
+                    plugin.getComponentLogger().error("Failed to run console command", e);
+                }
+            }
         });
         return true;
     });
