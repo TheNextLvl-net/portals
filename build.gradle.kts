@@ -31,7 +31,7 @@ repositories {
 dependencies {
     implementation(project(":api"))
 
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:26.1.1.build.+")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:8.0.0-SNAPSHOT") {
         exclude("com.google.code.gson", "gson")
     }
@@ -56,7 +56,7 @@ tasks.shadowJar {
 paper {
     name = "Portals"
     main = "net.thenextlvl.portals.plugin.PortalsPlugin"
-    apiVersion = "1.21.4"
+    apiVersion = "26.1"
     description = "Create, delete and manage custom portals"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://thenextlvl.net"
