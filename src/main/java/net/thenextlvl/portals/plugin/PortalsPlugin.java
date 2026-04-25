@@ -71,7 +71,7 @@ public final class PortalsPlugin extends JavaPlugin {
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
 
     private final PaperPortalProvider portalProvider = new PaperPortalProvider(this);
-    private EconomyProvider economyProvider = new EmptyEconomyProvider();
+    private EconomyProvider economyProvider = new EmptyEconomyProvider(this);
 
     private final Metrics metrics = new Metrics(this, 27514);
     private final dev.faststats.core.Metrics fastStats = BukkitMetrics.factory()
