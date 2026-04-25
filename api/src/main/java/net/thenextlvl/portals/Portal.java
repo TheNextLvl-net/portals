@@ -1,6 +1,8 @@
 package net.thenextlvl.portals;
 
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.thenextlvl.portals.action.EntryAction;
 import net.thenextlvl.portals.notification.Notifications;
 import net.thenextlvl.portals.shape.BoundingBox;
@@ -137,6 +139,25 @@ public interface Portal extends PortalLike {
     Duration getRemainingWarmup(Entity entity);
 
     /**
+     * Gets the currency name used for transactions of this portal.
+     *
+     * @return an {@code Optional} containing the name of the currency
+     * @since 1.6.0
+     */
+    @Contract(pure = true)
+    Optional<String> getCurrency();
+
+    /**
+     * Sets the currency name used for transaction of this portal.
+     *
+     * @param currency the name of the new currency
+     * @return {@code true} if the currency was successfully set, {@code false} otherwise
+     * @since 1.6.0
+     */
+    @Contract(mutates = "this")
+    boolean setCurrency(@Nullable String currency);
+
+    /**
      * Gets the entry cost of the portal.
      *
      * @return the entry cost
@@ -162,9 +183,13 @@ public interface Portal extends PortalLike {
      * @param audience the audience to format the entry cost for
      * @return the formatted entry cost
      * @since 1.4.0
+     * @deprecated use {@link #formattedEntryCost(Audience)}
      */
     @Contract(pure = true)
-    String getFormattedEntryCost(Audience audience);
+    @Deprecated(since = "1.6.0", forRemoval = true)
+    default String getFormattedEntryCost(final Audience audience) {
+        return PlainTextComponentSerializer.plainText().serialize(formattedEntryCost(audience));
+    }
 
     /**
      * Gets the formatted entry cost of the portal for the given locale.
@@ -172,9 +197,33 @@ public interface Portal extends PortalLike {
      * @param locale the locale to format the entry cost for
      * @return the formatted entry cost
      * @since 1.4.0
+     * @deprecated use {@link #formattedEntryCost(Locale)}
      */
     @Contract(pure = true)
-    String getFormattedEntryCost(Locale locale);
+    @Deprecated(since = "1.6.0", forRemoval = true)
+    default String getFormattedEntryCost(final Locale locale) {
+        return PlainTextComponentSerializer.plainText().serialize(formattedEntryCost(locale));
+    }
+
+    /**
+     * Gets the formatted entry cost of the portal for the given audience.
+     *
+     * @param audience the audience to format the entry cost for
+     * @return the formatted entry cost
+     * @since 1.6.0
+     */
+    @Contract(pure = true)
+    Component formattedEntryCost(Audience audience);
+
+    /**
+     * Gets the formatted entry cost of the portal for the given locale.
+     *
+     * @param locale the locale to format the entry cost for
+     * @return the formatted entry cost
+     * @since 1.6.0
+     */
+    @Contract(pure = true)
+    Component formattedEntryCost(Locale locale);
 
     /**
      * Gets the entry action of the portal.

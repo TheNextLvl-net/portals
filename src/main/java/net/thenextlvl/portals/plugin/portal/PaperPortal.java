@@ -3,6 +3,7 @@ package net.thenextlvl.portals.plugin.portal;
 import com.google.common.base.Preconditions;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import net.thenextlvl.nbt.NBTOutputStream;
 import net.thenextlvl.nbt.serialization.ParserException;
 import net.thenextlvl.nbt.serialization.TagDeserializationContext;
@@ -58,8 +59,9 @@ public final class PaperPortal implements Portal {
     private Duration cooldown = Duration.ZERO;
     private Duration warmup = Duration.ZERO;
 
-    private @Nullable String entryPermission = null;
     private @Nullable EntryAction<?> entryAction = null;
+    private @Nullable String entryPermission = null;
+    private @Nullable String currency = null;
 
     private double entryCost = 0.0;
     private boolean persistent = true;
@@ -185,6 +187,19 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
+    public Optional<String> getCurrency() {
+        return Optional.ofNullable(currency);
+    }
+
+    @Override
+    public boolean setCurrency(@Nullable final String currency) {
+        if (Objects.equals(this.currency, currency)) return false;
+        if (currency != null && !plugin.economyProvider().currencyExists(currency)) return false;
+        this.currency = currency;
+        return true;
+    }
+
+    @Override
     public double getEntryCost() {
         return entryCost;
     }
@@ -198,13 +213,13 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public String getFormattedEntryCost(final Audience audience) {
-        return plugin.economyProvider().format(audience, entryCost);
+    public Component formattedEntryCost(final Audience audience) {
+        return plugin.economyProvider().format(audience, currency, entryCost);
     }
 
     @Override
-    public String getFormattedEntryCost(final Locale locale) {
-        return plugin.economyProvider().format(locale, entryCost);
+    public Component formattedEntryCost(final Locale locale) {
+        return plugin.economyProvider().format(locale, currency, entryCost);
     }
 
     @Override
@@ -280,13 +295,14 @@ public final class PaperPortal implements Portal {
                 ", cooldown=" + cooldown +
                 ", warmup=" + warmup +
                 ", entryPermission='" + entryPermission + '\'' +
+                ", currency=" + currency +
                 ", entryCost=" + entryCost +
                 ", persistent=" + persistent +
                 '}';
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(@Nullable final Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         final PaperPortal that = (PaperPortal) o;
         return Objects.equals(name, that.name);

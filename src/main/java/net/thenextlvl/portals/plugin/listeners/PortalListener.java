@@ -208,7 +208,7 @@ public final class PortalListener implements Listener {
     private boolean withdrawEntryCost(final Portal portal, final Entity entity) {
         if (!plugin.config().entryCosts()) return true;
         if (!(entity instanceof final Player player)) return true;
-        return plugin.economyProvider().withdraw(player, portal.getEntryCost());
+        return plugin.economyProvider().withdraw(player, portal.getCurrency().orElse(null), portal.getEntryCost());
     }
 
     public static void setLastPortal(final Entity entity, final Portal portal) {

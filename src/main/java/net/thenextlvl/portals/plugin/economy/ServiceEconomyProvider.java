@@ -1,18 +1,23 @@
 package net.thenextlvl.portals.plugin.economy;
 
-import net.thenextlvl.portals.plugin.PortalsPlugin;
-import net.thenextlvl.service.api.economy.EconomyController;
+import net.kyori.adventure.text.Component;
+import net.thenextlvl.service.economy.EconomyController;
+import net.thenextlvl.service.economy.currency.Currency;
+import net.thenextlvl.service.economy.currency.CurrencyController;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @NullMarked
 public final class ServiceEconomyProvider implements EconomyProvider {
-    private final PortalsPlugin plugin;
+    private final Plugin plugin;
 
-    public ServiceEconomyProvider(final PortalsPlugin plugin) {
+    public ServiceEconomyProvider(final Plugin plugin) {
         this.plugin = plugin;
     }
 
@@ -20,16 +25,44 @@ public final class ServiceEconomyProvider implements EconomyProvider {
         return Optional.ofNullable(plugin.getServer().getServicesManager().load(EconomyController.class));
     }
 
-    @Override
-    public String format(final Locale locale, final double amount) {
-        return getController().map(controller -> controller.format(amount))
-                .orElseGet(() -> EconomyProvider.super.format(locale, amount));
+    private Optional<CurrencyController> getCurrencyController() {
+        return getController().map(EconomyController::getCurrencyController);
+    }
+
+    private Optional<Currency> getCurrency(@Nullable final String name) {
+        return getController().map(controller -> getCurrency(controller, name));
+    }
+
+    private Currency getCurrency(final EconomyController controller, @Nullable final String name) {
+        final var currencyController = controller.getCurrencyController();
+        if (name == null) return currencyController.getDefaultCurrency();
+        return currencyController.getCurrency(name).orElseGet(currencyController::getDefaultCurrency);
     }
 
     @Override
-    public boolean withdraw(final Player player, final double amount) {
+    public Component format(final Locale locale, @Nullable final String currency, final double amount) {
+        return getCurrency(currency).map(c -> c.format(amount, locale))
+                .orElseGet(() -> Component.text(String.format(locale, "%.2f", amount)));
+    }
+
+    @Override
+    public boolean withdraw(final Player player, @Nullable final String currency, final double amount) {
         return getController().flatMap(controller -> controller.getAccount(player).map(account -> {
-            return !account.getBalance().equals(account.withdraw(amount));
+            return account.withdraw(amount, getCurrency(controller, currency)).successful();
         })).orElse(false);
+    }
+
+    @Override
+    public boolean currencyExists(final String currency) {
+        return getCurrencyController()
+                .map(controller -> controller.currencyExists(currency))
+                .orElse(false);
+    }
+
+    @Override
+    public Stream<String> getCurrencies() {
+        return getCurrencyController()
+                .map(controller -> controller.getCurrencies().map(Currency::getName))
+                .orElseGet(Stream::empty);
     }
 }

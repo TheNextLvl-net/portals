@@ -13,6 +13,7 @@ module net.thenextlvl.portals {
 
     requires net.kyori.adventure.key;
     requires net.kyori.adventure.text.minimessage;
+    requires net.kyori.adventure.text.serializer.plain;
     requires net.kyori.adventure;
     requires net.kyori.examination.api;
     requires net.thenextlvl.binder;

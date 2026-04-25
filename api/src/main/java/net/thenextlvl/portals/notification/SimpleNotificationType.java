@@ -43,7 +43,7 @@ record SimpleNotificationType<T>(
                 Formatter.number("remaining-warmup", portal.getRemainingWarmup(entity).toMillis() / 1000d),
                 Formatter.number("warmup", portal.getWarmup().toMillis() / 1000d),
                 Placeholder.parsed("entity", entity.getName()),
-                Placeholder.parsed("entry-cost", portal.getFormattedEntryCost(entity)),
+                Placeholder.component("entry-cost", portal.formattedEntryCost(entity)),
                 Placeholder.parsed("permission", portal.getEntryPermission().orElse("undefined")),
                 Placeholder.parsed("portal", portal.getName())
         };
