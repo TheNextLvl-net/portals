@@ -1,6 +1,7 @@
 package net.thenextlvl.portals.plugin.portal;
 
 import com.google.common.base.Preconditions;
+import io.papermc.paper.ServerBuildInfo;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalProvider;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
@@ -21,6 +22,9 @@ import static net.thenextlvl.portals.plugin.PortalsPlugin.ISSUES;
 
 @NullMarked
 public final class PaperPortalProvider implements PortalProvider {
+    private static final Set<String> oldVersions = Set.of(
+            "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"
+    );
     public final Set<Portal> portals = new HashSet<>();
     private final PortalsPlugin plugin;
 
@@ -31,7 +35,10 @@ public final class PaperPortalProvider implements PortalProvider {
     @Override
     public Path getDataFolder(final World world) {
         // return world.getWorldPath().resolve("portals"); // 1.21.4 compat
-        return world.getWorldFolder().toPath().resolve("portals");
+        final var version = ServerBuildInfo.buildInfo().minecraftVersionId();
+        final var path = world.getWorldFolder().toPath();
+        if (oldVersions.contains(version)) return path.resolve("portals");
+        return path.resolve("data").resolve("portals");
     }
 
     @Override
