@@ -6,9 +6,10 @@ import org.bukkit.Particle;
 import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.Optional;
 
 public abstract class SimplePortalEffect implements PortalEffect {
-    private final Color color;
+    private final @Nullable Color color;
     private final Duration duration;
     private final Duration updateInterval;
     private final Particle particle;
@@ -16,7 +17,6 @@ public abstract class SimplePortalEffect implements PortalEffect {
     private final int particleCount;
 
     protected SimplePortalEffect(final Builder<?, ?> builder) throws IllegalArgumentException {
-        Preconditions.checkArgument(builder.color != null, "Color cannot be null");
         Preconditions.checkArgument(builder.particle != null, "Particle cannot be null");
         this.color = builder.color;
         this.duration = builder.duration;
@@ -37,8 +37,8 @@ public abstract class SimplePortalEffect implements PortalEffect {
     }
 
     @Override
-    public Color getColor() {
-        return color;
+    public Optional<Color> getColor() {
+        return Optional.ofNullable(color);
     }
 
     @Override
@@ -78,7 +78,7 @@ public abstract class SimplePortalEffect implements PortalEffect {
         }
 
         @Override
-        public B color(final Color color) {
+        public B color(final @Nullable Color color) {
             this.color = color;
             return (B) this;
         }
@@ -101,5 +101,4 @@ public abstract class SimplePortalEffect implements PortalEffect {
             return (B) this;
         }
     }
-}   
-    
+}
