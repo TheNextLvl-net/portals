@@ -1,13 +1,14 @@
 package net.thenextlvl.portals.effects;
 
 import net.thenextlvl.portals.effect.PortalEffect;
+import net.thenextlvl.portals.effect.PortalEffectTypeRegistry;
 import org.jetbrains.annotations.Contract;
 
 /**
  * An immutable wave effect configuration that creates rippling or undulating particle patterns.
  * All properties are defined via the builder and cannot be changed after creation.
  */
-public sealed interface WaveEffect extends PortalEffect permits SimpleWaveEffect {
+public interface WaveEffect extends PortalEffect {
     /**
      * Gets the amplitude of the wave.
      *
@@ -65,13 +66,13 @@ public sealed interface WaveEffect extends PortalEffect permits SimpleWaveEffect
      */
     @Contract(value = " -> new", pure = true)
     static Builder builder() {
-        return new SimpleWaveEffect.Builder();
+        return PortalEffectTypeRegistry.registry().builder(Builder.class).orElseThrow();
     }
 
     /**
      * Builder for creating immutable wave effect configurations.
      */
-    sealed interface Builder extends PortalEffect.Builder<WaveEffect, Builder> permits SimpleWaveEffect.Builder {
+    interface Builder extends PortalEffect.Builder<WaveEffect, Builder> {
         /**
          * Sets the amplitude of the wave.
          *

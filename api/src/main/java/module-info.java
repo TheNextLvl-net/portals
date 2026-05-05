@@ -18,6 +18,7 @@ module net.thenextlvl.portals {
     requires net.kyori.adventure.text.minimessage;
     requires net.kyori.adventure.text.serializer.plain;
     requires net.thenextlvl.binder;
+    requires net.thenextlvl.nbt;
     requires org.bukkit;
 
     requires static org.jetbrains.annotations;

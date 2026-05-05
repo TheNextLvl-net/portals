@@ -56,6 +56,15 @@ public abstract class SimplePortalEffect implements PortalEffect {
         return speed;
     }
 
+    protected <T extends PortalEffect, B extends PortalEffect.Builder<T, B>> B copyBase(final B builder) {
+        return builder.duration(getDuration())
+                .particle(getParticle())
+                .color(getColor().orElse(null))
+                .particleCount(getParticleCount())
+                .updateInterval(getUpdateInterval())
+                .speed(getSpeed());
+    }
+
     @SuppressWarnings("unchecked")
     public abstract static class Builder<T extends PortalEffect, B extends PortalEffect.Builder<T, B>> implements PortalEffect.Builder<T, B> {
         protected @Nullable Color color = null;
