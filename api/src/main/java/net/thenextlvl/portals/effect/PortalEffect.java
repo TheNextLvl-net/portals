@@ -5,8 +5,10 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.Optional;
 
 /**
  * Immutable base interface for all portal particle effects.
@@ -33,10 +35,10 @@ public interface PortalEffect {
     /**
      * Gets the particle color (for colorable particles).
      *
-     * @return the color, or null if not set
+     * @return the color, or an empty optional if not set
      */
     @Contract(pure = true)
-    Color getColor();
+    Optional<Color> getColor();
 
     /**
      * Gets the particle count.
@@ -110,7 +112,7 @@ public interface PortalEffect {
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        B color(Color color);
+        B color(@Nullable Color color);
 
         /**
          * Sets the particle count.

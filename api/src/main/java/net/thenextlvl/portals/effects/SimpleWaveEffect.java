@@ -61,7 +61,7 @@ final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
         return new SimpleWaveEffect.Builder()
                 .duration(getDuration())
                 .particle(getParticle())
-                .color(getColor())
+                .color(getColor().orElse(null))
                 .particleCount(getParticleCount())
                 .updateInterval(getUpdateInterval())
                 .speed(getSpeed())
