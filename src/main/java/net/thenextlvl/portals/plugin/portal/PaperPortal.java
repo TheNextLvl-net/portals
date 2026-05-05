@@ -242,7 +242,7 @@ public final class PaperPortal implements Portal {
     }
 
     @Override
-    public boolean setPortalEffect(@Nullable PortalEffect effect) {
+    public boolean setPortalEffect(@Nullable final PortalEffect effect) {
         if (Objects.equals(this.portalEffect, effect)) return false;
         this.portalEffect = effect;
         return true;
