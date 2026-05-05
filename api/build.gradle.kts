@@ -1,6 +1,5 @@
 plugins {
     id("java")
-    id("java-library")
     id("maven-publish")
 }
 
@@ -30,12 +29,26 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
-    api("net.thenextlvl:static-binder:0.1.3")
+    compileOnly("net.thenextlvl:static-binder:0.1.3")
+    compileOnly("net.thenextlvl:nbt:4.3.4")
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.addAll(listOf("--add-reads", "net.thenextlvl.portals=ALL-UNNAMED"))
+}
+
+tasks.withType<Test>().configureEach {
+    jvmArgs("--add-reads", "net.thenextlvl.portals=ALL-UNNAMED")
+}
+
+tasks.withType<JavaExec>().configureEach {
+    jvmArgs("--add-reads", "net.thenextlvl.portals=ALL-UNNAMED")
 }
 
 tasks.withType<Javadoc>().configureEach {
     val options = options as StandardJavadocDocletOptions
     options.tags("apiNote:a:API Note:", "implSpec:a:Implementation Requirements:")
+    options.addStringOption("-add-reads", "net.thenextlvl.portals=ALL-UNNAMED")
 }
 
 publishing {
