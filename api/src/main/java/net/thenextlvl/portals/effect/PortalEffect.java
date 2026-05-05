@@ -1,6 +1,7 @@
 package net.thenextlvl.portals.effect;
 
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
@@ -65,12 +66,13 @@ public interface PortalEffect {
     double getSpeed();
 
     /**
-     * Plays the effect for the specified player.
+     * Plays the effect for the specified player at the specified origin.
      *
      * @param player the player to play the effect for
+     * @param origin the origin of the effect
      */
     @ApiStatus.OverrideOnly
-    void play(Player player);
+    void play(Player player, Location origin);
 
     /**
      * Creates a builder for this effect.

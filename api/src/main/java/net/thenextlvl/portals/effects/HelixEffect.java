@@ -1,6 +1,7 @@
 package net.thenextlvl.portals.effects;
 
 import net.thenextlvl.portals.effect.PortalEffect;
+import net.thenextlvl.portals.effect.PortalEffectTypeRegistry;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -57,7 +58,7 @@ public interface HelixEffect extends PortalEffect {
      */
     @Contract(value = " -> new", pure = true)
     static Builder builder() {
-        throw new UnsupportedOperationException("Not implemented");
+        return PortalEffectTypeRegistry.registry().builder(Builder.class).orElseThrow();
     }
 
     /**

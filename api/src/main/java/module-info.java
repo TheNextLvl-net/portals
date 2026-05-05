@@ -20,6 +20,7 @@ module net.thenextlvl.portals {
     requires net.kyori.adventure;
     requires net.kyori.examination.api;
     requires net.thenextlvl.binder;
+    requires net.thenextlvl.nbt;
     requires org.bukkit;
 
     requires static org.jetbrains.annotations;

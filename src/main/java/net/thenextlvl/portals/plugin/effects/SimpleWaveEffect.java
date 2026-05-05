@@ -1,8 +1,13 @@
-package net.thenextlvl.portals.effects;
+package net.thenextlvl.portals.plugin.effects;
 
 import net.thenextlvl.portals.effect.SimplePortalEffect;
+import net.thenextlvl.portals.effects.WaveEffect;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
     private final WaveType waveType;
     private final boolean horizontal;
@@ -52,8 +57,48 @@ final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
     }
 
     @Override
-    public void play(final Player player) {
-        // todo: implement
+    public void play(final Player player, final Location origin) {
+        final var samples = Math.max(1, getParticleCount());
+        final var span = getLength() <= 1 ? Math.max(0, getLength()) * EffectRenderer.width(origin) : Math.max(0, getLength());
+        final var step = samples == 1 ? 0 : span / (samples - 1);
+        final var start = -span / 2d;
+        final var phase = getWaveSpeed() * getSpeed();
+        final var data = particleData();
+        if (data == null && getParticle().getDataType() != Void.class) return;
+
+        for (var i = 0; i < samples; i++) {
+            final var x = start + step * i;
+            final var wave = sample(x + phase) * getAmplitude();
+            final var location = isHorizontal()
+                    ? EffectRenderer.point(origin, x, 0, wave)
+                    : EffectRenderer.point(origin, x, wave, 0);
+            spawn(player, location, data);
+        }
+    }
+
+    private double sample(final double input) {
+        final var wavelength = Math.max(0.0001, getWavelength());
+        final var angle = (input / wavelength) * Math.PI * 2d;
+        return switch (getWaveType()) {
+            case SINE -> Math.sin(angle);
+            case SQUARE -> Math.sin(angle) >= 0 ? 1d : -1d;
+            case TRIANGLE -> (2d / Math.PI) * Math.asin(Math.sin(angle));
+            case SAWTOOTH -> 2d * (input / wavelength - Math.floor(0.5d + input / wavelength));
+        };
+    }
+
+    private Object particleData() {
+        if (getColor().isEmpty()) return null;
+        if (getParticle().getDataType() != Particle.DustOptions.class) return null;
+        return new Particle.DustOptions(getColor().orElseThrow(), 1f);
+    }
+
+    private void spawn(final Player player, final Location location, final Object data) {
+        if (data == null) {
+            player.spawnParticle(getParticle(), location, 1, 0, 0, 0, 0);
+            return;
+        }
+        player.spawnParticle(getParticle(), location, 1, 0, 0, 0, 0, data);
     }
 
     @Override

@@ -16,6 +16,8 @@ import net.thenextlvl.nbt.serialization.NBT;
 import net.thenextlvl.nbt.serialization.adapters.EnumAdapter;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.PortalProvider;
+import net.thenextlvl.portals.effect.PortalEffect;
+import net.thenextlvl.portals.effect.PortalEffectTypeRegistry;
 import net.thenextlvl.portals.action.ActionTypeRegistry;
 import net.thenextlvl.portals.action.ActionTypes;
 import net.thenextlvl.portals.action.EntryAction;
@@ -28,14 +30,19 @@ import net.thenextlvl.portals.plugin.adapters.BoundingBoxAdapter;
 import net.thenextlvl.portals.plugin.adapters.EntryActionAdapter;
 import net.thenextlvl.portals.plugin.adapters.FinePositionAdapter;
 import net.thenextlvl.portals.plugin.adapters.KeyAdapter;
+import net.thenextlvl.portals.plugin.adapters.LazyLocationAdapter;
 import net.thenextlvl.portals.plugin.adapters.NotificationTriggerAdapter;
 import net.thenextlvl.portals.plugin.adapters.NotificationTypeAdapter;
 import net.thenextlvl.portals.plugin.adapters.PortalAdapter;
+import net.thenextlvl.portals.plugin.adapters.PortalEffectAdapter;
 import net.thenextlvl.portals.plugin.adapters.SoundAdapter;
 import net.thenextlvl.portals.plugin.adapters.TitleTimesAdapter;
 import net.thenextlvl.portals.plugin.adapters.UnparsedTitleAdapter;
 import net.thenextlvl.portals.plugin.bounds.SimpleBoundsFactory;
 import net.thenextlvl.portals.plugin.commands.PortalCommand;
+import net.thenextlvl.portals.plugin.effects.BuiltinEffectTypes;
+import net.thenextlvl.portals.plugin.effects.PortalEffectScheduler;
+import net.thenextlvl.portals.plugin.effects.SimplePortalEffectTypeRegistry;
 import net.thenextlvl.portals.plugin.economy.EconomyProvider;
 import net.thenextlvl.portals.plugin.economy.EmptyEconomyProvider;
 import net.thenextlvl.portals.plugin.economy.ServiceEconomyProvider;
@@ -54,6 +61,7 @@ import net.thenextlvl.portals.shape.BoundingBox;
 import net.thenextlvl.portals.view.PortalConfig;
 import net.thenextlvl.portals.view.UnparsedTitle;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.ServicePriority;
@@ -71,6 +79,8 @@ public final class PortalsPlugin extends JavaPlugin {
     private final PluginVersionChecker versionChecker = new PluginVersionChecker(this);
 
     private final PaperPortalProvider portalProvider = new PaperPortalProvider(this);
+    private final SimplePortalEffectTypeRegistry portalEffectTypeRegistry = new SimplePortalEffectTypeRegistry();
+    private final PortalEffectScheduler portalEffectScheduler = new PortalEffectScheduler(this);
     private EconomyProvider economyProvider = new EmptyEconomyProvider(this);
 
     private final Metrics metrics = new Metrics(this, 27514);
@@ -101,6 +111,9 @@ public final class PortalsPlugin extends JavaPlugin {
         StaticBinder.getInstance(ActionTypeRegistry.class.getClassLoader()).bind(ActionTypeRegistry.class, SimpleActionTypeRegistry.INSTANCE);
         StaticBinder.getInstance(PortalConfig.class.getClassLoader()).bind(PortalConfig.class, portalConfig.getRoot());
         StaticBinder.getInstance(PortalProvider.class.getClassLoader()).bind(PortalProvider.class, portalProvider);
+        StaticBinder.getInstance(PortalEffectTypeRegistry.class.getClassLoader()).bind(PortalEffectTypeRegistry.class, portalEffectTypeRegistry);
+
+        BuiltinEffectTypes.register(portalEffectTypeRegistry);
 
         registerCommands();
     }
@@ -114,6 +127,7 @@ public final class PortalsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
+        portalEffectScheduler.start();
 
         if (getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
             getServer().getServicesManager().register(SelectionProvider.class, new WorldEditSelectionProvider(), this, ServicePriority.Normal);
@@ -127,6 +141,7 @@ public final class PortalsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        portalEffectScheduler.stop();
         portalProvider.forEachPortal(Portal::persist);
         metrics.shutdown();
     }
@@ -140,6 +155,11 @@ public final class PortalsPlugin extends JavaPlugin {
     @Contract(pure = true)
     public PaperPortalProvider portalProvider() {
         return portalProvider;
+    }
+
+    @Contract(pure = true)
+    public PortalEffectTypeRegistry portalEffectTypeRegistry() {
+        return portalEffectTypeRegistry;
     }
 
     @Contract(pure = true)
@@ -164,7 +184,9 @@ public final class PortalsPlugin extends JavaPlugin {
                 .registerTypeHierarchyAdapter(EntryAction.class, new EntryActionAdapter(this))
                 .registerTypeHierarchyAdapter(Position.class, new FinePositionAdapter())
                 .registerTypeHierarchyAdapter(Key.class, new KeyAdapter())
+                .registerTypeHierarchyAdapter(Location.class, new LazyLocationAdapter())
                 .registerTypeHierarchyAdapter(PaperPortal.class, new PortalAdapter(this))
+                .registerTypeHierarchyAdapter(PortalEffect.class, new PortalEffectAdapter(portalEffectTypeRegistry))
                 .registerTypeHierarchyAdapter(NotificationTrigger.class, new NotificationTriggerAdapter())
                 .registerTypeHierarchyAdapter(NotificationType.class, new NotificationTypeAdapter())
                 .registerTypeHierarchyAdapter(Sound.class, new SoundAdapter())
