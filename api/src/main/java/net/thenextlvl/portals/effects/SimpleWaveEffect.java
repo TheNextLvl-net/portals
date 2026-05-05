@@ -11,7 +11,7 @@ final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
     private final double waveSpeed;
     private final double wavelength;
 
-    private SimpleWaveEffect(Builder builder) throws IllegalArgumentException {
+    private SimpleWaveEffect(final Builder builder) throws IllegalArgumentException {
         super(builder);
         this.amplitude = builder.amplitude;
         this.wavelength = builder.wavelength;
@@ -52,7 +52,7 @@ final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
     }
 
     @Override
-    public void play(Player player) {
+    public void play(final Player player) {
         // todo: implement
     }
 
@@ -82,37 +82,37 @@ final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
         private double wavelength = 1.0;
 
         @Override
-        public WaveEffect.Builder amplitude(double amplitude) {
+        public WaveEffect.Builder amplitude(final double amplitude) {
             this.amplitude = amplitude;
             return this;
         }
 
         @Override
-        public WaveEffect.Builder wavelength(double wavelength) {
+        public WaveEffect.Builder wavelength(final double wavelength) {
             this.wavelength = wavelength;
             return this;
         }
 
         @Override
-        public WaveEffect.Builder waveSpeed(double speed) {
+        public WaveEffect.Builder waveSpeed(final double speed) {
             this.waveSpeed = speed;
             return this;
         }
 
         @Override
-        public WaveEffect.Builder waveType(WaveType type) {
+        public WaveEffect.Builder waveType(final WaveType type) {
             this.waveType = type;
             return this;
         }
 
         @Override
-        public WaveEffect.Builder horizontal(boolean horizontal) {
+        public WaveEffect.Builder horizontal(final boolean horizontal) {
             this.horizontal = horizontal;
             return this;
         }
 
         @Override
-        public WaveEffect.Builder length(double length) {
+        public WaveEffect.Builder length(final double length) {
             this.length = length;
             return this;
         }

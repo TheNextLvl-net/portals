@@ -15,7 +15,7 @@ public abstract class SimplePortalEffect implements PortalEffect {
     private final double speed;
     private final int particleCount;
 
-    protected SimplePortalEffect(Builder<?, ?> builder) throws IllegalArgumentException {
+    protected SimplePortalEffect(final Builder<?, ?> builder) throws IllegalArgumentException {
         Preconditions.checkArgument(builder.color != null, "Color cannot be null");
         Preconditions.checkArgument(builder.particle != null, "Particle cannot be null");
         this.color = builder.color;
@@ -66,37 +66,37 @@ public abstract class SimplePortalEffect implements PortalEffect {
         protected int particleCount = 10;
 
         @Override
-        public B duration(Duration duration) {
+        public B duration(final Duration duration) {
             this.duration = duration;
             return (B) this;
         }
 
         @Override
-        public B particle(Particle particle) {
+        public B particle(final Particle particle) {
             this.particle = particle;
             return (B) this;
         }
 
         @Override
-        public B color(Color color) {
+        public B color(final Color color) {
             this.color = color;
             return (B) this;
         }
 
         @Override
-        public B particleCount(int count) {
+        public B particleCount(final int count) {
             this.particleCount = count;
             return (B) this;
         }
 
         @Override
-        public B updateInterval(Duration interval) {
+        public B updateInterval(final Duration interval) {
             this.updateInterval = interval;
             return (B) this;
         }
 
         @Override
-        public B speed(double speed) {
+        public B speed(final double speed) {
             this.speed = speed;
             return (B) this;
         }
