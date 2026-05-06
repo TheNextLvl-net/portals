@@ -79,7 +79,7 @@ public final class CommandOptionsArgument implements CustomArgumentType<CommandO
                 return argument.listSuggestions(context, builder.createOffset(builder.getStart() + argumentStart));
             try {
                 parseArgument(argument, reader);
-            } catch (final CommandSyntaxException ignored) {
+            } catch (final Exception ignored) {
                 return argument.listSuggestions(context, builder.createOffset(builder.getStart() + argumentStart));
             }
             if (!reader.canRead())
