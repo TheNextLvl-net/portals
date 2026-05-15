@@ -49,14 +49,6 @@ public interface SphereEffect extends PortalEffect {
     @Contract(pure = true)
     double getRotationSpeed();
 
-    /**
-     * Gets whether the sphere should pulse (expand/contract).
-     *
-     * @return true if pulsing is enabled
-     */
-    @Contract(pure = true)
-    boolean isPulse();
-
     SphereEffect.Builder toBuilder();
 
     /**
@@ -118,13 +110,5 @@ public interface SphereEffect extends PortalEffect {
         @Contract(value = "_ -> this", mutates = "this")
         Builder rotationSpeed(double speed);
 
-        /**
-         * Sets whether the sphere should pulse (expand/contract).
-         *
-         * @param pulse true to enable pulsing
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        Builder pulse(boolean pulse);
     }
 }

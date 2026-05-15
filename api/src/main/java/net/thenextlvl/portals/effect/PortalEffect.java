@@ -8,8 +8,8 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.Nullable;
 
-import java.time.Duration;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * Immutable base interface for all portal particle effects.
@@ -17,14 +17,6 @@ import java.util.Optional;
  * All effects are configured via builders and cannot be modified after creation.
  */
 public interface PortalEffect {
-    /**
-     * Gets the duration of the effect.
-     *
-     * @return the effect duration
-     */
-    @Contract(pure = true)
-    Duration getDuration();
-
     /**
      * Gets the particle type used by this effect.
      *
@@ -42,20 +34,12 @@ public interface PortalEffect {
     Optional<Color> getColor();
 
     /**
-     * Gets the particle count.
+     * Gets the configured particle count.
      *
-     * @return the particle count
+     * @return the particle count, or an empty optional if it should be calculated from the portal size
      */
     @Contract(pure = true)
-    int getParticleCount();
-
-    /**
-     * Gets the update interval (how often particles spawn).
-     *
-     * @return the interval
-     */
-    @Contract(pure = true)
-    Duration getUpdateInterval();
+    OptionalInt getParticleCount();
 
     /**
      * Gets the effect speed/velocity.
@@ -89,16 +73,6 @@ public interface PortalEffect {
      */
     interface Builder<T extends PortalEffect, B extends Builder<T, B>> {
         /**
-         * Sets the effect duration.
-         * This is the total time the effect will run when played.
-         *
-         * @param duration the duration
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        B duration(Duration duration);
-
-        /**
          * Sets the particle type for the effect.
          *
          * @param particle the particle type
@@ -119,20 +93,11 @@ public interface PortalEffect {
         /**
          * Sets the particle count.
          *
-         * @param count the number of particles
+         * @param count the number of particles, or null to calculate it from the portal size
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        B particleCount(int count);
-
-        /**
-         * Sets the update interval (how often particles spawn).
-         *
-         * @param interval the interval
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        B updateInterval(Duration interval);
+        B particleCount(@Nullable Integer count);
 
         /**
          * Sets the effect speed/velocity.

@@ -3,6 +3,9 @@ package net.thenextlvl.portals.effects;
 import net.thenextlvl.portals.effect.PortalEffect;
 import net.thenextlvl.portals.effect.PortalEffectTypeRegistry;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 /**
  * An immutable vortex effect configuration that creates a swirling tornado-like pattern.
@@ -28,10 +31,10 @@ public interface VortexEffect extends PortalEffect {
     /**
      * Gets the height of the vortex.
      *
-     * @return the height
+     * @return the height, or empty to infer it from the portal height
      */
     @Contract(pure = true)
-    double getHeight();
+    Optional<Double> getHeight();
 
     /**
      * Gets the rotation speed.
@@ -94,11 +97,11 @@ public interface VortexEffect extends PortalEffect {
         /**
          * Sets the height of the vortex.
          *
-         * @param height the height
+         * @param height the height, or null to infer it from the portal height
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder height(double height);
+        Builder height(@Nullable Double height);
 
         /**
          * Sets the rotation speed in degrees per tick.

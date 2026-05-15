@@ -26,28 +26,12 @@ public interface PulseEffect extends PortalEffect {
     double getMaxRadius();
 
     /**
-     * Gets the pulse speed.
-     *
-     * @return the pulse speed
-     */
-    @Contract(pure = true)
-    double getPulseSpeed();
-
-    /**
      * Gets the shape of the pulse.
      *
      * @return the pulse shape
      */
     @Contract(pure = true)
     PulseShape getShape();
-
-    /**
-     * Gets whether the pulse should fade as it expands.
-     *
-     * @return true if fading is enabled
-     */
-    @Contract(pure = true)
-    boolean isFade();
 
     /**
      * Gets the number of concurrent pulse waves.
@@ -92,15 +76,6 @@ public interface PulseEffect extends PortalEffect {
         Builder maxRadius(double radius);
 
         /**
-         * Sets the pulse speed.
-         *
-         * @param speed the pulse speed
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        Builder pulseSpeed(double speed);
-
-        /**
          * Sets the shape of the pulse.
          *
          * @param shape the pulse shape
@@ -108,15 +83,6 @@ public interface PulseEffect extends PortalEffect {
          */
         @Contract(value = "_ -> this", mutates = "this")
         Builder shape(PulseShape shape);
-
-        /**
-         * Sets whether the pulse should fade as it expands.
-         *
-         * @param fade true to enable fading
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        Builder fade(boolean fade);
 
         /**
          * Sets the number of concurrent pulse waves.

@@ -3,6 +3,10 @@ package net.thenextlvl.portals.effects;
 import net.thenextlvl.portals.effect.PortalEffect;
 import net.thenextlvl.portals.effect.PortalEffectTypeRegistry;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * An immutable waterfall effect configuration that creates cascading particles.
@@ -12,34 +16,26 @@ public interface WaterfallEffect extends PortalEffect {
     /**
      * Gets the width of the waterfall.
      *
-     * @return the width
+     * @return the width, or empty to infer it from the portal width
      */
     @Contract(pure = true)
-    double getWidth();
+    Optional<Double> getWidth();
 
     /**
      * Gets the height of the waterfall.
      *
-     * @return the height
+     * @return the height, or empty to infer it from the portal height
      */
     @Contract(pure = true)
-    double getHeight();
+    Optional<Double> getHeight();
 
     /**
      * Gets the flow rate (particles per tick).
      *
-     * @return the flow rate
+     * @return the flow rate, or empty to infer it from the portal width
      */
     @Contract(pure = true)
-    int getFlowRate();
-
-    /**
-     * Gets the splash radius at the bottom.
-     *
-     * @return the splash radius
-     */
-    @Contract(pure = true)
-    double getSplashRadius();
+    OptionalInt getFlowRate();
 
     /**
      * Gets the turbulence/randomness of the flow.
@@ -52,10 +48,10 @@ public interface WaterfallEffect extends PortalEffect {
     /**
      * Gets the fall speed of particles.
      *
-     * @return the fall speed
+     * @return the fall speed, or empty to infer it from the portal width
      */
     @Contract(pure = true)
-    double getFallSpeed();
+    Optional<Double> getFallSpeed();
 
     WaterfallEffect.Builder toBuilder();
 
@@ -76,38 +72,29 @@ public interface WaterfallEffect extends PortalEffect {
         /**
          * Sets the width of the waterfall.
          *
-         * @param width the width
+         * @param width the width, or null to infer it from the portal width
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder width(double width);
+        Builder width(@Nullable Double width);
 
         /**
          * Sets the height of the waterfall.
          *
-         * @param height the height
+         * @param height the height, or null to infer it from the portal height
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder height(double height);
+        Builder height(@Nullable Double height);
 
         /**
          * Sets the flow rate (particles per tick).
          *
-         * @param rate the flow rate
+         * @param rate the flow rate, or null to infer it from the portal width
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder flowRate(int rate);
-
-        /**
-         * Sets the splash effect at the bottom.
-         *
-         * @param radius the splash radius
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        Builder splash(double radius);
+        Builder flowRate(@Nullable Integer rate);
 
         /**
          * Sets the turbulence/randomness of the flow.
@@ -121,10 +108,10 @@ public interface WaterfallEffect extends PortalEffect {
         /**
          * Sets the fall speed of particles.
          *
-         * @param speed the fall speed
+         * @param speed the fall speed, or null to infer it from the portal width
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder fallSpeed(double speed);
+        Builder fallSpeed(@Nullable Double speed);
     }
 }

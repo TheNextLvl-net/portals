@@ -1,7 +1,6 @@
 package net.thenextlvl.portals.plugin.effects;
 
 import net.thenextlvl.portals.effect.PortalEffect;
-import net.thenextlvl.portals.effects.BeamEffect;
 import net.thenextlvl.portals.effects.FountainEffect;
 import net.thenextlvl.portals.effects.HelixEffect;
 import net.thenextlvl.portals.effects.PulseEffect;
@@ -22,58 +21,55 @@ final class EffectRenderer {
     private EffectRenderer() {
     }
 
-    static void beam(final BeamEffect effect, final Player player, final Location origin) {
-        final var base = origin.clone();
-        final var startOffset = effect.getStart();
-        final var endOffset = effect.getEnd();
-        final var start = point(base, startOffset.getX(), startOffset.getY(), startOffset.getZ());
-        final var end = point(base, endOffset.getX(), endOffset.getY(), endOffset.getZ());
-        final var count = Math.max(1, effect.getDensity());
-        for (var i = 0; i < count; i++) {
-            final var progress = count == 1 ? 0 : i / (double) (count - 1);
-            final var location = start.clone().add(
-                    (end.getX() - start.getX()) * progress,
-                    (end.getY() - start.getY()) * progress,
-                    (end.getZ() - start.getZ()) * progress
-            );
-            spawn(effect, player, location);
-        }
-    }
-
     static void ring(final RingEffect effect, final Player player, final Location origin) {
-        final var count = Math.max(8, effect.getParticleCount());
-        final var radius = scaleHorizontal(origin, Math.max(0, effect.getRadius() + (effect.isPulse() ? Math.sin(effect.getPulseSpeed()) * effect.getThickness() : 0)));
+        final var count = particleCount(effect, origin, 12);
+        final var tick = animationTick(origin);
+        final var thickness = Math.max(0, effect.getThickness());
+        final var pulse = effect.isPulse() ? Math.sin(tick * effect.getPulseSpeed()) * thickness : 0;
+        final var radius = scaleHorizontal(origin, Math.max(0, effect.getRadius() + pulse));
+        final var offset = Math.toRadians(tick * effect.getRotationSpeed());
+        final var horizontal = effect instanceof SimpleRingEffect simple ? simple.isHorizontal(origin) : effect.isHorizontal();
         for (var i = 0; i < count; i++) {
-            final var angle = Math.TAU * i / count + Math.toRadians(effect.getRotationSpeed());
-            final var x = Math.cos(angle) * radius;
-            final var y = effect.isHorizontal() ? 0 : Math.sin(angle) * radius;
-            final var z = effect.isHorizontal() ? Math.sin(angle) * radius : 0;
+            final var angle = Math.TAU * i / count + offset;
+            final var band = thickness <= 0 ? 0 : ((i % 4) / 3d - .5) * thickness;
+            final var sampleRadius = Math.max(0, radius + band);
+            final var x = Math.cos(angle) * sampleRadius;
+            final var y = horizontal ? 0 : Math.sin(angle) * sampleRadius;
+            final var z = horizontal ? Math.sin(angle) * sampleRadius : 0;
             spawn(effect, player, point(origin, x, y, z));
         }
     }
 
     static void sphere(final SphereEffect effect, final Player player, final Location origin) {
-        final var count = Math.max(8, effect.getDensity());
-        final var radius = Math.min(scaleHorizontal(origin, Math.max(0, effect.getRadius())), scaleVertical(origin, Math.max(0, effect.getRadius())));
+        final var radius = Math.max(0, effect.getRadius());
+        final var count = effect.getParticleCount().orElse(Math.max(8, effect.getDensity() > 0
+                ? effect.getDensity()
+                : (int) Math.ceil(radius * 1000)));
+        final var offset = Math.toRadians(effect.isRotate() ? animationTick(origin) * effect.getRotationSpeed() : 0);
         for (var i = 0; i < count; i++) {
             final var phi = Math.acos(1 - 2 * (i + .5) / count);
-            final var theta = Math.PI * (1 + Math.sqrt(5)) * i + Math.toRadians(effect.isRotate() ? effect.getRotationSpeed() : 0);
-            final var r = effect.isFilled() ? radius * ((i % count) / (double) count) : radius;
+            final var theta = Math.PI * (1 + Math.sqrt(5)) * i + offset;
             spawn(effect, player, point(origin,
-                    Math.cos(theta) * Math.sin(phi) * r,
-                    Math.cos(phi) * r,
-                    Math.sin(theta) * Math.sin(phi) * r
+                    Math.cos(theta) * Math.sin(phi) * radius,
+                    Math.cos(phi) * radius,
+                    Math.sin(theta) * Math.sin(phi) * radius
             ));
         }
     }
 
     static void spiral(final SpiralEffect effect, final Player player, final Location origin) {
-        final var count = Math.max(1, (int) Math.ceil(effect.getDensity() * Math.max(1, effect.getRotations())));
-        final var radius = scaleHorizontal(origin, effect.getRadius());
-        final var height = scaleVertical(origin, effect.getHeight());
-        for (var i = 0; i < count; i++) {
-            final var progress = i / (double) count;
-            final var angle = Math.TAU * effect.getRotations() * progress + Math.toRadians(effect.getRotationSpeed());
+        final var count = particleCount(effect, origin, 4);
+        final var samples = Math.max(count, (int) Math.ceil(effect.getDensity() * Math.max(1, effect.getRotations())));
+        final var radius = effect.getRadius().map(value -> scaleHorizontal(origin, value)).orElse(width(origin) / 2);
+        final var height = effect.getHeight().map(value -> scaleVertical(origin, value)).orElse(height(origin));
+        final var tick = animationTick(origin);
+        final var speed = Math.max(0, effect.getSpeed());
+        final var offset = samples == 1 ? 0 : (tick * speed) % samples;
+        final var spirals = Math.max(1, effect.getSpirals());
+        for (var spiral = 0; spiral < spirals; spiral++) for (var i = 0; i < count; i++) {
+            final var sample = samples == 1 ? 0 : (offset + i) % samples;
+            final var progress = samples == 1 ? .5 : (sample + .5) / samples;
+            final var angle = Math.TAU * effect.getRotations() * progress + Math.TAU * spiral / spirals;
             final var y = (effect.isAscending() ? progress : 1 - progress) * height - height / 2;
             spawn(effect, player, point(origin, Math.cos(angle) * radius, y, Math.sin(angle) * radius));
         }
@@ -81,13 +77,13 @@ final class EffectRenderer {
 
     static void helix(final HelixEffect effect, final Player player, final Location origin) {
         final var strands = Math.max(1, effect.getStrands());
-        final var count = Math.max(1, effect.getParticleCount());
+        final var count = particleCount(effect, origin, 8);
         final var radius = scaleHorizontal(origin, effect.getRadius());
-        final var height = scaleVertical(origin, effect.getHeight());
+        final var height = effect.getHeight().map(value -> scaleVertical(origin, value)).orElse(height(origin));
         for (var strand = 0; strand < strands; strand++) for (var i = 0; i < count; i++) {
             final var progress = i / (double) count;
-            final var angle = Math.TAU * effect.getPitch() * progress + Math.TAU * strand / strands + Math.toRadians(effect.getRotationSpeed());
-            spawn(effect, player, point(origin, Math.cos(angle) * radius, progress * height - height / 2, Math.sin(angle) * radius));
+            final var angle = Math.TAU * effect.getRotations() * progress + Math.TAU * strand / strands;
+            spawn(effect, player, point(origin, Math.cos(angle) * radius, progress * height - height / 2 + .5, Math.sin(angle) * radius));
         }
     }
 
@@ -102,7 +98,7 @@ final class EffectRenderer {
     static void fountain(final FountainEffect effect, final Player player, final Location origin) {
         final var random = ThreadLocalRandom.current();
         final var baseRadius = scaleHorizontal(origin, effect.getBaseRadius());
-        final var maxHeight = scaleVertical(origin, effect.getMaxHeight());
+        final var maxHeight = effect.getMaxHeight().map(value -> scaleVertical(origin, value)).orElse(height(origin));
         for (var i = 0; i < Math.max(1, effect.getSprayRate()); i++) {
             final var angle = random.nextDouble(Math.TAU);
             final var radius = random.nextDouble(Math.max(0, baseRadius));
@@ -113,44 +109,73 @@ final class EffectRenderer {
 
     static void vortex(final VortexEffect effect, final Player player, final Location origin) {
         final var streams = Math.max(1, effect.getStreams());
-        final var count = Math.max(1, effect.getParticleCount());
+        final var count = particleCount(effect, origin, 8);
         final var baseRadius = scaleHorizontal(origin, effect.getBaseRadius());
         final var topRadius = scaleHorizontal(origin, effect.getTopRadius());
-        final var height = scaleVertical(origin, effect.getHeight());
+        final var height = effect.getHeight().map(value -> scaleVertical(origin, value)).orElse(height(origin));
         for (var stream = 0; stream < streams; stream++) for (var i = 0; i < count; i++) {
             final var progress = i / (double) count;
             final var radius = baseRadius + (topRadius - baseRadius) * progress;
             final var direction = effect.isPullInward() ? 1 : -1;
             final var angle = Math.TAU * progress * direction + Math.TAU * stream / streams + Math.toRadians(effect.getRotationSpeed());
-            spawn(effect, player, point(origin, Math.cos(angle) * radius, progress * height - height / 2, Math.sin(angle) * radius));
+            spawn(effect, player, point(origin, Math.cos(angle) * radius, progress * height - height / 2 + .5, Math.sin(angle) * radius));
         }
     }
 
     static void waterfall(final WaterfallEffect effect, final Player player, final Location origin) {
         final var random = ThreadLocalRandom.current();
-        final var width = scaleHorizontal(origin, effect.getWidth()) * 2;
-        final var height = scaleVertical(origin, effect.getHeight());
-        for (var i = 0; i < Math.max(1, effect.getFlowRate()); i++) {
-            final var x = random.nextDouble(-width / 2, width / 2);
-            final var y = random.nextDouble(-height / 2, height / 2);
-            final var z = (random.nextDouble() - .5) * effect.getTurbulence();
+        final var width = effect.getWidth().map(value -> scaleHorizontal(origin, value) * 2).orElse(width(origin));
+        final var height = effect.getHeight().map(value -> scaleVertical(origin, value)).orElse(height(origin));
+        final var flowRate = Math.max(1, effect.getFlowRate().orElse((int) Math.ceil(width * 3)));
+        final var tick = animationTick(origin);
+        final var turbulence = Math.max(0, effect.getTurbulence());
+        final var fallSpeed = effect.getFallSpeed().orElse(width / 10);
+        final var fall = (tick * Math.max(0, fallSpeed)) % flowRate;
+        for (var i = 0; i < flowRate; i++) {
+            final var lane = flowRate == 1 ? .5 : i / (double) (flowRate - 1);
+            final var sample = (i + fall) % flowRate;
+            final var progress = flowRate == 1 ? .5 : Math.min(1, sample / (flowRate - 1));
+            final var x = (lane - .5) * width + (random.nextDouble() - .5) * turbulence;
+            final var y = height / 2 - progress * height + .5;
+            final var z = (random.nextDouble() - .5) * turbulence;
             spawn(effect, player, point(origin, x, y, z));
         }
     }
 
     private static void ringLike(final PortalEffect effect, final Player player, final Location origin, final double radius, final PulseEffect.PulseShape shape) {
-        final var count = Math.max(8, effect.getParticleCount());
+        final var count = particleCount(effect, origin, 12);
         for (var i = 0; i < count; i++) {
-            final var angle = Math.TAU * i / count;
-            final var x = switch (shape) {
-                case SQUARE, CUBE -> Math.copySign(radius, Math.cos(angle)) * Math.min(1, Math.abs(Math.cos(angle) / Math.max(.0001, Math.sin(angle))));
-                default -> Math.cos(angle) * radius;
-            };
-            final var z = switch (shape) {
-                case SQUARE, CUBE -> Math.copySign(radius, Math.sin(angle)) * Math.min(1, Math.abs(Math.sin(angle) / Math.max(.0001, Math.cos(angle))));
-                default -> Math.sin(angle) * radius;
-            };
-            spawn(effect, player, point(origin, x, shape == PulseEffect.PulseShape.SPHERE || shape == PulseEffect.PulseShape.CUBE ? Math.sin(angle) * radius : 0, z));
+            final var progress = i / (double) count;
+            final var angle = Math.TAU * progress;
+            if (shape == PulseEffect.PulseShape.SQUARE || shape == PulseEffect.PulseShape.CUBE) {
+                final var perimeter = progress * 4;
+                final var side = (int) perimeter;
+                final var local = perimeter - side;
+                final var x = switch (side) {
+                    case 0 -> -radius + local * radius * 2;
+                    case 1 -> radius;
+                    case 2 -> radius - local * radius * 2;
+                    default -> -radius;
+                };
+                final var z = switch (side) {
+                    case 0 -> -radius;
+                    case 1 -> -radius + local * radius * 2;
+                    case 2 -> radius;
+                    default -> radius - local * radius * 2;
+                };
+                if (shape == PulseEffect.PulseShape.CUBE) spawnCube(effect, player, origin, radius, x, z);
+                else spawn(effect, player, point(origin, x, 0, z));
+                continue;
+            }
+            spawn(effect, player, point(origin, Math.cos(angle) * radius, shape == PulseEffect.PulseShape.SPHERE ? Math.sin(angle) * radius : 0, Math.sin(angle) * radius));
+        }
+    }
+
+    private static void spawnCube(final PortalEffect effect, final Player player, final Location origin, final double radius, final double x, final double z) {
+        spawn(effect, player, point(origin, x, -radius, z));
+        spawn(effect, player, point(origin, x, radius, z));
+        if (Math.abs(Math.abs(x) - radius) < .0001 && Math.abs(Math.abs(z) - radius) < .0001) {
+            spawn(effect, player, point(origin, x, 0, z));
         }
     }
 
@@ -174,6 +199,14 @@ final class EffectRenderer {
 
     static double height(final Location origin) {
         return origin instanceof PortalEffectOrigin effectOrigin ? Math.max(1, effectOrigin.height()) : 1;
+    }
+
+    static long animationTick(final Location origin) {
+        return origin instanceof PortalEffectOrigin effectOrigin ? effectOrigin.animationTick() : 0;
+    }
+
+    private static int particleCount(final PortalEffect effect, final Location origin, final double particlesPerBlock) {
+        return Math.max(1, effect.getParticleCount().orElse((int) Math.ceil((width(origin) + height(origin)) * particlesPerBlock)));
     }
 
     private static void spawn(final PortalEffect effect, final Player player, final Location location) {
