@@ -28,7 +28,7 @@ public interface PortalEffectType<T extends PortalEffect, B extends PortalEffect
     Map<String, @Nullable ArgumentType<?>> getOptions();
 
     @Contract(pure = true)
-    T create(@Nullable T current, CommandInput input);
+    T create(CommandInput input);
 
     @Contract(pure = true)
     T deserialize(CompoundTag tag, TagDeserializationContext context) throws ParserException;
@@ -37,9 +37,6 @@ public interface PortalEffectType<T extends PortalEffect, B extends PortalEffect
     CompoundTag serialize(T effect, TagSerializationContext context) throws ParserException;
 
     interface CommandInput {
-        @Contract(pure = true)
-        boolean has(String option);
-
         @Contract(pure = true)
         <V> Optional<V> get(String option, Class<V> type);
     }

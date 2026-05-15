@@ -3,6 +3,9 @@ package net.thenextlvl.portals.effects;
 import net.thenextlvl.portals.effect.PortalEffect;
 import net.thenextlvl.portals.effect.PortalEffectTypeRegistry;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 /**
  * An immutable helix effect configuration that creates intertwining spiral patterns.
@@ -20,10 +23,10 @@ public interface HelixEffect extends PortalEffect {
     /**
      * Gets the height of the helix.
      *
-     * @return the height
+     * @return the height, or empty to infer it from the portal height
      */
     @Contract(pure = true)
-    double getHeight();
+    Optional<Double> getHeight();
 
     /**
      * Gets the number of strands in the helix.
@@ -34,20 +37,12 @@ public interface HelixEffect extends PortalEffect {
     int getStrands();
 
     /**
-     * Gets the rotation speed in degrees per tick.
+     * Gets how many times the helix revolves over its height.
      *
-     * @return the rotation speed
+     * @return the rotation count
      */
     @Contract(pure = true)
-    double getRotationSpeed();
-
-    /**
-     * Gets the pitch (tightness) of the helix.
-     *
-     * @return the pitch value
-     */
-    @Contract(pure = true)
-    double getPitch();
+    double getRotations();
 
     HelixEffect.Builder toBuilder();
 
@@ -77,11 +72,11 @@ public interface HelixEffect extends PortalEffect {
         /**
          * Sets the height of the helix.
          *
-         * @param height the height
+         * @param height the height, or null to infer it from the portal height
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder height(double height);
+        Builder height(@Nullable Double height);
 
         /**
          * Sets the number of intertwining strands.
@@ -93,21 +88,12 @@ public interface HelixEffect extends PortalEffect {
         Builder strands(int strands);
 
         /**
-         * Sets the rotation speed in degrees per tick.
+         * Sets how many times the helix revolves over its height.
          *
-         * @param speed the rotation speed
+         * @param rotations the rotation count
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder rotationSpeed(double speed);
-
-        /**
-         * Sets the pitch (tightness) of the helix.
-         *
-         * @param pitch the pitch value
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        Builder pitch(double pitch);
+        Builder rotations(double rotations);
     }
 }

@@ -6,11 +6,12 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
     private final WaveType waveType;
-    private final boolean horizontal;
+    private final @Nullable Boolean horizontal;
     private final double amplitude;
     private final double length;
     private final double waveSpeed;
@@ -48,6 +49,10 @@ final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
 
     @Override
     public boolean isHorizontal() {
+        return horizontal != null ? horizontal : true;
+    }
+
+    @Nullable Boolean configuredHorizontal() {
         return horizontal;
     }
 
@@ -58,18 +63,20 @@ final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
 
     @Override
     public void play(final Player player, final Location origin) {
-        final var samples = Math.max(1, getParticleCount());
         final var span = getLength() <= 1 ? Math.max(0, getLength()) * EffectRenderer.width(origin) : Math.max(0, getLength());
+        final var samples = Math.max(1, getParticleCount().orElse((int) Math.ceil(Math.max(EffectRenderer.width(origin), span) * 12)));
         final var step = samples == 1 ? 0 : span / (samples - 1);
         final var start = -span / 2d;
-        final var phase = getWaveSpeed() * getSpeed();
+        final var phase = EffectRenderer.animationTick(origin) * getWaveSpeed() * getSpeed();
+        final var amplitude = getAmplitude() > 0 ? getAmplitude() : EffectRenderer.height(origin) / 2;
+        final var horizontal = this.horizontal != null ? this.horizontal : EffectRenderer.width(origin) >= EffectRenderer.height(origin);
         final var data = particleData();
         if (data == null && getParticle().getDataType() != Void.class) return;
 
         for (var i = 0; i < samples; i++) {
             final var x = start + step * i;
-            final var wave = sample(x + phase) * getAmplitude();
-            final var location = isHorizontal()
+            final var wave = sample(x + phase) * amplitude;
+            final var location = horizontal
                     ? EffectRenderer.point(origin, x, 0, wave)
                     : EffectRenderer.point(origin, x, wave, 0);
             spawn(player, location, data);
@@ -103,25 +110,24 @@ final class SimpleWaveEffect extends SimplePortalEffect implements WaveEffect {
 
     @Override
     public WaveEffect.Builder toBuilder() {
-        return new SimpleWaveEffect.Builder()
-                .duration(getDuration())
+        final var builder = new SimpleWaveEffect.Builder()
                 .particle(getParticle())
                 .color(getColor().orElse(null))
-                .particleCount(getParticleCount())
-                .updateInterval(getUpdateInterval())
+                .particleCount(getParticleCount().isPresent() ? getParticleCount().getAsInt() : null)
                 .speed(getSpeed())
                 .amplitude(getAmplitude())
                 .wavelength(getWavelength())
                 .waveSpeed(getWaveSpeed())
                 .waveType(getWaveType())
-                .horizontal(isHorizontal())
                 .length(getLength());
+        if (horizontal != null) builder.horizontal(horizontal);
+        return builder;
     }
 
     public static final class Builder extends SimplePortalEffect.Builder<WaveEffect, WaveEffect.Builder> implements WaveEffect.Builder {
         private WaveType waveType = WaveType.SINE;
-        private boolean horizontal = true;
-        private double amplitude = 1.0;
+        private @Nullable Boolean horizontal = null;
+        private double amplitude = 0.0;
         private double length = 1.0;
         private double waveSpeed = 1.0;
         private double wavelength = 1.0;

@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class PortalEffectScheduler {
     private static final double VIEW_DISTANCE_SQUARED = 32 * 32;
 
-    private final Map<Key, Long> lastPlayed = new ConcurrentHashMap<>();
+    private final Map<Key, Long> animationTicks = new ConcurrentHashMap<>();
     private final PortalsPlugin plugin;
 
     private @Nullable ScheduledTask task;
@@ -38,7 +38,7 @@ public final class PortalEffectScheduler {
         if (task == null) return;
         task.cancel();
         task = null;
-        lastPlayed.clear();
+        animationTicks.clear();
     }
 
     private void playNearby(final Player player) {
@@ -51,17 +51,13 @@ public final class PortalEffectScheduler {
 
     private void play(final Player player, final Portal portal, final PortalEffect effect) {
         final var key = new Key(player.getUniqueId(), portal.getName());
-        final var now = System.currentTimeMillis();
-        final var interval = Math.max(1, effect.getUpdateInterval().toMillis());
-        final var previous = lastPlayed.getOrDefault(key, 0L);
-        if (now - previous < interval) return;
-        lastPlayed.put(key, now);
+        final var animationTick = animationTicks.merge(key, 1L, Long::sum);
         final var bounds = portal.getBoundingBox();
         final var xLength = bounds.getMaxX() - bounds.getMinX();
         final var yLength = bounds.getMaxY() - bounds.getMinY();
         final var zLength = bounds.getMaxZ() - bounds.getMinZ();
         final var width = Math.max(xLength, zLength);
-        final var origin = new PortalEffectOrigin(bounds.getCenter().subtract(0, 0.5, 0), width, yLength);
+        final var origin = new PortalEffectOrigin(bounds.getCenter().subtract(0, 0.5, 0), width, yLength, animationTick);
         origin.setYaw(xLength >= zLength ? 0f : 90f);
         effect.play(player, origin);
     }

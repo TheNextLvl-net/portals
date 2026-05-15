@@ -3,6 +3,9 @@ package net.thenextlvl.portals.effects;
 import net.thenextlvl.portals.effect.PortalEffect;
 import net.thenextlvl.portals.effect.PortalEffectTypeRegistry;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 /**
  * An immutable spiral effect configuration that creates particles in a spiral pattern.
@@ -12,18 +15,18 @@ public interface SpiralEffect extends PortalEffect {
     /**
      * Gets the radius of the spiral.
      *
-     * @return the radius
+     * @return the radius, or empty to infer it from the portal width
      */
     @Contract(pure = true)
-    double getRadius();
+    Optional<Double> getRadius();
 
     /**
      * Gets the height of the spiral.
      *
-     * @return the height
+     * @return the height, or empty to infer it from the portal height
      */
     @Contract(pure = true)
-    double getHeight();
+    Optional<Double> getHeight();
 
     /**
      * Gets the number of rotations.
@@ -32,6 +35,14 @@ public interface SpiralEffect extends PortalEffect {
      */
     @Contract(pure = true)
     double getRotations();
+
+    /**
+     * Gets the number of spiral strands shown at the same time.
+     *
+     * @return the spiral strand count
+     */
+    @Contract(pure = true)
+    int getSpirals();
 
     /**
      * Gets whether the spiral ascends or descends.
@@ -76,20 +87,20 @@ public interface SpiralEffect extends PortalEffect {
         /**
          * Sets the radius of the spiral.
          *
-         * @param radius the radius
+         * @param radius the radius, or null to infer it from the portal width
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder radius(double radius);
+        Builder radius(@Nullable Double radius);
 
         /**
          * Sets the height of the spiral.
          *
-         * @param height the height
+         * @param height the height, or null to infer it from the portal height
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder height(double height);
+        Builder height(@Nullable Double height);
 
         /**
          * Sets the number of rotations.
@@ -99,6 +110,15 @@ public interface SpiralEffect extends PortalEffect {
          */
         @Contract(value = "_ -> this", mutates = "this")
         Builder rotations(double rotations);
+
+        /**
+         * Sets the number of spiral strands shown at the same time.
+         *
+         * @param spirals the spiral strand count
+         * @return this builder for chaining
+         */
+        @Contract(value = "_ -> this", mutates = "this")
+        Builder spirals(int spirals);
 
         /**
          * Sets the spiral direction.

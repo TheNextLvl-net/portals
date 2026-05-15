@@ -3,6 +3,9 @@ package net.thenextlvl.portals.effects;
 import net.thenextlvl.portals.effect.PortalEffect;
 import net.thenextlvl.portals.effect.PortalEffectTypeRegistry;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
 
 /**
  * An immutable fountain effect configuration that shoots particles upward and lets them fall.
@@ -20,10 +23,10 @@ public interface FountainEffect extends PortalEffect {
     /**
      * Gets the maximum height particles reach.
      *
-     * @return the max height
+     * @return the max height, or empty to infer it from the portal height
      */
     @Contract(pure = true)
-    double getMaxHeight();
+    Optional<Double> getMaxHeight();
 
     /**
      * Gets the spray rate (particles per tick).
@@ -32,30 +35,6 @@ public interface FountainEffect extends PortalEffect {
      */
     @Contract(pure = true)
     int getSprayRate();
-
-    /**
-     * Gets the initial velocity of particles.
-     *
-     * @return the initial velocity
-     */
-    @Contract(pure = true)
-    double getVelocity();
-
-    /**
-     * Gets the spread angle in degrees.
-     *
-     * @return the spread angle
-     */
-    @Contract(pure = true)
-    double getSpreadAngle();
-
-    /**
-     * Gets whether particles should arc or shoot straight up.
-     *
-     * @return true for arcing particles
-     */
-    @Contract(pure = true)
-    boolean isArc();
 
     FountainEffect.Builder toBuilder();
 
@@ -85,11 +64,11 @@ public interface FountainEffect extends PortalEffect {
         /**
          * Sets the maximum height particles reach.
          *
-         * @param height the max height
+         * @param height the max height, or null to infer it from the portal height
          * @return this builder for chaining
          */
         @Contract(value = "_ -> this", mutates = "this")
-        Builder maxHeight(double height);
+        Builder maxHeight(@Nullable Double height);
 
         /**
          * Sets the spray rate (particles per tick).
@@ -100,31 +79,5 @@ public interface FountainEffect extends PortalEffect {
         @Contract(value = "_ -> this", mutates = "this")
         Builder sprayRate(int rate);
 
-        /**
-         * Sets the initial velocity of particles.
-         *
-         * @param velocity the initial velocity
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        Builder velocity(double velocity);
-
-        /**
-         * Sets the spread angle in degrees.
-         *
-         * @param angle the spread angle
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        Builder spreadAngle(double angle);
-
-        /**
-         * Sets whether particles should arc or shoot straight up.
-         *
-         * @param arc true for arcing particles
-         * @return this builder for chaining
-         */
-        @Contract(value = "_ -> this", mutates = "this")
-        Builder arc(boolean arc);
     }
 }
