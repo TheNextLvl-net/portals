@@ -40,8 +40,9 @@ dependencies {
         exclude("com.google.code.gson", "gson")
     }
 
-    compileOnly("net.thenextlvl:vault-api:1.7.1")
     compileOnly("net.thenextlvl:service-io:3.0.0-pre11")
+    compileOnly("net.thenextlvl:vault-api:1.7.1")
+    compileOnly("net.thenextlvl:worlds:4.2.0")
 
     implementation("net.thenextlvl.core:files:4.0.0-pre1")
     implementation("net.thenextlvl.version-checker:modrinth-paper:1.0.1")
@@ -74,6 +75,10 @@ paper {
         // todo: remove this eventually – "provides" was fixed in paper 1.21.10
         register("FastAsyncWorldEdit") {
             load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+            required = false
+        }
+        register("Worlds") {
+            load = PaperPluginDescription.RelativeLoadOrder.AFTER
             required = false
         }
         register("ServiceIO") {

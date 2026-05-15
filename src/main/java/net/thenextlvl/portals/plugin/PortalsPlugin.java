@@ -43,6 +43,7 @@ import net.thenextlvl.portals.plugin.economy.VaultEconomyProvider;
 import net.thenextlvl.portals.plugin.listeners.EntityListener;
 import net.thenextlvl.portals.plugin.listeners.PortalListener;
 import net.thenextlvl.portals.plugin.listeners.WorldListener;
+import net.thenextlvl.portals.plugin.listeners.WorldMigrationListener;
 import net.thenextlvl.portals.plugin.model.SimplePortalConfig;
 import net.thenextlvl.portals.plugin.portal.PaperPortal;
 import net.thenextlvl.portals.plugin.portal.PaperPortalProvider;
@@ -53,6 +54,7 @@ import net.thenextlvl.portals.selection.SelectionProvider;
 import net.thenextlvl.portals.shape.BoundingBox;
 import net.thenextlvl.portals.view.PortalConfig;
 import net.thenextlvl.portals.view.UnparsedTitle;
+import net.thenextlvl.version.SemanticVersion;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -115,6 +117,12 @@ public final class PortalsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PortalListener(this), this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
 
+        final var worlds = getServer().getPluginManager().getPlugin("Worlds");
+        if (worlds != null && SemanticVersion.parse(worlds.getPluginMeta().getVersion())
+                .compareTo(new SemanticVersion(4, 2, 0, null)) >= 0) {
+            getServer().getPluginManager().registerEvents(new WorldMigrationListener(this), this);
+            getComponentLogger().info("Added WorldFolderMigrationEvent hook");
+        }
         if (getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
             getServer().getServicesManager().register(SelectionProvider.class, new WorldEditSelectionProvider(), this, ServicePriority.Normal);
         }
