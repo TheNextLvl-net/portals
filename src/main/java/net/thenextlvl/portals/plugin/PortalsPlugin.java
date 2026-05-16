@@ -136,6 +136,7 @@ public final class PortalsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         portalProvider.forEachPortal(Portal::persist);
+        fastStats.shutdown();
         metrics.shutdown();
     }
 
