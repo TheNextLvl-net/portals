@@ -4,6 +4,8 @@ import org.jspecify.annotations.NullMarked;
 module net.thenextlvl.portals {
     exports net.thenextlvl.portals.action;
     exports net.thenextlvl.portals.bounds;
+    exports net.thenextlvl.portals.effect;
+    exports net.thenextlvl.portals.effects;
     exports net.thenextlvl.portals.event;
     exports net.thenextlvl.portals.notification;
     exports net.thenextlvl.portals.selection;
@@ -11,12 +13,14 @@ module net.thenextlvl.portals {
     exports net.thenextlvl.portals.view;
     exports net.thenextlvl.portals;
 
+    requires com.google.common;
     requires net.kyori.adventure.key;
     requires net.kyori.adventure.text.minimessage;
     requires net.kyori.adventure.text.serializer.plain;
     requires net.kyori.adventure;
     requires net.kyori.examination.api;
     requires net.thenextlvl.binder;
+    requires net.thenextlvl.nbt;
     requires org.bukkit;
 
     requires static org.jetbrains.annotations;

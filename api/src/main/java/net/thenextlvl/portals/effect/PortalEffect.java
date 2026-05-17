@@ -1,0 +1,120 @@
+package net.thenextlvl.portals.effect;
+
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.OptionalInt;
+
+/**
+ * Immutable base interface for all portal particle effects.
+ * This allows developers to create custom effect types by implementing this interface.
+ * All effects are configured via builders and cannot be modified after creation.
+ */
+public interface PortalEffect {
+    /**
+     * Gets the particle type used by this effect.
+     *
+     * @return the particle type
+     */
+    @Contract(pure = true)
+    Particle getParticle();
+
+    /**
+     * Gets the particle color (for colorable particles).
+     *
+     * @return the color, or an empty optional if not set
+     */
+    @Contract(pure = true)
+    Optional<Color> getColor();
+
+    /**
+     * Gets the configured particle count.
+     *
+     * @return the particle count, or an empty optional if it should be calculated from the portal size
+     */
+    @Contract(pure = true)
+    OptionalInt getParticleCount();
+
+    /**
+     * Gets the effect speed/velocity.
+     *
+     * @return the speed multiplier
+     */
+    @Contract(pure = true)
+    double getSpeed();
+
+    /**
+     * Plays the effect for the specified player at the specified origin.
+     *
+     * @param player the player to play the effect for
+     * @param origin the origin of the effect
+     */
+    @ApiStatus.OverrideOnly
+    void play(Player player, Location origin);
+
+    /**
+     * Creates a builder for this effect.
+     *
+     * @return a new builder instance
+     */
+    Builder<?, ?> toBuilder();
+
+    /**
+     * Base builder interface for effect configurations.
+     *
+     * @param <T> the type of effect config being built
+     * @param <B> the type of builder (for fluent chaining)
+     */
+    interface Builder<T extends PortalEffect, B extends Builder<T, B>> {
+        /**
+         * Sets the particle type for the effect.
+         *
+         * @param particle the particle type
+         * @return this builder for chaining
+         */
+        @Contract(value = "_ -> this", mutates = "this")
+        B particle(Particle particle);
+
+        /**
+         * Sets the particle color (for colorable particles).
+         *
+         * @param color the color
+         * @return this builder for chaining
+         */
+        @Contract(value = "_ -> this", mutates = "this")
+        B color(@Nullable Color color);
+
+        /**
+         * Sets the particle count.
+         *
+         * @param count the number of particles, or null to calculate it from the portal size
+         * @return this builder for chaining
+         */
+        @Contract(value = "_ -> this", mutates = "this")
+        B particleCount(@Nullable Integer count);
+
+        /**
+         * Sets the effect speed/velocity.
+         *
+         * @param speed the speed multiplier
+         * @return this builder for chaining
+         */
+        @Contract(value = "_ -> this", mutates = "this")
+        B speed(double speed);
+
+        /**
+         * Builds the immutable effect configuration.
+         *
+         * @return the constructed effect config
+         * @throws IllegalArgumentException if {@link #color(Color)} or {@link #particle(Particle)} has not been set
+         */
+        @Contract(value = " -> new", pure = true)
+        T build() throws IllegalArgumentException;
+    }
+}

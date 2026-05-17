@@ -48,6 +48,7 @@ dependencies {
     implementation("net.thenextlvl.version-checker:modrinth-paper:1.0.1")
     implementation("net.thenextlvl:i18n:1.2.0")
     implementation("net.thenextlvl:nbt:4.3.4")
+    implementation("net.thenextlvl:static-binder:0.1.3")
 
     implementation("dev.faststats.metrics:bukkit:0.22.0")
     implementation("org.bstats:bstats-bukkit:3.2.1")
@@ -99,6 +100,7 @@ paper {
         register("portals.command.debug.paste") { children = listOf("portals.command.debug") }
         register("portals.command.debug.verbose") { children = listOf("portals.command.debug") }
         register("portals.command.delete") { children = listOf("portals.command.portal") }
+        register("portals.command.effect") { children = listOf("portals.command.portal") }
         register("portals.command.list") { children = listOf("portals.command.portal") }
         register("portals.command.notification") { children = listOf("portals.command.portal") }
         register("portals.command.notification.list") { children = listOf("portals.command.notification") }
