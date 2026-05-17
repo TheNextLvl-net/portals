@@ -42,7 +42,7 @@ dependencies {
 
     compileOnly("net.thenextlvl:service-io:3.0.0-pre11")
     compileOnly("net.thenextlvl:vault-api:1.7.1")
-    compileOnly("net.thenextlvl:worlds:4.2.1")
+    compileOnly("net.thenextlvl:worlds:4.2.2")
 
     implementation("net.thenextlvl.core:files:4.0.0-pre1")
     implementation("net.thenextlvl.version-checker:modrinth-paper:1.0.1")
