@@ -3,8 +3,8 @@ package net.thenextlvl.portals.plugin;
 import com.google.common.io.ByteStreams;
 import core.file.FileIO;
 import core.file.formats.GsonFile;
-import dev.faststats.bukkit.BukkitMetrics;
-import dev.faststats.core.ErrorTracker;
+import dev.faststats.ErrorTracker;
+import dev.faststats.bukkit.BukkitContext;
 import io.papermc.paper.math.Position;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.key.Key;
@@ -76,10 +76,10 @@ public final class PortalsPlugin extends JavaPlugin {
     private EconomyProvider economyProvider = new EmptyEconomyProvider(this);
 
     private final Metrics metrics = new Metrics(this, 27514);
-    private final dev.faststats.core.Metrics fastStats = BukkitMetrics.factory()
-            .token("871d4095811865739273cb8ce0e65302")
-            .errorTracker(ERROR_TRACKER)
-            .create(this);
+    private final BukkitContext context = new BukkitContext.Factory(this, "871d4095811865739273cb8ce0e65302")
+            .metrics(dev.faststats.Metrics.Factory::create)
+            .errorTrackerService(ERROR_TRACKER)
+            .create();
 
     private final FileIO<SimplePortalConfig> portalConfig = new GsonFile<>(
             getDataPath().resolve("config.json"),
@@ -109,8 +109,7 @@ public final class PortalsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        fastStats.ready();
-
+        context.ready();
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
         getServer().getPluginManager().registerEvents(new EntityListener(this), this);
@@ -136,7 +135,7 @@ public final class PortalsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         portalProvider.forEachPortal(Portal::persist);
-        fastStats.shutdown();
+        context.shutdown();
         metrics.shutdown();
     }
 
