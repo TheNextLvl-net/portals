@@ -35,9 +35,10 @@ repositories {
 dependencies {
     implementation(project(":api"))
 
-    compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
+    compileOnly("io.papermc.paper:paper-api:26.2.+")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:8.0.0-SNAPSHOT") {
         exclude("com.google.code.gson", "gson")
+        exclude("com.google.guava", "guava")
     }
 
     compileOnly("net.thenextlvl:service-io:3.0.0-pre11")
