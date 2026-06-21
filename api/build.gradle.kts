@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.2.rc.2.+")
+    compileOnly("io.papermc.paper:paper-api:26.2.+")
     api("net.thenextlvl:static-binder:0.1.3")
 }
 
