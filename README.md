@@ -1,4 +1,12 @@
-# Portals – The Ultimate Portal Plugin
+[![Banner](https://raw.githubusercontent.com/TheNextLvl-net/portals/refs/heads/main/assets/banner.png)](https://thenextlvl.net/docs/portals)
+
+<p align="center" style="text-align: center;">
+  <a href="https://thenextlvl.net/discord"><img src="https://tr7zw.github.io/uikit/social_buttons_icon/Discord-Button-64.png"></img></a>
+  <a href="https://modrinth.com/project/R2dgUCYq"><img src="https://tr7zw.github.io/uikit/social_buttons_icon/Modrinth-Button-64.png"></img></a>
+  <a href="https://github.com/TheNextLvl-net/portals"><img src="https://tr7zw.github.io/uikit/social_buttons_icon/Github-Button-64.png"></img></a>
+</p>
+
+# The Ultimate Portal Plugin
 
 Portals is a modern, flexible portal plugin designed for **Paper** and **Folia** servers.  
 Create custom portals with permissions, cooldowns, entry fees, and pushback mechanics.
@@ -33,7 +41,5 @@ For more information and documentation, visit the [Wiki](https://thenextlvl.net/
 **Multiverse-Portals Migration** – Easy import tool to migrate from Multiverse-Portals
 
 ---
-
-[Download now on Modrinth](https://modrinth.com/project/R2dgUCYq)
 
 [![Usage](https://faststats.dev/embed/default:c1267093-5c16-449d-bafa-10bd66a5c95e:servers-and-players?w=1012)](https://faststats.dev/project/portals)
