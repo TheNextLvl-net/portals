@@ -13,6 +13,7 @@ import net.thenextlvl.nbt.tag.ListTag;
 import net.thenextlvl.nbt.tag.Tag;
 import net.thenextlvl.portals.Portal;
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.effect.PortalEffect;
 import net.thenextlvl.portals.notification.Notification;
 import net.thenextlvl.portals.notification.NotificationTrigger;
 import net.thenextlvl.portals.notification.NotificationType;
@@ -60,6 +61,7 @@ public final class PaperPortal implements Portal {
     private Duration warmup = Duration.ZERO;
 
     private @Nullable EntryAction<?> entryAction = null;
+    private @Nullable PortalEffect portalEffect = null;
     private @Nullable String entryPermission = null;
     private @Nullable String currency = null;
 
@@ -231,6 +233,18 @@ public final class PaperPortal implements Portal {
     public boolean setEntryAction(@Nullable final EntryAction<?> action) {
         if (Objects.equals(this.entryAction, action)) return false;
         this.entryAction = action;
+        return true;
+    }
+
+    @Override
+    public Optional<PortalEffect> getPortalEffect() {
+        return Optional.ofNullable(portalEffect);
+    }
+
+    @Override
+    public boolean setPortalEffect(@Nullable final PortalEffect effect) {
+        if (Objects.equals(this.portalEffect, effect)) return false;
+        this.portalEffect = effect;
         return true;
     }
 

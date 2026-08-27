@@ -8,6 +8,7 @@ import net.thenextlvl.nbt.tag.CompoundTag;
 import net.thenextlvl.nbt.tag.ListTag;
 import net.thenextlvl.nbt.tag.Tag;
 import net.thenextlvl.portals.action.EntryAction;
+import net.thenextlvl.portals.effect.PortalEffect;
 import net.thenextlvl.portals.plugin.PortalsPlugin;
 import net.thenextlvl.portals.plugin.portal.PaperPortal;
 import net.thenextlvl.portals.shape.BoundingBox;
@@ -36,6 +37,7 @@ public final class PortalAdapter implements TagAdapter<PaperPortal> {
         root.optional("entryAction").map(tag1 -> context.deserialize(tag1, EntryAction.class)).ifPresent(portal::setEntryAction);
         root.optional("entryCost").map(tag1 -> context.deserialize(tag1, Double.class)).ifPresent(portal::setEntryCost);
         root.optional("entryPermission").map(tag1 -> context.deserialize(tag1, String.class)).ifPresent(portal::setEntryPermission);
+        root.optional("portalEffect").map(tag1 -> context.deserialize(tag1, PortalEffect.class)).ifPresent(portal::setPortalEffect);
         root.optional("notifications").<ListTag<CompoundTag>>map(Tag::getAsList)
                 .ifPresent(list -> portal.getNotifications().deserialize(list, context));
         root.optional("warmup").map(tag1 -> context.deserialize(tag1, Duration.class)).ifPresent(portal::setWarmup);
@@ -52,6 +54,7 @@ public final class PortalAdapter implements TagAdapter<PaperPortal> {
 
         portal.getEntryAction().ifPresent(action -> tag.put("entryAction", context.serialize(action)));
         portal.getEntryPermission().ifPresent(permission -> tag.put("entryPermission", permission));
+        portal.getPortalEffect().ifPresent(effect -> tag.put("portalEffect", context.serialize(effect)));
 
         tag.put("cooldown", context.serialize(portal.getCooldown()));
         tag.put("entryCost", portal.getEntryCost());

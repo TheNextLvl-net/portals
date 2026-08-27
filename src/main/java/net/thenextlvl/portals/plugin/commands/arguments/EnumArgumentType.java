@@ -22,7 +22,7 @@ public class EnumArgumentType<E extends Enum<E>> implements CustomArgumentType.C
 
     @Override
     public E convert(final String nativeType) {
-        final var normalized = nativeType.toUpperCase(Locale.ROOT).replaceAll("-", "_");
+        final var normalized = nativeType.toUpperCase(Locale.ROOT).replace("-", "_");
         return Enum.valueOf(enumClass, normalized);
     }
 
